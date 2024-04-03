@@ -42,7 +42,8 @@ CREATE TABLE pessoas (
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	funcao VARCHAR(64),
 	admissao DATE,
-	senha INT
+	senha INT,
+	foto VARCHAR(512)
 );
 
 CREATE TABLE produtos (
