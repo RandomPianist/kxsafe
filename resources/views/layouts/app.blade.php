@@ -244,11 +244,11 @@
                             _email.classList.add("invalido");
                         }
                     }
-                    /*if (!_cpf.value.length) {
+                    if (!_cpf.value.length) {
                         if (!erro) erro = "Preencha o campo";
                         else erro = "Preencha os campos";
                         _cpf.classList.add("invalido");
-                    }*/
+                    }
                     let aux = verifica_vazios(["nome", "setor", "pessoa-empresa"], erro);
                     erro = aux.erro;
                     let alterou = aux.alterou;
@@ -262,7 +262,7 @@
                             _email.value.toLowerCase() != anteriores.email.toLowerCase()
                         ) alterou = true;
                     }
-                    if (!erro && !validar_cpf(_cpf.value) && _cpf.value.trim()) {
+                    if (!erro && !validar_cpf(_cpf.value)/* && _cpf.value.trim()*/) {
                         erro = "CPF inválido";
                         _cpf.classList.add("invalido");
                     }
