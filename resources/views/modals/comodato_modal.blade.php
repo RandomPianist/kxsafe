@@ -15,7 +15,7 @@
                         @csrf
                         <input class = "id_maquina" name = "id_maquina" type = "hidden" />
                         <div class = "row">
-                            <div class = "col-12 form-search">
+                            <div class = "col-11 pr-0 form-search form-search-2">
                                 <label for = "comodato-empresa" class = "custom-label-form">Empresa: *</label>
                                 <input id = "comodato-empresa"
                                     class = "form-control autocomplete"
@@ -28,6 +28,11 @@
                                     autocomplete = "off"
                                 />
                                 <input id = "comodato-id_empresa" name = "id_empresa" type = "hidden" />
+                            </div>
+                            <div class = "col-1 pt-4 d-flex align-items-center">
+                                <a href = "{{ config('app.root_url') }}/empresas" title = "Cadastro de empresas" target = "_blank">
+                                    <i class="fa-sharp fa-regular fa-arrow-up-right-from-square"></i>
+                                </a>
                             </div>
                         </div>
                         <div class = "row">

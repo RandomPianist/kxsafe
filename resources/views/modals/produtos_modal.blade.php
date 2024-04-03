@@ -43,7 +43,7 @@
                                 <label for = "validade" class = "custom-label-form">Validade em dias: *</label>
                                 <input id = "validade" name = "validade" class = "form-control text-right" autocomplete = "off" type = "number" onkeyup = "$(this).trigger('change')" onchange = "limitar(this)" />
                             </div>
-                            <div class = "col-4 form-search">
+                            <div class = "col-3 pr-0 form-search form-search-2">
                                 <label for = "categoria" class = "custom-label-form">Categoria: *</label>
                                 <input id = "categoria"
                                     class = "form-control autocomplete"
@@ -56,6 +56,11 @@
                                     autocomplete = "off"
                                 />
                                 <input id = "id_categoria" name = "id_categoria" type = "hidden"/>
+                            </div>
+                            <div class = "col-1 d-flex align-items-center pl-0" style = "justify-content:end">
+                                <a href = "{{ config('app.root_url') }}/valores/categorias" title = "Cadastro de categorias" target = "_blank">
+                                    <i class="fa-sharp fa-regular fa-arrow-up-right-from-square"></i>
+                                </a>
                             </div>
                             <div class = "col-3">
                                 <button type = "button" class = "btn btn-target btn-target-black w-100 mt-4" onclick = "$(this).next().trigger('click')">Adicionar imagem</button>
