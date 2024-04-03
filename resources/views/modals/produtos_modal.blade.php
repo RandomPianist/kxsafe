@@ -43,7 +43,7 @@
                                 <label for = "validade" class = "custom-label-form">Validade em dias: *</label>
                                 <input id = "validade" name = "validade" class = "form-control text-right" autocomplete = "off" type = "number" onkeyup = "$(this).trigger('change')" onchange = "limitar(this)" />
                             </div>
-                            <div class = "col-3 pr-0 form-search form-search-2">
+                            <div class = "col-3 pr-0 form-search form-search-3">
                                 <label for = "categoria" class = "custom-label-form">Categoria: *</label>
                                 <input id = "categoria"
                                     class = "form-control autocomplete"
@@ -54,6 +54,7 @@
                                     data-filter = "categorias"
                                     type = "text"
                                     autocomplete = "off"
+                                    style = "width:113%"
                                 />
                                 <input id = "id_categoria" name = "id_categoria" type = "hidden"/>
                             </div>

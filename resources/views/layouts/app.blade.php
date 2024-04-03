@@ -26,6 +26,10 @@
             .form-search-2::after {
                 right: 7px
             }
+
+            .form-search-3::after {
+                right: -15px
+            }
         </style>
     </head>
     <body>
