@@ -6,15 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int    $id
- * @property int    $lixeira
- * @property int    $id_setor
- * @property int    $id_empresa
  * @property int    $created_at
+ * @property int    $senha
  * @property int    $updated_at
- * @property string $nome
- * @property string $cpf
- * @property string $funcao
+ * @property int    $id_empresa
+ * @property int    $id_setor
+ * @property int    $lixeira
  * @property Date   $admissao
+ * @property string $funcao
+ * @property string $cpf
+ * @property string $nome
  */
 class Pessoas extends Model
 {
@@ -38,7 +39,7 @@ class Pessoas extends Model
      * @var array
      */
     protected $fillable = [
-        'nome', 'cpf', 'lixeira', 'id_setor', 'id_empresa', 'created_at', 'updated_at', 'funcao', 'admissao'
+        'created_at', 'senha', 'admissao', 'funcao', 'updated_at', 'id_empresa', 'id_setor', 'lixeira', 'cpf', 'nome'
     ];
 
     /**
@@ -56,7 +57,7 @@ class Pessoas extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'nome' => 'string', 'cpf' => 'string', 'lixeira' => 'int', 'id_setor' => 'int', 'id_empresa' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp', 'funcao' => 'string', 'admissao' => 'date'
+        'id' => 'int', 'created_at' => 'timestamp', 'senha' => 'int', 'admissao' => 'date', 'funcao' => 'string', 'updated_at' => 'timestamp', 'id_empresa' => 'int', 'id_setor' => 'int', 'lixeira' => 'int', 'cpf' => 'string', 'nome' => 'string'
     ];
 
     /**
@@ -65,7 +66,7 @@ class Pessoas extends Model
      * @var array
      */
     protected $dates = [
-        'created_at', 'updated_at', 'admissao'
+        'created_at', 'admissao', 'updated_at'
     ];
 
     /**

@@ -86,8 +86,14 @@
                         </div>
                         <div class = "row usr-info">
                             <div class = "col-12">
-                                <label id = "pessoa-senha" for = "password" class = "custom-label-form"></label>
+                                <label for = "password" class = "custom-label-form pessoa-senha"></label>
                                 <input id = "password" name = "password" class = "form-control" autocomplete = "off" type = "password"/>
+                            </div>
+                        </div>
+                        <div class = "row" id = "pes-info">
+                            <div class = "col-12">
+                                <label for = "senha" class = "custom-label-form pessoa-senha"></label>
+                                <input id = "senha" name = "senha" class = "form-control" autocomplete = "off" type = "password" onkeyup = "this.value=this.value.replace(/\D/g, '')" />
                             </div>
                         </div>
                     </div>

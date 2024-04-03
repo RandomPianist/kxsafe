@@ -70,6 +70,7 @@ class PessoasController extends Controller {
         if ($request->admissao) $modelo->admissao = Carbon::createFromFormat('d/m/Y', $request->admissao)->format('Y-m-d');
         $modelo->id_empresa = $request->id_empresa;
         $modelo->id_setor = $request->id_setor;
+        if (trim($request->senha)) $modelo->senha = $request->senha;
         $modelo->save();
         $log->inserir($request->id ? "E" : "C", "pessoas", $modelo->id);
         return $modelo;

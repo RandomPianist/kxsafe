@@ -181,12 +181,15 @@
                     $.get(URL + "/setores/mostrar/" + setor, function(data) {
                         if (typeof data == "string") data = $.parseJSON(data);
                         Array.from(document.getElementsByClassName("usr-info")).forEach((el) => {
+                            let pes_info = document.getElementById("pes-info").classList;
                             let palavras = document.getElementById("pessoasModalLabel").innerHTML.split(" ");
                             if (parseInt(data.cria_usuario)) {
                                 el.classList.remove("d-none");
+                                pes_info.add("d-none");
                                 palavras[1] = "administrador";
                             } else {
                                 el.classList.add("d-none");
+                                pes_info.remove("d-none");
                                 palavras[1] = "colaborador";
                             }
                             document.getElementById("pessoasModalLabel").innerHTML = palavras.join(" ");
@@ -316,7 +319,9 @@
                                 that.toggle_user(parseInt(data.id_setor));
                                 estilo_bloco_senha.display = id != {{ Auth::user()->id_pessoa }} ? "none" : "";
                                 document.getElementById("setor").disabled = id == {{ Auth::user()->id_pessoa }};
-                                document.getElementById("pessoa-senha").innerHTML = "Senha:";
+                                Array.from(document.getElementsByClassName("pessoa-senha")).forEach((el) => {
+                                    el.innerHTML = "Senha:";
+                                });
                             });
                         }, 0);
                     });
@@ -326,7 +331,9 @@
                             that.toggle_user(id);
                             estilo_bloco_senha.removeProperty("display");
                             document.getElementById("setor").disabled = false;
-                            document.getElementById("pessoa-senha").innerHTML = "Senha: *";
+                            Array.from(document.getElementsByClassName("pessoa-senha")).forEach((el) => {
+                                el.innerHTML = "Senha: *";
+                            });
                         });
                     }, 0);
                 }

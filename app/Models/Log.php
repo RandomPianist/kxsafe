@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int    $id
- * @property int    $id_pessoa
- * @property int    $fk
- * @property int    $created_at
  * @property int    $updated_at
+ * @property int    $created_at
+ * @property int    $fk
+ * @property int    $id_pessoa
  * @property string $tabela
  */
 class Log extends Model
@@ -34,7 +34,7 @@ class Log extends Model
      * @var array
      */
     protected $fillable = [
-        'id_pessoa', 'acao', 'tabela', 'fk', 'created_at', 'updated_at'
+        'acao', 'updated_at', 'created_at', 'fk', 'tabela', 'id_pessoa'
     ];
 
     /**
@@ -52,7 +52,7 @@ class Log extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'id_pessoa' => 'int', 'tabela' => 'string', 'fk' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp'
+        'id' => 'int', 'updated_at' => 'timestamp', 'created_at' => 'timestamp', 'fk' => 'int', 'tabela' => 'string', 'id_pessoa' => 'int'
     ];
 
     /**
@@ -61,7 +61,7 @@ class Log extends Model
      * @var array
      */
     protected $dates = [
-        'created_at', 'updated_at'
+        'updated_at', 'created_at'
     ];
 
     /**
