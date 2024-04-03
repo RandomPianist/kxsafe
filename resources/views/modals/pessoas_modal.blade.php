@@ -55,7 +55,7 @@
                         </div>
                         <div class = "row">
                             <div class = "col-6">
-                                <label for = "cpf" class = "custom-label-form">CPF:</label>
+                                <label for = "cpf" class = "custom-label-form">CPF: *</label>
                                 <input id = "cpf" name = "cpf" class = "form-control" autocomplete = "off" type = "text" onkeyup = "pessoa.formatar_cpf(this)" />
                             </div>
                             <div class = "col-5 pr-0 form-search-2">
