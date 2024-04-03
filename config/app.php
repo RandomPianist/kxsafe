@@ -194,5 +194,9 @@ return [
         // ...
     ])->toArray(),
 
+<<<<<<< HEAD
     'root_url' => ''
+=======
+    'root_url' => '/kxsafe'
+>>>>>>> eec9a4c74804f2cd9f120aa6d244370223272954
 ];

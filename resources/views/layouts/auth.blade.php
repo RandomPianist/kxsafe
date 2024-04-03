@@ -14,7 +14,11 @@
         <div class = "font-sans text-gray-900 antialiased">
             <div class = "min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
                 <div>
+<<<<<<< HEAD
                     <a href = "">
+=======
+                    <a href = "/kxsafe">
+>>>>>>> eec9a4c74804f2cd9f120aa6d244370223272954
                         <img src = "{{ asset('img/logo.png') }}">
                     </a>
                 </div>

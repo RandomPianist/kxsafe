@@ -6,10 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int    $id
+<<<<<<< HEAD
  * @property int    $id_maquina
  * @property int    $id_produto
  * @property int    $created_at
  * @property int    $updated_at
+=======
+ * @property int    $updated_at
+ * @property int    $created_at
+ * @property int    $id_produto
+ * @property int    $id_maquina
+>>>>>>> eec9a4c74804f2cd9f120aa6d244370223272954
  * @property string $descr
  */
 class Estoque extends Model
@@ -34,7 +41,11 @@ class Estoque extends Model
      * @var array
      */
     protected $fillable = [
+<<<<<<< HEAD
         'es', 'descr', 'qtd', 'id_maquina', 'id_produto', 'created_at', 'updated_at'
+=======
+        'updated_at', 'created_at', 'id_produto', 'qtd', 'descr', 'es', 'id_maquina'
+>>>>>>> eec9a4c74804f2cd9f120aa6d244370223272954
     ];
 
     /**
@@ -52,7 +63,11 @@ class Estoque extends Model
      * @var array
      */
     protected $casts = [
+<<<<<<< HEAD
         'id' => 'int', 'descr' => 'string', 'id_maquina' => 'int', 'id_produto' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp'
+=======
+        'id' => 'int', 'updated_at' => 'timestamp', 'created_at' => 'timestamp', 'id_produto' => 'int', 'descr' => 'string', 'id_maquina' => 'int'
+>>>>>>> eec9a4c74804f2cd9f120aa6d244370223272954
     ];
 
     /**
@@ -61,7 +76,11 @@ class Estoque extends Model
      * @var array
      */
     protected $dates = [
+<<<<<<< HEAD
         'created_at', 'updated_at'
+=======
+        'updated_at', 'created_at'
+>>>>>>> eec9a4c74804f2cd9f120aa6d244370223272954
     ];
 
     /**
