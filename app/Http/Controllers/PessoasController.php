@@ -221,10 +221,6 @@ class PessoasController extends Controller {
         $linha->save();
         $log = new LogController;
         $log->inserir("D", "pessoas", $linha->id);
-        if (intval(
-            DB::table("setores")
-                ->where("id", $linha->id_setor)
-                ->value("cria_usuario")
-        )) $this->deletar_usuario($linha->id);
+        if ($this->cria_usuario($linha->id_setor)) $this->deletar_usuario($linha->id);
     }
 }
