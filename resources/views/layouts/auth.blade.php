@@ -17,7 +17,7 @@
 <<<<<<< HEAD
                     <a href = "">
 =======
-                    <a href = "/kxsafe">
+                    <a href = "">
 >>>>>>> eec9a4c74804f2cd9f120aa6d244370223272954
                         <img src = "{{ asset('img/logo.png') }}">
                     </a>

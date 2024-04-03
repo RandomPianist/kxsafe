@@ -51,10 +51,10 @@
                                 </li>
                                 <li onclick = "redirect('/colaboradores')">
 =======
-                                <li onclick = "redirect('/kxsafe/empresas')">
+                                <li onclick = "redirect('/empresas')">
                                     <span>Empresas</span>
                                 </li>
-                                <li onclick = "redirect('/kxsafe/colaboradores')">
+                                <li onclick = "redirect('/colaboradores')">
 >>>>>>> eec9a4c74804f2cd9f120aa6d244370223272954
                                     <span>Colaboradores</span>
                                 </li>
@@ -72,10 +72,10 @@
                                     </li>
                                     <li onclick = "redirect('/produtos')">
 =======
-                                    <li onclick = "redirect('/kxsafe/valores/categorias')">
+                                    <li onclick = "redirect('/valores/categorias')">
                                         <span>Categorias</span>
                                     </li>
-                                    <li onclick = "redirect('/kxsafe/produtos')">
+                                    <li onclick = "redirect('/produtos')">
 >>>>>>> eec9a4c74804f2cd9f120aa6d244370223272954
                                         <span>Produtos</span>
                                     </li>
@@ -99,7 +99,7 @@
 <<<<<<< HEAD
                                     <li onclick = "window.open('/relatorios/comodatos', '_blank')">
 =======
-                                    <li onclick = "window.open('/kxsafe/relatorios/comodatos', '_blank')">
+                                    <li onclick = "window.open('/relatorios/comodatos', '_blank')">
 >>>>>>> eec9a4c74804f2cd9f120aa6d244370223272954
                                         <span>Locação</span>
                                     </li>
