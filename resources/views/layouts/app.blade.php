@@ -241,66 +241,72 @@
                     let _cpf = document.getElementById("cpf");
                     let nome = document.getElementById("nome");
 
-                    if (id_setor == 1) {
-                        if (!_email.value.length) {
-                            erro = "Preencha o campo";
-                            _email.classList.add("invalido");
-                        }
-                    }
-                    if (!_cpf.value.length) {
-                        if (!erro) erro = "Preencha o campo";
-                        else erro = "Preencha os campos";
-                        _cpf.classList.add("invalido");
-                    }
-                    let aux = verifica_vazios(["nome", "setor", "pessoa-empresa"], erro);
-                    erro = aux.erro;
-                    let alterou = aux.alterou;
-                    if (id_setor == 1) {
-                        if (!erro && !validar_email(_email.value)) {
-                            erro = "E-mail inválido";
-                            _email.classList.add("invalido");
-                        }
-                        if (
-                            document.getElementById("password").value.length ||
-                            _email.value.toLowerCase() != anteriores.email.toLowerCase()
-                        ) alterou = true;
-                    }
-                    if (!erro && !validar_cpf(_cpf.value)/* && _cpf.value.trim()*/) {
-                        erro = "CPF inválido";
-                        _cpf.classList.add("invalido");
-                    }
-                    if (_cpf.value != anteriores.cpf) alterou = true;
-                    
-                    aux = document.getElementById("admissao").value;
-                    if (aux) {
-                        aux = aux.split("/");
-                        const hj = new Date();
-                        const admissao = new Date(aux[2], aux[1] - 1, aux[0]);
-                        if (!erro && admissao > hj) erro = "A admissão não pode ser no futuro";
-                    }
-
-                    $.get(URL + "/colaboradores/consultar/", {
-                        cpf : _cpf.value.replace(/\D/g, ""),
-                        email : _email.value,
-                        empresa : document.getElementById("pessoa-empresa").value,
-                        id_empresa : document.getElementById("pessoa-id_empresa").value,
-                        setor : document.getElementById("setor").value,
-                        id_setor : document.getElementById("id_setor").value
-                    }, function(data) {
+                    $.get(URL + "/setores/mostrar/" + id_setor, function(data) {
                         if (typeof data == "string") data = $.parseJSON(data);
-                        if (!erro && data.tipo == "invalido") {
-                            erro = data.dado + " não encontrad" + (data.dado == "Empresa" ? "a" : "o");
-                            document.getElementById(data.dado == "Empresa" ? "pessoa-empresa" : "setor").classList.add("invalido");
+                        if (parseInt(data.cria_usuario)) {
+                            if (!_email.value.length) {
+                                erro = "Preencha o campo";
+                                _email.classList.add("invalido");
+                            }
                         }
-                        if (!erro && data.tipo == "duplicado" && !parseInt(document.getElementById("pessoa-id").value)) {
-                            erro = "Já existe um registro com esse " + data.dado;
-                            document.getElementById(data.dado == "CPF" ? "cpf" : "email").classList.add("invalido");
+                        if (!_cpf.value.length) {
+                            if (!erro) erro = "Preencha o campo";
+                            else erro = "Preencha os campos";
+                            _cpf.classList.add("invalido");
                         }
-                        if (!erro && !alterou) erro = "Altere pelo menos um campo para salvar";
-                        if (!erro) {
-                            _cpf.value = _cpf.value.replace(/\D/g, "");
-                            document.querySelector("#pessoasModal form").submit();
-                        } else s_alert(erro);
+                        let lista = ["nome", "setor", "pessoa-empresa"];
+                        if (!parseInt(document.getElementById("pessoa-id").value)) lista.push(parseInt(data.cria_usuario) ? "password" : "senha");
+                        let aux = verifica_vazios(lista, erro);
+                        erro = aux.erro;
+                        let alterou = aux.alterou;
+                        
+                        if (parseInt(data.cria_usuario)) {
+                            if (!erro && !validar_email(_email.value)) {
+                                erro = "E-mail inválido";
+                                _email.classList.add("invalido");
+                            }
+                            if (
+                                document.getElementById("password").value.length ||
+                                _email.value.toLowerCase() != anteriores.email.toLowerCase()
+                            ) alterou = true;
+                        } else if (document.getElementById("senha").value.length) alterou = true;
+                        if (!erro && !validar_cpf(_cpf.value)/* && _cpf.value.trim()*/) {
+                            erro = "CPF inválido";
+                            _cpf.classList.add("invalido");
+                        }
+                        if (_cpf.value != anteriores.cpf) alterou = true;
+                        
+                        aux = document.getElementById("admissao").value;
+                        if (aux) {
+                            aux = aux.split("/");
+                            const hj = new Date();
+                            const admissao = new Date(aux[2], aux[1] - 1, aux[0]);
+                            if (!erro && admissao > hj) erro = "A admissão não pode ser no futuro";
+                        }
+
+                        $.get(URL + "/colaboradores/consultar/", {
+                            cpf : _cpf.value.replace(/\D/g, ""),
+                            email : _email.value,
+                            empresa : document.getElementById("pessoa-empresa").value,
+                            id_empresa : document.getElementById("pessoa-id_empresa").value,
+                            setor : document.getElementById("setor").value,
+                            id_setor : document.getElementById("id_setor").value
+                        }, function(data) {
+                            if (typeof data == "string") data = $.parseJSON(data);
+                            if (!erro && data.tipo == "invalido") {
+                                erro = data.dado + " não encontrad" + (data.dado == "Empresa" ? "a" : "o");
+                                document.getElementById(data.dado == "Empresa" ? "pessoa-empresa" : "setor").classList.add("invalido");
+                            }
+                            if (!erro && data.tipo == "duplicado" && !parseInt(document.getElementById("pessoa-id").value)) {
+                                erro = "Já existe um registro com esse " + data.dado;
+                                document.getElementById(data.dado == "CPF" ? "cpf" : "email").classList.add("invalido");
+                            }
+                            if (!erro && !alterou) erro = "Altere pelo menos um campo para salvar";
+                            if (!erro) {
+                                _cpf.value = _cpf.value.replace(/\D/g, "");
+                                document.querySelector("#pessoasModal form").submit();
+                            } else s_alert(erro);
+                        });
                     });
                 }
 
