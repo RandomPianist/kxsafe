@@ -10,6 +10,23 @@ use App\Models\Produtos;
 use App\Models\Estoque;
 
 class ApiController extends Controller {
+    public function categoria(Request $request) {
+        $linha = Valores::firstOrNew(["id" => $request->id]);
+        $linha->descr = mb_strtoupper($request->descr);
+        $linha->alias = "categorias";
+        if (!$request->id) {
+            $linha->seq = intval(DB::select(DB::raw("
+                SELECT IFNULL(MAX(seq), 0) AS ultimo
+                FROM valores
+                WHERE alias = '".$alias."'
+            "))[0]->ultimo) + 1;
+        }
+        $linha->save();
+        $log = new LogController;
+        $log->inserir($request->id ? "E" : "C", "valores", $linha->id, true);
+        return $linha->id;
+    }
+
     public function salvar_produtos(Request $request) {
         $linha = Produtos::firstOrNew(["id" => $request->id]);
         $linha->descr = mb_strtoupper($request->descr);
