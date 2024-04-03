@@ -223,7 +223,7 @@ class PessoasController extends Controller {
         $log->inserir("D", "pessoas", $linha->id);
         if (intval(
             DB::table("setores")
-                ->where("id_setor", $linha->id_setor)
+                ->where("id", $linha->id_setor)
                 ->value("cria_usuario")
         )) $this->deletar_usuario($linha->id);
     }
