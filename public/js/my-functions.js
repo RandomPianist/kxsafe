@@ -206,6 +206,7 @@ function contar_char(el, max) {
 }
 
 function modal(nome, id, callback) {
+    limpar_invalido();
     if (callback === undefined) callback = function() {}
     if (id) document.getElementById(nome == "pessoasModal" ? "pessoa-id" : "id").value = id;
     Array.from(document.querySelectorAll("#" + nome + " input")).forEach((el) => {
