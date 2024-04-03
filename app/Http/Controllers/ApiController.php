@@ -18,7 +18,7 @@ class ApiController extends Controller {
             $linha->seq = intval(DB::select(DB::raw("
                 SELECT IFNULL(MAX(seq), 0) AS ultimo
                 FROM valores
-                WHERE alias = '".$alias."'
+                WHERE alias = 'categorias'
             "))[0]->ultimo) + 1;
         }
         $linha->save();
