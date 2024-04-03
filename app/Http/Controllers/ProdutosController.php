@@ -76,7 +76,10 @@ class ProdutosController extends Controller {
 
             WHERE produtos.id = ".$id
         ));
-        foreach($consulta as $linha) $linha->foto = $linha->foto != null ? asset("storage/".$linha->foto) : "";
+        foreach($consulta as $linha) {
+            if ($linha->foto == null) $linha->foto = "";
+            else if (!stripos($linha->foto, "//")) $linha->foto = asset("storage/".$linha->foto);
+        }
         return json_encode($consulta[0]);
     }
 
