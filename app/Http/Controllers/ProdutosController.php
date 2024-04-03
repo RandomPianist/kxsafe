@@ -11,12 +11,8 @@ class ProdutosController extends Controller {
     private function busca($param) {
         return DB::select(DB::raw("
             SELECT
-                produtos.id,
-                produtos.foto,
-                produtos.cod_externo,
-                produtos.descr,
-                IFNULL(valores.descr, 'A CLASSIFICAR') AS categoria,
-                produtos.preco
+                produtos.*,
+                IFNULL(valores.descr, 'A CLASSIFICAR') AS categoria
 
             FROM produtos
 

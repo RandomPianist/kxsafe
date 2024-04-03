@@ -8,12 +8,12 @@ use App\Models\Log;
 use App\Models\Pessoas;
 
 class LogController extends Controller {
-    public function inserir($acao, $tabela, $fk) {
+    public function inserir($acao, $tabela, $fk, $api = false) {
         $linha = new Log;
         $linha->acao = $acao;
         $linha->tabela = $tabela;
         $linha->fk = $fk;
-        $linha->id_pessoa = Auth::user()->id_pessoa;
+        if (!$api) $linha->id_pessoa = Auth::user()->id_pessoa;
         $linha->save();
     }
 
