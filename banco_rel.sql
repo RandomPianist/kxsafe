@@ -49,10 +49,7 @@ CREATE TABLE pessoas (
 	funcao VARCHAR(64),
 	admissao DATE,
 	senha INT,
-<<<<<<< HEAD
 	foto VARCHAR(512),
-=======
->>>>>>> eec9a4c74804f2cd9f120aa6d244370223272954
 	FOREIGN KEY (id_setor) REFERENCES setores(id),
 	FOREIGN KEY (id_empresa) REFERENCES empresas(id)
 );

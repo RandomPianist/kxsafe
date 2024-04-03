@@ -6,17 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int    $id
-<<<<<<< HEAD
  * @property int    $id_pessoa
  * @property int    $fk
  * @property int    $created_at
  * @property int    $updated_at
-=======
- * @property int    $updated_at
- * @property int    $created_at
- * @property int    $fk
- * @property int    $id_pessoa
->>>>>>> eec9a4c74804f2cd9f120aa6d244370223272954
  * @property string $tabela
  */
 class Log extends Model
@@ -41,11 +34,7 @@ class Log extends Model
      * @var array
      */
     protected $fillable = [
-<<<<<<< HEAD
         'id_pessoa', 'acao', 'tabela', 'fk', 'created_at', 'updated_at'
-=======
-        'acao', 'updated_at', 'created_at', 'fk', 'tabela', 'id_pessoa'
->>>>>>> eec9a4c74804f2cd9f120aa6d244370223272954
     ];
 
     /**
@@ -63,11 +52,7 @@ class Log extends Model
      * @var array
      */
     protected $casts = [
-<<<<<<< HEAD
         'id' => 'int', 'id_pessoa' => 'int', 'tabela' => 'string', 'fk' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp'
-=======
-        'id' => 'int', 'updated_at' => 'timestamp', 'created_at' => 'timestamp', 'fk' => 'int', 'tabela' => 'string', 'id_pessoa' => 'int'
->>>>>>> eec9a4c74804f2cd9f120aa6d244370223272954
     ];
 
     /**
@@ -76,11 +61,7 @@ class Log extends Model
      * @var array
      */
     protected $dates = [
-<<<<<<< HEAD
         'created_at', 'updated_at'
-=======
-        'updated_at', 'created_at'
->>>>>>> eec9a4c74804f2cd9f120aa6d244370223272954
     ];
 
     /**

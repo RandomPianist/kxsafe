@@ -45,17 +45,10 @@
                             <span>Corporativo</span>
                             <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
                             <ul class = "dropdown-toolbar">
-<<<<<<< HEAD
                                 <li onclick = "redirect('/empresas')">
                                     <span>Empresas</span>
                                 </li>
                                 <li onclick = "redirect('/colaboradores')">
-=======
-                                <li onclick = "redirect('/empresas')">
-                                    <span>Empresas</span>
-                                </li>
-                                <li onclick = "redirect('/colaboradores')">
->>>>>>> eec9a4c74804f2cd9f120aa6d244370223272954
                                     <span>Colaboradores</span>
                                 </li>
                             </ul>
@@ -66,17 +59,10 @@
                                 <span>Itens</span>
                                 <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
                                 <ul class = "dropdown-toolbar">
-<<<<<<< HEAD
                                     <li onclick = "redirect('/valores/categorias')">
                                         <span>Categorias</span>
                                     </li>
                                     <li onclick = "redirect('/produtos')">
-=======
-                                    <li onclick = "redirect('/valores/categorias')">
-                                        <span>Categorias</span>
-                                    </li>
-                                    <li onclick = "redirect('/produtos')">
->>>>>>> eec9a4c74804f2cd9f120aa6d244370223272954
                                         <span>Produtos</span>
                                     </li>
                                 </ul>
@@ -96,11 +82,7 @@
                                 <span>Relatórios</span>
                                 <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
                                 <ul class = "dropdown-toolbar">
-<<<<<<< HEAD
                                     <li onclick = "window.open('/relatorios/comodatos', '_blank')">
-=======
-                                    <li onclick = "window.open('/relatorios/comodatos', '_blank')">
->>>>>>> eec9a4c74804f2cd9f120aa6d244370223272954
                                         <span>Locação</span>
                                     </li>
                                     <li onclick = "relatorio = new RelatorioBilateral('empresas-por-maquina')">
