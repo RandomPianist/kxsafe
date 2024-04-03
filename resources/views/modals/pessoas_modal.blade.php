@@ -33,7 +33,7 @@
                             </div>
                         </div>
                         <div class = "row">
-                            <div class = "col-12 form-search">
+                            <div class = "col-11 pr-0 form-search">
                                 <label for = "pessoa-empresa" class = "custom-label-form">Empresa: *</label>
                                 <input id = "pessoa-empresa"
                                     class = "form-control autocomplete"
@@ -47,13 +47,18 @@
                                 />
                                 <input id = "pessoa-id_empresa" name = "id_empresa" type = "hidden" />
                             </div>
+                            <div class = "col-1 pt-4 d-flex align-items-center">
+                                <a href = "{{ config('app.root_url') }}/empresas" title = "Cadastro de empresas" target = "_blank">
+                                    <i class="fa-sharp fa-regular fa-arrow-up-right-from-square"></i>
+                                </a>
+                            </div>
                         </div>
                         <div class = "row">
                             <div class = "col-6">
                                 <label for = "cpf" class = "custom-label-form">CPF:</label>
                                 <input id = "cpf" name = "cpf" class = "form-control" autocomplete = "off" type = "text" onkeyup = "pessoa.formatar_cpf(this)" />
                             </div>
-                            <div class = "col-6 form-search">
+                            <div class = "col-5 pr-0 form-search-2">
                                 <label for = "setor" class = "custom-label-form">Setor: *</label>
                                 <input id = "setor"
                                     class = "form-control autocomplete"
@@ -66,6 +71,11 @@
                                     autocomplete = "off"
                                 />
                                 <input id = "id_setor" name = "id_setor" type = "hidden" onchange = "pessoa.toggle_user(parseInt(this.value))"/>
+                            </div>
+                            <div class = "col-1 pt-4 d-flex align-items-center">
+                                <a href = "{{ config('app.root_url') }}/setores" title = "Cadastro de setores" target = "_blank">
+                                    <i class="fa-sharp fa-regular fa-arrow-up-right-from-square"></i>
+                                </a>
                             </div>
                         </div>
                         <div class = "row usr-info">

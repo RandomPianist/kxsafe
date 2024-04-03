@@ -12,7 +12,7 @@
         <link href = "{{ asset('css/my-style.css')      }}" rel = "stylesheet" />
         <link href = "{{ asset('css/fa.css')            }}" rel = "stylesheet" />
         <style type = "text/css">
-            .form-search::after {
+            .form-search::after, .form-search-2::after {
                 background: url("{{ config('app.root_url') }}/img/keyboard.png") no-repeat;
                 background-size: contain;
                 bottom: 4.5px;
@@ -21,6 +21,10 @@
                 right: 20px;
                 height: 30px;
                 width: 30px;
+            }
+
+            .form-search-2::after {
+                right: 7px
             }
         </style>
     </head>
