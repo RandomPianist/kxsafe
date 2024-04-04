@@ -167,6 +167,7 @@ class MaquinasController extends Controller {
     }
 
     public function mov_estoque($id_produto) {
+        $log = new LogController;
         $maquinas = DB::table("valores")
                         ->select("id")
                         ->where("alias", "maquinas")
