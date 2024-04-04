@@ -179,8 +179,8 @@ class MaquinasController extends Controller {
                     ->get()
             )) {
                 $gestor = new GestorEstoque;
-                $gestor->id_maquina = $linha->id;
-                $gestor->id_produto = $produto->id;
+                $gestor->id_maquina = $maquina->id;
+                $gestor->id_produto = $id_produto;
                 $gestor->save();
                 $log->inserir("C", "gestor_estoque", $gestor->id);
             }
