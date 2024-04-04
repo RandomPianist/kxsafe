@@ -14,10 +14,10 @@ class ApiController extends Controller {
     public function empresas() {
         return json_encode(DB::select(DB::raw("
             SELECT
-                id,
+                empresas.id,
                 CONCAT(
-                    descr,
-                    IFNULL(CONCAT(' - ', matriz.descr), '')
+                    empresas.razao_social,
+                    IFNULL(CONCAT(' - ', matriz.razao_social), '')
                 ) AS descr
 
             FROM empresas
