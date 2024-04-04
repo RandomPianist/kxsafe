@@ -140,6 +140,7 @@ class ApiController extends Controller {
                 "preco",
                 "validade",
                 "ca",
+                "lixeira",
                 "id_categoria AS idCategoria",
                 "cod_externo AS codExterno",
                 "foto"
@@ -147,6 +148,7 @@ class ApiController extends Controller {
             ->where("id", $linha->id)
             ->first();
         $consulta->preco = floatval($consulta->preco);
+        $consulta->lixeira = intval($consulta->lixeira);
         return json_encode($consulta);
     }
 
