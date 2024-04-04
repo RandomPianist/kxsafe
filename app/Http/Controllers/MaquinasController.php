@@ -129,6 +129,7 @@ class MaquinasController extends Controller {
                     ON valores.id = comodatos.id_maquina
 
                 WHERE (('".$inicio."' BETWEEN comodatos.inicio AND comodatos.fim) OR ('".$fim."' BETWEEN comodatos.inicio AND comodatos.fim))
+                  AND comodatos.inicio <> comodatos.fim
                   AND id_maquina = ".$request->id_maquina
             ));
             if (sizeof($consulta)) $resultado = $consulta[0];
