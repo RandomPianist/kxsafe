@@ -59,6 +59,44 @@ class ApiController extends Controller {
         return DB::select(DB::raw($query));
     }
 
+    public function produtos_por_maquina(Request $request) {
+        return DB::select(DB::raw("
+            SELECT
+                produtos.id,
+                produtos.descr
+
+            FROM (
+                SELECT
+                    IFNULL(SUM(qtd), 0) AS saldo,
+                    id_maquina,
+                    id_produto
+                    
+                FROM (
+                    SELECT
+                        CASE
+                            WHEN (es = 'E') THEN qtd
+                            ELSE qtd * -1
+                        END AS qtd,
+                        id_maquina,
+                        id_produto
+            
+                    FROM estoque
+                ) AS estq
+            
+                GROUP BY
+                    id_maquina,
+                    id_produto
+            ) AS tab
+
+            JOIN produtos
+                ON produtos.id = tab.id_produto
+
+            WHERE tab.saldo > 0
+              AND tab.id_maquina = ".$request->idMaquina."
+              AND produtos.lixeira = 0
+        "));
+    }
+
     public function categorias(Request $request) {
         $linha = Valores::firstOrNew(["id" => $request->id]);
         $linha->descr = mb_strtoupper($request->descr);
