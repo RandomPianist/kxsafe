@@ -170,7 +170,7 @@ class ApiController extends Controller {
         for ($i = 0; $i < sizeof($request->idProduto); $i++) {
             $linha = new Estoque;
             $linha->es = $request->es[$i];
-            $linha->descr = $request->obs[$i];
+            $linha->descr = $request->descr[$i];
             $linha->qtd = $request->qtd[$i];
             $linha->id_produto = $request->idProduto[$i];
             $linha->id_maquina = $request->idMaquina;
