@@ -63,7 +63,8 @@ class ApiController extends Controller {
         return DB::select(DB::raw("
             SELECT
                 produtos.id,
-                produtos.descr
+                produtos.descr,
+                tab.saldo
 
             FROM (
                 SELECT
@@ -126,6 +127,7 @@ class ApiController extends Controller {
         $linha->cod_externo = $request->codExterno;
         $linha->id_categoria = $request->idCategoria;
         $linha->foto = $request->foto;
+        $linha->lixeira = $request->lixeira;
         $linha->save();
         $log = new LogController;
         $log->inserir($request->id ? "E" : "C", "produtos", $linha->id, true);
