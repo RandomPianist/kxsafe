@@ -30,6 +30,35 @@ class ApiController extends Controller {
         ")));
     }
 
+    public function maquinas(Request $request) {
+        $query = "
+            SELECT
+                tab.id,
+                tab.descr
+            
+            FROM (
+                SELECT
+                    id,
+                    descr
+                FROM valores
+                WHERE alias = 'maquinas'
+                  AND lixeira = 0
+            ) AS tab
+        ";
+        if (isset($request->idEmp)) {
+            $query .= "
+                JOIN (
+                    SELECT id_maquina
+                    FROM comodatos
+                    WHERE id_empresa = ".$request->idEmp."
+                      AND CURDATE() >= inicio
+                      AND CURDATE() < fim
+                ) AS aux ON aux.id_maquina = tab.id
+            ";
+        }
+        return DB::select(DB::raw($query));
+    }
+
     public function categorias(Request $request) {
         $linha = Valores::firstOrNew(["id" => $request->id]);
         $linha->descr = mb_strtoupper($request->descr);
