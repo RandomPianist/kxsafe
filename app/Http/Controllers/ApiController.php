@@ -98,8 +98,7 @@ class ApiController extends Controller {
             JOIN gestor_estoque AS ge
                 ON ge.id_produto = produtos.id AND ge.id_maquina = tab.id_maquina
 
-            WHERE tab.saldo > 0
-              AND tab.id_maquina = ".$request->idMaquina."
+            WHERE tab.id_maquina = ".$request->idMaquina."
               AND produtos.lixeira = 0
         "));
         foreach ($consulta as $linha) {
