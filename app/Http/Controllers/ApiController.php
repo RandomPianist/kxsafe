@@ -91,7 +91,21 @@ class ApiController extends Controller {
         $linha->save();
         $log = new LogController;
         $log->inserir($request->id ? "E" : "C", "produtos", $linha->id, true);
-        return json_encode($linha);
+        $consulta = DB::table("produtos")
+            ->select(
+                "id",
+                "descr",
+                "preco",
+                "validade",
+                "ca",
+                "id_categoria AS idCategoria",
+                "cod_externo AS codExterno",
+                "foto"
+            )
+            ->where("id", $linha->id)
+            ->first();
+        $consulta->preco = floatval($consulta->preco);
+        return json_encode($consulta);
     }
 
     public function estoque(Request $request) {
