@@ -6,6 +6,7 @@ use DB;
 use Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\MaquinasController;
 use App\Models\Valores;
 use App\Models\Produtos;
 use App\Models\Estoque;
