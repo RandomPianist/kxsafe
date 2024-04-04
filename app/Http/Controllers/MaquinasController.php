@@ -166,7 +166,7 @@ class MaquinasController extends Controller {
         return redirect("/valores/maquinas");
     }
 
-    public function mov_estoque() {
+    public function mov_estoque($id_produto) {
         $maquinas = DB::table("valores")
                         ->select("id")
                         ->where("alias", "maquinas")
@@ -174,7 +174,7 @@ class MaquinasController extends Controller {
         foreach ($maquinas as $maquina) {
             if (!sizeof(
                 DB::table("gestor_estoque")
-                    ->where("id_produto", $linha->id)
+                    ->where("id_produto", $id_produto)
                     ->where("id_maquina", $maquina->id)
                     ->get()
             )) {

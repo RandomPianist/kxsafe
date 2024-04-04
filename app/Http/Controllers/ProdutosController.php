@@ -105,7 +105,7 @@ class ProdutosController extends Controller {
         $linha->save();
         $log->inserir($request->id ? "E" : "C", "produtos", $linha->id);
         $maquinas = new MaquinasController;
-        $maquinas->mov_estoque();
+        $maquinas->mov_estoque($linha->id);
         return redirect("/produtos");
     }
 

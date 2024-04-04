@@ -146,7 +146,7 @@ class ApiController extends Controller {
         if (intval($request->lixeira)) $letra_log = "D";
         $log->inserir($letra_log, "produtos", $linha->id, true);
         $maquinas = new MaquinasController;
-        $maquinas->mov_estoque();
+        $maquinas->mov_estoque($linha->id);
         $consulta = DB::table("produtos")
             ->select(
                 "id",
