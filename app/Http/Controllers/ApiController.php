@@ -60,7 +60,7 @@ class ApiController extends Controller {
     }
 
     public function produtos_por_maquina(Request $request) {
-        return DB::select(DB::raw("
+        $consulta = DB::select(DB::raw("
             SELECT
                 produtos.id,
                 produtos.descr,
@@ -96,6 +96,8 @@ class ApiController extends Controller {
               AND tab.id_maquina = ".$request->idMaquina."
               AND produtos.lixeira = 0
         "));
+        foreach ($consulta as $linha) $linha->saldo = floatval($linha->saldo);
+        return json_encode($consulta);
     }
 
     public function categorias(Request $request) {
