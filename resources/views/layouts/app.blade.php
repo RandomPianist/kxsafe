@@ -45,10 +45,10 @@
                             <span>Corporativo</span>
                             <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
                             <ul class = "dropdown-toolbar">
-                                <li onclick = "redirect('/empresas')">
+                                <li onclick = "redirect('/kxsafe/empresas')">
                                     <span>Empresas</span>
                                 </li>
-                                <li onclick = "redirect('/colaboradores')">
+                                <li onclick = "redirect('/kxsafe/colaboradores')">
                                     <span>Colaboradores</span>
                                 </li>
                             </ul>
@@ -59,10 +59,10 @@
                                 <span>Itens</span>
                                 <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
                                 <ul class = "dropdown-toolbar">
-                                    <li onclick = "redirect('/valores/categorias')">
+                                    <li onclick = "redirect('/kxsafe/valores/categorias')">
                                         <span>Categorias</span>
                                     </li>
-                                    <li onclick = "redirect('/produtos')">
+                                    <li onclick = "redirect('/kxsafe/produtos')">
                                         <span>Produtos</span>
                                     </li>
                                 </ul>
@@ -82,7 +82,7 @@
                                 <span>Relatórios</span>
                                 <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
                                 <ul class = "dropdown-toolbar">
-                                    <li onclick = "window.open('/relatorios/comodatos', '_blank')">
+                                    <li onclick = "window.open('/kxsafe/relatorios/comodatos', '_blank')">
                                         <span>Locação</span>
                                     </li>
                                     <li onclick = "relatorio = new RelatorioBilateral('empresas-por-maquina')">
