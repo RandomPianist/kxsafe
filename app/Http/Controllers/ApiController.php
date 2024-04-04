@@ -166,7 +166,7 @@ class ApiController extends Controller {
         return json_encode($consulta);
     }
 
-    public function estoque(Request $request) {
+    public function movimentar_estoque(Request $request) {
         for ($i = 0; $i < sizeof($request->idProduto); $i++) {
             $linha = new Estoque;
             $linha->es = $request->es[$i];
@@ -179,5 +179,15 @@ class ApiController extends Controller {
             $log->inserir("C", "estoque", $linha->id, true);
         }
         return 200;
+    }
+
+    public function gerenciar_estoque(Request $request) {
+        DB::statement("
+            UPDATE gestor_estoque SET
+                minimo = ".$request->minimo.",
+                maximo = ".$request->maximo."
+            WHERE id_produto = ".$request->idProduto."
+              AND id_maquina = ".$request->idMaquina
+        );
     }
 }
