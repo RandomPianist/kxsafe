@@ -164,7 +164,7 @@ class RelatoriosController extends Controller {
                     WHEN (es = 'E') THEN qtd
                     ELSE qtd * -1
                 END AS qtd,
-                pessoas.nome AS autor
+                IFNULL(pessoas.nome, 'API') AS autor
 
             FROM log
 
@@ -177,7 +177,7 @@ class RelatoriosController extends Controller {
             JOIN valores
                 ON valores.id = estoque.id_maquina
 
-            JOIN pessoas
+            LEFT JOIN pessoas
                 ON pessoas.id = log.id_pessoa
 
             WHERE log.tabela = 'estoque'
