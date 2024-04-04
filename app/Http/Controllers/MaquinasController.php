@@ -166,7 +166,7 @@ class MaquinasController extends Controller {
         return redirect("/valores/maquinas");
     }
 
-    public function mov_estoque($id_produto) {
+    public function mov_estoque($id_produto, $api) {
         $log = new LogController;
         $maquinas = DB::table("valores")
                         ->select("id")
@@ -183,7 +183,7 @@ class MaquinasController extends Controller {
                 $gestor->id_maquina = $maquina->id;
                 $gestor->id_produto = $id_produto;
                 $gestor->save();
-                $log->inserir("C", "gestor_estoque", $gestor->id);
+                $log->inserir("C", "gestor_estoque", $gestor->id, $api);
             }
         }
     }
