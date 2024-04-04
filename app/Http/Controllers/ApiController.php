@@ -11,7 +11,7 @@ use App\Models\Produtos;
 use App\Models\Estoque;
 
 class ApiController extends Controller {
-    public function empresa() {
+    public function empresas() {
         return json_encode(DB::select(DB::raw("
             SELECT
                 id,
@@ -30,7 +30,7 @@ class ApiController extends Controller {
         ")));
     }
 
-    public function categoria(Request $request) {
+    public function categorias(Request $request) {
         $linha = Valores::firstOrNew(["id" => $request->id]);
         $linha->descr = mb_strtoupper($request->descr);
         $linha->alias = "categorias";
@@ -50,7 +50,7 @@ class ApiController extends Controller {
         return json_encode($resultado);
     }
 
-    public function salvar_produtos(Request $request) {
+    public function produtos(Request $request) {
         $linha = Produtos::firstOrNew(["id" => $request->id]);
         $linha->descr = mb_strtoupper($request->descr);
         $linha->preco = $request->preco;
