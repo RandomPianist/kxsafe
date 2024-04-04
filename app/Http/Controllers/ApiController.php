@@ -65,11 +65,13 @@ class ApiController extends Controller {
             SELECT
                 produtos.id,
                 produtos.descr,
-                tab.saldo,
+                IFNULL(tab.saldo, 0) AS saldo,
                 IFNULL(ge.minimo, 0) AS minimo,
                 IFNULL(ge.maximo, 0) AS maximo
 
-            FROM (
+            FROM gestor_estoque AS ge
+            
+            LEFT JOIN (
                 SELECT
                     IFNULL(SUM(qtd), 0) AS saldo,
                     id_maquina,
@@ -90,15 +92,12 @@ class ApiController extends Controller {
                 GROUP BY
                     id_maquina,
                     id_produto
-            ) AS tab
+            ) AS tab ON tab.id_maquina = ge.id_maquina AND tab.id_produto = ge.id_produto
 
             JOIN produtos
-                ON produtos.id = tab.id_produto
+                ON produtos.id = ge.id_produto
 
-            JOIN gestor_estoque AS ge
-                ON ge.id_produto = produtos.id AND ge.id_maquina = tab.id_maquina
-
-            WHERE tab.id_maquina = ".$request->idMaquina."
+            WHERE ge.id_maquina = ".$request->idMaquina."
               AND produtos.lixeira = 0
         "));
         foreach ($consulta as $linha) {
