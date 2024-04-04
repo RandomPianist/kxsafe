@@ -128,7 +128,7 @@ class MaquinasController extends Controller {
                 JOIN valores
                     ON valores.id = comodatos.id_maquina
 
-                WHERE (inicio >= '".$inicio."' AND fim < '".$fim."')
+                WHERE (('".$inicio."' BETWEEN comodatos.inicio AND comodatos.fim) OR ('".$fim."' BETWEEN comodatos.inicio AND comodatos.fim))
                   AND id_maquina = ".$request->id_maquina
             ));
             if (sizeof($consulta)) $resultado = $consulta[0];
