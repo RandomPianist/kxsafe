@@ -6,6 +6,7 @@ use DB;
 use Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\LogController;
+use App\Models\Valores;
 use App\Models\Produtos;
 use App\Models\Estoque;
 
@@ -24,7 +25,10 @@ class ApiController extends Controller {
         $linha->save();
         $log = new LogController;
         $log->inserir($request->id ? "E" : "C", "valores", $linha->id, true);
-        return $linha->id;
+        $resultado = new \stdClass;
+        $resultado->id = $linha->id;
+        $resultado->descr = $linha->descr;
+        return json_encode($resultado);
     }
 
     public function salvar_produtos(Request $request) {
@@ -33,23 +37,23 @@ class ApiController extends Controller {
         $linha->preco = $request->preco;
         $linha->validade = $request->validade;
         $linha->ca = $request->ca;
-        $linha->cod_externo = $request->cod_externo;
-        $linha->id_categoria = $request->id_categoria;
+        $linha->cod_externo = $request->codExterno;
+        $linha->id_categoria = $request->idCategoria;
         $linha->foto = $request->foto;
         $linha->save();
         $log = new LogController;
         $log->inserir($request->id ? "E" : "C", "produtos", $linha->id, true);
-        return $linha->id;
+        return json_encode($linha);
     }
 
     public function estoque(Request $request) {
-        for ($i = 0; $i < sizeof($request->id_produto); $i++) {
+        for ($i = 0; $i < sizeof($request->idProduto); $i++) {
             $linha = new Estoque;
             $linha->es = $request->es[$i];
             $linha->descr = $request->obs[$i];
             $linha->qtd = $request->qtd[$i];
-            $linha->id_produto = $request->id_produto[$i];
-            $linha->id_maquina = $request->id_maquina;
+            $linha->id_produto = $request->idProduto[$i];
+            $linha->id_maquina = $request->idMaquina;
             $linha->save();
             $log = new LogController;
             $log->inserir("C", "estoque", $linha->id, true);
