@@ -17,8 +17,8 @@ class ApiController extends Controller {
             SELECT
                 empresas.id,
                 CONCAT(
-                    empresas.razao_social,
-                    IFNULL(CONCAT(' - ', matriz.razao_social), '')
+                    empresas.nome_fantasia,
+                    IFNULL(CONCAT(' - ', matriz.nome_fantasia), '')
                 ) AS descr
 
             FROM empresas
