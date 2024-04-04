@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::get ("empresa",   [ApiController::class, "empresa"]);
 Route::get ("produtos",  [ProdutosController::class, "listar"]);
 Route::post("categoria", [ApiController::class, "categoria"]);
 Route::post("produtos",  [ApiController::class, "salvar_produtos"]);

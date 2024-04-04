@@ -11,6 +11,25 @@ use App\Models\Produtos;
 use App\Models\Estoque;
 
 class ApiController extends Controller {
+    public function empresa() {
+        return json_encode(DB::select(DB::raw("
+            SELECT
+                id,
+                CONCAT(
+                    descr,
+                    IFNULL(CONCAT(' - ', matriz.descr), '')
+                ) AS descr
+
+            FROM empresas
+
+            LEFT JOIN empresas AS matriz
+                ON matriz.id = empresas.id_matriz
+
+            WHERE empresas.lixeira = 0
+              AND matriz.lixeira = 0
+        ")));
+    }
+
     public function categoria(Request $request) {
         $linha = Valores::firstOrNew(["id" => $request->id]);
         $linha->descr = mb_strtoupper($request->descr);
