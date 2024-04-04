@@ -9,6 +9,7 @@ use App\Http\Controllers\LogController;
 use App\Http\Controllers\EmpresasController;
 use App\Models\Comodatos;
 use App\Models\Estoque;
+use App\Models\GestorEstoque;
 
 class MaquinasController extends Controller {
     public function estoque(Request $request) {
@@ -163,5 +164,26 @@ class MaquinasController extends Controller {
         $log = new LogController;
         $log->inserir("E", "comodatos", $modelo->id);
         return redirect("/valores/maquinas");
+    }
+
+    public function mov_estoque() {
+        $maquinas = DB::table("valores")
+                        ->select("id")
+                        ->where("alias", "maquinas")
+                        ->get();
+        foreach ($maquinas as $maquina) {
+            if (!sizeof(
+                DB::table("gestor_estoque")
+                    ->where("id_produto", $linha->id)
+                    ->where("id_maquina", $maquina->id)
+                    ->get()
+            )) {
+                $gestor = new GestorEstoque;
+                $gestor->id_maquina = $linha->id;
+                $gestor->id_produto = $produto->id;
+                $gestor->save();
+                $log->inserir("C", "gestor_estoque", $gestor->id);
+            }
+        }
     }
 }

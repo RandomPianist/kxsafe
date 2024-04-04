@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\LogController;
 use App\Models\Pessoas;
 use App\Models\Valores;
+use App\Models\GestorEstoque;
 
 class ValoresController extends Controller {
     private function busca($alias, $param) {
@@ -178,6 +179,7 @@ class ValoresController extends Controller {
     }
 
     public function salvar($alias, Request $request) {
+        $log = new LogController;
         $linha = Valores::firstOrNew(["id" => $request->id]);
         $linha->descr = mb_strtoupper($request->descr);
         $linha->alias = $alias;
@@ -189,7 +191,25 @@ class ValoresController extends Controller {
             "))[0]->ultimo) + 1;
         }
         $linha->save();
-        $log = new LogController;
+        if ($alias == "maquinas") {
+            $produtos = DB::table("produtos")
+                            ->select("id")
+                            ->get();
+            foreach ($produtos as $produto) {
+                if (!sizeof(
+                    DB::table("gestor_estoque")
+                        ->where("id_produto", $produto->id)
+                        ->where("id_maquina", $linha->id)
+                        ->get()
+                )) {
+                    $gestor = new GestorEstoque;
+                    $gestor->id_maquina = $linha->id;
+                    $gestor->id_produto = $produto->id;
+                    $gestor->save();
+                    $log->inserir("C", "gestor_estoque", $gestor->id);
+                }
+            }
+        }
         $log->inserir($request->id ? "E" : "C", "valores", $linha->id);
         return redirect("/valores/$alias");
     }

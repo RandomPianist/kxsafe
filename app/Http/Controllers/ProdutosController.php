@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\LogController;
+use App\Http\Controllers\MaquinasController;
 use App\Models\Produtos;
 
 class ProdutosController extends Controller {
@@ -92,6 +93,7 @@ class ProdutosController extends Controller {
     }
 
     public function salvar(Request $request) {
+        $log = new LogController;
         $linha = Produtos::firstOrNew(["id" => $request->id]);
         $linha->descr = mb_strtoupper($request->descr);
         $linha->preco = $request->preco;
@@ -101,8 +103,9 @@ class ProdutosController extends Controller {
         $linha->id_categoria = $request->id_categoria;
         if ($request->file("foto")) $linha->foto = $request->file("foto")->store("uploads", "public");
         $linha->save();
-        $log = new LogController;
         $log->inserir($request->id ? "E" : "C", "produtos", $linha->id);
+        $maquinas = new MaquinasController;
+        $maquinas->mov_estoque();
         return redirect("/produtos");
     }
 

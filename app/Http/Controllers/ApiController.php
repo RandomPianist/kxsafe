@@ -64,7 +64,9 @@ class ApiController extends Controller {
             SELECT
                 produtos.id,
                 produtos.descr,
-                tab.saldo
+                tab.saldo,
+                IFNULL(ge.minimo, 0) AS minimo,
+                IFNULL(ge.maximo, 0) AS maximo
 
             FROM (
                 SELECT
@@ -92,11 +94,18 @@ class ApiController extends Controller {
             JOIN produtos
                 ON produtos.id = tab.id_produto
 
+            JOIN gestor_estoque AS ge
+                ON ge.id_produto = produtos.id AND ge.id_maquina = tab.id_maquina
+
             WHERE tab.saldo > 0
               AND tab.id_maquina = ".$request->idMaquina."
               AND produtos.lixeira = 0
         "));
-        foreach ($consulta as $linha) $linha->saldo = floatval($linha->saldo);
+        foreach ($consulta as $linha) {
+            $linha->saldo = floatval($linha->saldo);
+            $linha->minimo = floatval($linha->minimo);
+            $linha->maximo = floatval($linha->maximo);
+        }
         return json_encode($consulta);
     }
 
@@ -135,6 +144,8 @@ class ApiController extends Controller {
         $letra_log = $request->id ? "E" : "C";
         if (intval($request->lixeira)) $letra_log = "D";
         $log->inserir($letra_log, "produtos", $linha->id, true);
+        $maquinas = new MaquinasController;
+        $maquinas->mov_estoque();
         $consulta = DB::table("produtos")
             ->select(
                 "id",

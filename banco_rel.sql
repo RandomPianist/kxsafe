@@ -101,6 +101,19 @@ CREATE TABLE estoque (
 ------------------------------------------------------------------------- RESTANTE -------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+CREATE TABLE gestor_estoque (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	descr VARCHAR(16),
+	minimo NUMERIC(10,5),
+	maximo NUMERIC(10,5),
+	id_maquina INT,
+	id_produto INT,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	FOREIGN KEY (id_maquina) REFERENCES valores(id),
+	FOREIGN KEY (id_produto) REFERENCES produtos(id)
+);
+
 CREATE TABLE comodatos (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	inicio DATE,
