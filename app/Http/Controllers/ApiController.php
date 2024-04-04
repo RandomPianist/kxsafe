@@ -130,7 +130,9 @@ class ApiController extends Controller {
         $linha->lixeira = $request->lixeira;
         $linha->save();
         $log = new LogController;
-        $log->inserir($request->id ? "E" : "C", "produtos", $linha->id, true);
+        $letra_log = $request->id ? "E" : "C";
+        if (intval($request->lixeira)) $letra_log = "D";
+        $log->inserir($letra_log, "produtos", $linha->id, true);
         $consulta = DB::table("produtos")
             ->select(
                 "id",
