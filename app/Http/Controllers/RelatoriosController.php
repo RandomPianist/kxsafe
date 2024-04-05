@@ -133,7 +133,7 @@ class RelatoriosController extends Controller {
         }
         if ($request->fim) {
             $fim = Carbon::createFromFormat('d/m/Y', $request->fim)->format('Y-m-d');
-            array_push($filtro, "DATE(log.created_at) >= '".$fim."'");
+            array_push($filtro, "DATE(log.created_at) <= '".$fim."'");
             $periodo .= " até ".$request->fim;
         }
         if ($periodo) array_push($criterios, $periodo);
