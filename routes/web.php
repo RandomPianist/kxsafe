@@ -36,16 +36,15 @@ Route::middleware("auth")->group(function () {
     });
 
     Route::group(["prefix" => "setores"], function() {
-        Route::get ("/",                        [SetoresController::class, "ver"]);
-        Route::get ("/listar",                  [SetoresController::class, "listar"]);
-        Route::get ("/consultar",               [SetoresController::class, "consultar"]);
-        Route::get ("/consultar-usuarios/{id}", [SetoresController::class, "consultar_usuarios"]);
-        Route::get ("/listar-pessoas/{id}",     [SetoresController::class, "listar_pessoas"]);
-        Route::get ("/bloquear/{id}",           [SetoresController::class, "bloquear"]);
-        Route::get ("/mostrar/{id}",            [SetoresController::class, "mostrar"]);
-        Route::get ("/aviso/{id}",              [SetoresController::class, "aviso"]);
-        Route::post("/salvar",                  [SetoresController::class, "salvar"]);
-        Route::post("/excluir",                 [SetoresController::class, "excluir"]);
+        Route::get ("/",              [SetoresController::class, "ver"]);
+        Route::get ("/listar",        [SetoresController::class, "listar"]);
+        Route::get ("/consultar",     [SetoresController::class, "consultar"]);
+        Route::get ("/usuarios/{id}", [SetoresController::class, "usuarios"]);
+        Route::get ("/pessoas/{id}",  [SetoresController::class, "pessoas"]);
+        Route::get ("/mostrar/{id}",  [SetoresController::class, "mostrar"]);
+        Route::get ("/aviso/{id}",    [SetoresController::class, "aviso"]);
+        Route::post("/salvar",        [SetoresController::class, "salvar"]);
+        Route::post("/excluir",       [SetoresController::class, "excluir"]);
     });
 
     Route::group(["prefix" => "empresas"], function() {

@@ -47,18 +47,22 @@ class SetoresController extends Controller {
         return "0";
     }
 
-    public function consultar_usuarios($id) {
-        if (sizeof(
-            DB::table("users")
-                ->join("pessoas", "pessoas.id", "users.id_pessoa")
-                ->where("lixeira", 0)
-                ->where("id_setor", $id)
-                ->get()
-        )) return "1";
-        return "0";
+    public function usuarios($id) {
+        $resultado = new \stdClass;
+        $resultado->consulta = DB::table("pessoas")
+                                    ->select(
+                                        "pessoas.id",
+                                        "pessoas.nome"
+                                    )
+                                    ->join("users", "users.id_pessoa", "pessoas.id")
+                                    ->where("pessoas.id_setor", $id)
+                                    ->where("pessoas.lixeira", 0)
+                                    ->get();
+        $resultado->bloquear = Pessoas::find(Auth::user()->id_pessoa)->id_setor == $id ? "1" : "0";
+        return json_encode($resultado);
     }
 
-    public function listar_pessoas($id) {
+    public function pessoas($id) {
         return DB::select(DB::raw("
             SELECT
                 pessoas.id,
@@ -73,11 +77,6 @@ class SetoresController extends Controller {
               AND pessoas.lixeira = 0
               AND users.id IS NULL
         "));
-    }
-
-    public function bloquear($id) {
-        if (Pessoas::find(Auth::user()->id_pessoa)->id_setor == $id) return "1";
-        return "0";
     }
 
     public function mostrar($id) {
@@ -133,7 +132,17 @@ class SetoresController extends Controller {
                         $log->inserir("D", "users", $usuario->id);
                     }
                     $lista = join(",", $lista);
-                    if ($lista) DB::statement("DELETE FROM users WHERE id IN (".$lista.")");
+                    if ($lista) {
+                        if (isset($request->id_pessoa)) {
+                            for ($i = 0; $i < sizeof($request->id_pessoa); $i++) {
+                                $modelo = Pessoas::find($request->id_pessoa[$i]);
+                                $modelo->senha = $request->password[$i];
+                                $modelo->save();
+                                $log->inserir("E", "pessoas", $modelo->id);
+                            }
+                        }
+                        DB::statement("DELETE FROM users WHERE id IN (".$lista.")");
+                    }
                 } else if (isset($request->id_pessoa)) {
                     for ($i = 0; $i < sizeof($request->id_pessoa); $i++) {
                         $senha = Hash::make($request->password[$i]);

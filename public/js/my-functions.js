@@ -535,3 +535,7 @@ function extrato_maquina(id_maquina) {
         link.click();
     });
 }
+
+function numerico(el) {
+    el.value = el.value.replace(/\D/g, "");
+}

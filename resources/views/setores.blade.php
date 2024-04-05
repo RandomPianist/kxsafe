@@ -103,28 +103,10 @@
                     erro = "Já existe um registro com essa descrição";
                     invalida_descricao = true;
                 }
-                if (!erro) {
-                    if (!el_chk.checked && id) {
-                        $.get(URL + "/setores/consultar-usuarios/" + id, function(avisar) {
-                            if (parseInt(avisar)) {
-                                Swal.fire({
-                                    title: "Aviso",
-                                    html : "Prosseguir apagará o acesso de alguns usuários ao sistema.<br>Deseja continuar?",
-                                    showDenyButton : true,
-                                    confirmButtonText : "NÃO",
-                                    confirmButtonColor : "rgb(31, 41, 55)",
-                                    denyButtonText : "SIM"
-                                }).then((result) => {
-                                    if (result.isDenied) document.querySelector("#setoresModal form").submit();
-                                    else el_chk.checked = true;
-                                });
-                            } else document.querySelector("#setoresModal form").submit();
-                        });
-                    } else document.querySelector("#setoresModal form").submit();
-                } else {
+                if (erro) {
                     if (invalida_descricao) el.classList.add("invalido");
                     s_alert(erro);
-                }
+                } else document.querySelector("#setoresModal form").submit();
             });
         }
 
@@ -152,18 +134,14 @@
         function muda_cria_usuario(el) {
             $(el).prev().val(el.checked ? "S" : "N");
             const id = parseInt(document.getElementById("id").value);
+            let tudo = document.querySelector("#setoresModal .container");
             if (id) {
-                const remover = function() {
-                    $(".linha-usuario").each(function() {
-                        $(this).remove();
-                    });
-                }
-
+                $(".linha-usuario").each(function() {
+                    $(this).remove();
+                });
                 if (el.checked) {
-                    $.get(URL + "/setores/listar-pessoas/" + id, function(data) {
-                        remover();
+                    $.get(URL + "/setores/pessoas/" + id, function(data) {
                         if (typeof data == "string") data = $.parseJSON(data);
-                        let tudo = document.querySelector("#setoresModal .container");
                         for (let i = 1; i <= data.length; i++) {
                             let linha = document.createElement("div");
                             linha.classList.add("row", "linha-usuario", "mb-2");
@@ -215,9 +193,44 @@
                         });
                     });
                 } else {
-                    remover();
-                    $.get(URL + "/setores/bloquear/" + id, function(bloquear) {
-                        if (parseInt(bloquear)) {
+                    $.get(URL + "/setores/usuarios/" + id, function(data) {
+                        if (typeof data == "string") data = $.parseJSON(data);
+                        if (!parseInt(data.bloquear)) {
+                            for (let i = 1; i <= data.consulta.length; i++) {
+                                let linha = document.createElement("div");
+                                linha.classList.add("row", "linha-usuario", "mb-2");
+
+                                let col_senha = document.createElement("div");
+                                col_senha.classList.add("col-12");
+
+                                let el_id_pessoa = document.createElement("input");
+                                el_id_pessoa.type = "hidden";
+                                el_id_pessoa.name = "id_pessoa[]";
+                                el_id_pessoa.value = data.consulta[i - 1].id;
+
+                                let el_senha = document.createElement("input");
+                                el_senha.classList.add("form-control", "validar");
+                                el_senha.type = "password";
+                                el_senha.name = "password[]";
+                                el_senha.placeholder = "Senha de " + data.consulta[i - 1].nome;
+                                el_senha.id = "senha-" + i;
+                                el_senha.onkeyup = function() {
+                                    numerico(el_senha);
+                                }
+
+                                col_senha.appendChild(el_senha);
+                                linha.appendChild(el_id_pessoa);
+                                linha.appendChild(col_senha);
+                                tudo.appendChild(linha);
+                            }
+                            let lista = document.getElementsByClassName("linha-usuario");
+                            lista[lista.length - 1].classList.add("mb-4");
+                            $(".form-control").each(function() {
+                                $(this).keydown(function() {
+                                    $(this).removeClass("invalido");
+                                });
+                            });
+                        } else {
                             s_alert("Alterar essa opção apagaria seu usuário");
                             el.checked = true;
                         }

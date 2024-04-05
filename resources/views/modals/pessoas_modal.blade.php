@@ -93,7 +93,7 @@
                         <div class = "row" id = "pes-info">
                             <div class = "col-12">
                                 <label for = "senha" class = "custom-label-form pessoa-senha"></label>
-                                <input id = "senha" name = "senha" class = "form-control" autocomplete = "off" type = "password" onkeyup = "this.value=this.value.replace(/\D/g, '')" />
+                                <input id = "senha" name = "senha" class = "form-control" autocomplete = "off" type = "password" onkeyup = "numerico(this)" />
                             </div>
                         </div>
                     </div>
