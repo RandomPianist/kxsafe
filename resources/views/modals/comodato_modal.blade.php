@@ -58,7 +58,7 @@
 <script type = "text/javascript" language = "JavaScript">
     function comodatar(id) {
         $.get(URL + "/valores/{{ $alias }}/mostrar/" + id, function(descr) {
-            document.getElementById("comodatoModalLabel").innerHTML = "Comodatando " + descr;
+            document.getElementById("comodatoModalLabel").innerHTML = "Locando " + descr;
             Array.from(document.getElementsByClassName("id_maquina")).forEach((el) => {
                 el.value = id;
             });
