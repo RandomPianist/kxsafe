@@ -121,7 +121,9 @@ class ApiController extends Controller {
         }
         $linha->save();
         $log = new LogController;
-        $log->inserir($request->id ? "E" : "C", "valores", $linha->id, true);
+        $modelo = $log->inserir($request->id ? "E" : "C", "valores", $linha->id, true);
+        if (isset($request->usu)) $modelo->nome = $request->usu;
+        $modelo->save();
         $resultado = new \stdClass;
         $resultado->id = $linha->id;
         $resultado->descr = $linha->descr;
@@ -142,7 +144,9 @@ class ApiController extends Controller {
         $log = new LogController;
         $letra_log = $request->id ? "E" : "C";
         if (intval($request->lixeira)) $letra_log = "D";
-        $log->inserir($letra_log, "produtos", $linha->id, true);
+        $modelo = $log->inserir($letra_log, "produtos", $linha->id, true);
+        if (isset($request->usu)) $modelo->nome = $request->usu;
+        $modelo->save();
         $maquinas = new MaquinasController;
         $maquinas->mov_estoque($linha->id, true);
         $consulta = DB::table("produtos")
@@ -174,12 +178,15 @@ class ApiController extends Controller {
             $linha->id_maquina = $request->idMaquina;
             $linha->save();
             $log = new LogController;
-            $log->inserir("C", "estoque", $linha->id, true);
+            $modelo = $log->inserir("C", "estoque", $linha->id, true);
+            if (isset($request->usu)) $modelo->nome = $request->usu;
+            $modelo->save();
         }
         return 200;
     }
 
     public function gerenciar_estoque(Request $request) {
+        $log = new LogController;
         DB::statement("
             UPDATE gestor_estoque SET
                 minimo = ".$request->minimo.",
@@ -187,5 +194,15 @@ class ApiController extends Controller {
             WHERE id_produto = ".$request->idProduto."
               AND id_maquina = ".$request->idMaquina
         );
+        $consulta = DB::table("gestor_estoque")
+                    ->select("id")
+                    ->where("id_produto", $request->idProduto)
+                    ->where("id_maquina", $request->idMaquina)
+                    ->get();
+        foreach ($consulta as $linha) {
+            $modelo = $log->inserir("E", "gestor_estoque", $linha->id, true);
+            if (isset($request->usu)) $modelo->nome = $request->usu;
+            $modelo->save();
+        }
     }
 }

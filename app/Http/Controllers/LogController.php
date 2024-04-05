@@ -15,12 +15,16 @@ class LogController extends Controller {
         $linha->fk = $fk;
         if (!$api) $linha->id_pessoa = Auth::user()->id_pessoa;
         $linha->save();
+        return $linha;
     }
 
     public function consultar($tabela, $alias = "") {
         $query = "
             SELECT
-                nome,
+                IFNULL(pessoas.nome, CONCAT(
+                    'API',
+                    IFNULL(CONCAT(' - ', log.nome), '')
+                )) AS nome,
                 DATE_FORMAT(log.created_at, '%d/%m/%Y às %H:%i') AS data
             
             FROM log

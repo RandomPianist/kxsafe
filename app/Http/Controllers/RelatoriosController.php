@@ -164,7 +164,10 @@ class RelatoriosController extends Controller {
                     WHEN (es = 'E') THEN qtd
                     ELSE qtd * -1
                 END AS qtd,
-                IFNULL(pessoas.nome, 'API') AS autor
+                IFNULL(pessoas.nome, CONCAT(
+                    'API',
+                    IFNULL(CONCAT(' - ', log.nome), '')
+                )) AS autor
 
             FROM log
 

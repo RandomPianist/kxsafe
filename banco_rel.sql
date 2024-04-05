@@ -130,6 +130,7 @@ CREATE TABLE comodatos (
 CREATE TABLE log (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	id_pessoa INT,
+	nome VARCHAR(32),
 	acao CHAR,
 	tabela VARCHAR(16),
 	fk INT,
