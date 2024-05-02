@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int    $created_at
  * @property int    $updated_at
  * @property string $tabela
+ * @property string $produto
  * @property string $referencia
  */
 class Atribuicoes extends Model
@@ -34,7 +35,7 @@ class Atribuicoes extends Model
      * @var array
      */
     protected $fillable = [
-        'tabela', 'qtd', 'referencia', 'fk', 'created_at', 'updated_at'
+        'tabela', 'qtd', 'produto', 'referencia', 'fk', 'created_at', 'updated_at'
     ];
 
     /**
@@ -52,7 +53,7 @@ class Atribuicoes extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'tabela' => 'string', 'referencia' => 'string', 'fk' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp'
+        'id' => 'int', 'tabela' => 'string', 'produto' => 'string', 'referencia' => 'string', 'fk' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp'
     ];
 
     /**
