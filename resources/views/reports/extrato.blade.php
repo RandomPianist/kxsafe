@@ -37,7 +37,7 @@
                         <h6 class = "pl-3 fw-600">{{ $produto["descr"] }}</h6>
                     </td>
                     <td width = "50%">
-                        <h6 class = "pl-3 fw-600">Preço: R$ {{ $produto["preco"] }}</h6>
+                        <h6 class = "pl-3 fw-600">Preço: R$ {{ str_replace(".", ",", $produto["preco"]) }}</h6>
                     </td>
                     <td style = "white-space:nowrap">
                         <h6 class = "pl-3 fw-600">Saldo total: {{ $produto["saldo"] }}</h6>
