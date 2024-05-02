@@ -150,7 +150,7 @@
             if (id) {
                 $.get(URL + "/produtos/mostrar/" + id, function(data) {
                     if (typeof data == "string") data = $.parseJSON(data);
-                    ["cod_externo", "descr", "preco", "ca", "validade", "categoria", "id_categoria"].forEach((_id) => {
+                    ["cod_externo", "descr", "preco", "ca", "validade", "categoria", "id_categoria", "referencia"].forEach((_id) => {
                         document.getElementById(_id).value = data[_id];
                     });
                     modal("produtosModal", id, function() {

@@ -104,6 +104,7 @@ class ProdutosController extends Controller {
         $linha->ca = $request->ca;
         $linha->cod_externo = $request->cod_externo;
         $linha->id_categoria = $request->id_categoria;
+        $linha->referencia = $request->referencia;
         if ($request->file("foto")) $linha->foto = $request->file("foto")->store("uploads", "public");
         $linha->save();
         $log->inserir($request->id ? "E" : "C", "produtos", $linha->id);

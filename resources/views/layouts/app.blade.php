@@ -28,7 +28,8 @@
             }
 
             .form-search-3::after {
-                right: -15px
+                right: -14px;
+                top: 31px
             }
         </style>
     </head>

@@ -39,11 +39,18 @@
                                 <input id = "ca" name = "ca" class = "form-control" autocomplete = "off" type = "text" onkeyup = "contar_char(this, 16)" />
                                 <span class = "custom-label-form tam-max"></span>
                             </div>
-                            <div class = "col-2">
+                            <div class = "col-9">
+                                <label for = "referencia" class = "custom-label-form">Referência: *</label>
+                                <input id = "referencia" name = "referencia" class = "form-control" autocomplete = "off" type = "text" onkeyup = "contar_char(this, 50)" />
+                                <span class = "custom-label-form tam-max"></span>
+                            </div>
+                        </div>
+                        <div class = "row">
+                            <div class = "col-3">
                                 <label for = "validade" class = "custom-label-form">Validade em dias: *</label>
                                 <input id = "validade" name = "validade" class = "form-control text-right" autocomplete = "off" type = "number" onkeyup = "$(this).trigger('change')" onchange = "limitar(this)" />
                             </div>
-                            <div class = "col-3 pr-0 form-search form-search-3">
+                            <div class = "col-5 pr-0 form-search form-search-3">
                                 <label for = "categoria" class = "custom-label-form">Categoria: *</label>
                                 <input id = "categoria"
                                     class = "form-control autocomplete"
@@ -54,11 +61,11 @@
                                     data-filter = "categorias"
                                     type = "text"
                                     autocomplete = "off"
-                                    style = "width:113%"
+                                    style = "width:108%"
                                 />
                                 <input id = "id_categoria" name = "id_categoria" type = "hidden"/>
                             </div>
-                            <div class = "col-1 d-flex align-items-center pl-0" style = "justify-content:end">
+                            <div class = "col-1 d-flex align-items-center pl-0 pt-3" style = "justify-content:end">
                                 <a href = "{{ config('app.root_url') }}/valores/categorias" title = "Cadastro de categorias" target = "_blank">
                                     <i class="fa-sharp fa-regular fa-arrow-up-right-from-square"></i>
                                 </a>
