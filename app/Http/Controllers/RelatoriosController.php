@@ -139,11 +139,11 @@ class RelatoriosController extends Controller {
         if ($periodo) array_push($criterios, $periodo);
         if ($request->id_maquina) {
             array_push($criterios, "Máquina: ".$request->maquina);
-            array_push($filtro, "id_maquina = ".$request->id_maquina);
+            array_push($filtro, "estoque.id_maquina = ".$request->id_maquina);
         }
         if ($request->id_produto) {
             array_push($criterios, "Produto: ".$request->produto);
-            array_push($filtro, "id_produto = ".$request->id_produto);
+            array_push($filtro, "estoque.id_produto = ".$request->id_produto);
         }
         $filtro = join(" AND ", $filtro);
         if (!$filtro) $filtro = "1";
@@ -155,6 +155,7 @@ class RelatoriosController extends Controller {
 
                 /* GRUPO 2 */
                 produtos.descr AS produto,
+                IFNULL(ge.preco, produtos.preco) AS preco,
 
                 /* DETALHES */
                 DATE_FORMAT(log.created_at, '%d/%m/%Y %H:%i') AS data,
@@ -180,6 +181,9 @@ class RelatoriosController extends Controller {
             JOIN valores
                 ON valores.id = estoque.id_maquina
 
+            JOIN gestor_estoque AS ge
+                ON ge.id_maquina = estoque.id_maquina AND ge.id_produto = estoque.id_produto
+
             LEFT JOIN pessoas
                 ON pessoas.id = log.id_pessoa
 
@@ -196,6 +200,7 @@ class RelatoriosController extends Controller {
                     "produtos" => collect($itens1)->groupBy("produto")->map(function($itens2) {
                         return [
                             "descr" => $itens2[0]->produto,
+                            "preco" => $itens2[0]->preco,
                             "saldo" => $itens2->sum("qtd"),
                             "movimentacao" => $itens2->map(function($movimento) {
                                 $qtd = floatval($movimento->qtd);
