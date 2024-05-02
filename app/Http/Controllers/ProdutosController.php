@@ -13,7 +13,10 @@ class ProdutosController extends Controller {
         return DB::select(DB::raw("
             SELECT
                 produtos.*,
-                IFNULL(valores.descr, 'A CLASSIFICAR') AS categoria
+                CASE
+                    WHEN valores.descr IS NULL OR valores.descr = '' THEN 'A CLASSIFICAR'
+                    ELSE valores.descr
+                END AS categoria
 
             FROM produtos
 
