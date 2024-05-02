@@ -162,7 +162,11 @@ class ApiController extends Controller {
                 lixeira,
                 id_categoria AS idCategoria,
                 cod_externo AS codExterno
-        "));
+
+            FROM produtos
+
+            WHERE id = ".$linha->id."
+        "))[0];
         $consulta->preco = floatval($consulta->preco);
         $consulta->lixeira = intval($consulta->lixeira);
         return json_encode($consulta);
