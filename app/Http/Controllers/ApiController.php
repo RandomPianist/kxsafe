@@ -65,6 +65,7 @@ class ApiController extends Controller {
             SELECT
                 produtos.id,
                 produtos.descr,
+                IFNULL(ge.preco, 0) AS preco,
                 IFNULL(tab.saldo, 0) AS saldo,
                 IFNULL(ge.minimo, 0) AS minimo,
                 IFNULL(ge.maximo, 0) AS maximo
@@ -140,6 +141,7 @@ class ApiController extends Controller {
         $linha->id_categoria = $request->idCategoria;
         $linha->foto = $request->foto;
         $linha->lixeira = $request->lixeira;
+        if (isset($request->refer)) $linha->referencia = $request->refer;
         $linha->save();
         $log = new LogController;
         $letra_log = $request->id ? "E" : "C";
@@ -184,11 +186,13 @@ class ApiController extends Controller {
     }
 
     public function gerenciar_estoque(Request $request) {
+        $precoProd = floatval($request->preco) > 0 ? floatval($request->preco) : floatval(DB::select("produtos")->where("id", $request->idProduto)->value("preco"));
         $log = new LogController;
         DB::statement("
             UPDATE gestor_estoque SET
                 minimo = ".$request->minimo.",
-                maximo = ".$request->maximo."
+                maximo = ".$request->maximo.",
+                preco = ".$precoProd."
             WHERE id_produto = ".$request->idProduto."
               AND id_maquina = ".$request->idMaquina
         );
