@@ -29,7 +29,7 @@ class LogController extends Controller {
             
             FROM log
 
-            JOIN pessoas
+            LEFT JOIN pessoas
                 ON log.id_pessoa = pessoas.id
         ";
         $query .= $alias != "" ? "
