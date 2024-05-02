@@ -40,9 +40,10 @@ class AtribuicoesController extends Controller {
 
     public function excluir(Request $request) {
         $linha = Atribuicoes::find($request->id);
+        $id = $linha->id;
         $linha->delete();
         $log = new LogController;
-        $log->inserir("D", "atribuicoes", $linha->id);
+        $log->inserir("D", "atribuicoes", $id);
     }
 
     public function mostrar($id) {
