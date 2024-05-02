@@ -91,18 +91,18 @@
                 if (data.length) {
                     resultado += "<thead>" +
                         "<tr>" +
-                            "<th>Produto</th>" +
+                            "<th>Referência</th>" +
                             "<th class = 'text-right'>Quantidade</th>" +
                             "<th>&nbsp;</th>" +
                         "</tr>" +
                     "</thead>" +
                     "<tbody>";
-                    data.forEach((produto) => {
+                    data.forEach((atribuicao) => {
                         resultado += "<tr>" +
-                            "<td>" + produto.descr + "</td>" +
-                            "<td class = 'text-right'>" + produto.qtd + "</td>" +
+                            "<td>" + atribuicao.referencia + "</td>" +
+                            "<td class = 'text-right'>" + atribuicao.qtd + "</td>" +
                             "<td class = 'text-center'>" +
-                                "<i class = 'my-icon far fa-trash-alt' title = 'Excluir' onclick = 'excluir_atribuicao(" + produto.id + ")'></i>" +
+                                "<i class = 'my-icon far fa-trash-alt' title = 'Excluir' onclick = 'excluir_atribuicao(" + atribuicao.id + ")'></i>" +
                             "</td>" +
                         "</tr>";
                     });
@@ -119,36 +119,42 @@
                 $.get(URL + "/colaboradores/mostrar/" + id, function(data) {
                     if (typeof data == "string") data = $.parseJSON(data);
                     document.getElementById("atribuicaoModalLabel").innerHTML = data.nome.toUpperCase() + " - Atribuindo produtos";
+                    document.getElementById("referencia").dataset.filter = id;
                     mostrar_atribuicoes();
                 });
             });
         }
 
         function atualizaLimiteMaximo() {
-            $.get(URL + "/atribuicoes/ver-maximo/" + document.getElementById("id_produto").value, function(maximo) {
-                limite_maximo = parseFloat(maximo);
-            });
+            id_produto = document.getElementById("id_produto").value;
+            if (id_produto) {
+                $.get(URL + "/atribuicoes/ver-maximo/" + id_produto, function(maximo) {
+                    limite_maximo = parseFloat(maximo);
+                });
+            }
         }
 
         function atribuir() {
             $.post(URL + "/atribuicoes/salvar", {
                 _token : $("meta[name='csrf-token']").attr("content"),
-                id_produto : document.getElementById("id_produto").value,
+                referencia : document.getElementById("referencia").value,
                 fk : pessoa_atribuindo,
                 tabela : "pessoas",
                 qtd : document.getElementById("quantidade").value
-            }, function() {
-                document.getElementById("id_produto").value = "";
-                document.getElementById("produto").value = "";
-                document.getElementById("quantidade").value = 1;
-                mostrar_atribuicoes();
+            }, function(ret) {
+                if (parseInt(ret)) {
+                    document.getElementById("id_produto").value = "";
+                    document.getElementById("referencia").value = "";
+                    document.getElementById("quantidade").value = 1;
+                    mostrar_atribuicoes();
+                } else s_alert("Referência não encontrada");
             });
         }
 
         function excluir_atribuicao(_id) {
             Swal.fire({
                 title: "Aviso",
-                html : "Tem certeza que deseja excluir esse produto?",
+                html : "Tem certeza que deseja excluir essa referência?",
                 showDenyButton : true,
                 confirmButtonText : "NÃO",
                 confirmButtonColor : "rgb(31, 41, 55)",

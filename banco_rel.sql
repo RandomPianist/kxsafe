@@ -133,11 +133,11 @@ CREATE TABLE atribuicoes (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	tabela VARCHAR(16),
 	qtd NUMERIC(10, 5),
-	id_produto INT,
+	referencia VARCHAR(64),
 	fk INT,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	FOREIGN KEY (id_produto) REFERENCES produtos(id),
+	FOREIGN KEY (referencia) REFERENCES produtos(referencia),
 	FOREIGN KEY (fk) REFERENCES pessoas(id),
 	FOREIGN KEY (fk) REFERENCES setores(id)
 );

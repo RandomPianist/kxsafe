@@ -13,12 +13,12 @@
                 <div class = "container">
                     <div class = "row pb-4">
                         <div class = "col-6">
-                            <label for = "produto" class = "custom-label-form">Produto: *</label>
-                            <input id = "produto"
+                            <label for = "referencia" class = "custom-label-form">Referência: *</label>
+                            <input id = "referencia"
                                 class = "form-control autocomplete"
                                 data-input = "#id_produto"
                                 data-table = "produtos"
-                                data-column = "descr"
+                                data-column = "referencia"
                                 data-filter_col = ""
                                 data-filter = ""
                                 type = "text"
