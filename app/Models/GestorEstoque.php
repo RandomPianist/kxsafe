@@ -34,7 +34,7 @@ class GestorEstoque extends Model
      * @var array
      */
     protected $fillable = [
-        'descr', 'minimo', 'maximo', 'id_maquina', 'id_produto', 'created_at', 'updated_at'
+        'descr', 'minimo', 'maximo', 'id_maquina', 'id_produto', 'created_at', 'updated_at', 'preco'
     ];
 
     /**

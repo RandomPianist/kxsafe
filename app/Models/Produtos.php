@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $ca
  * @property string $foto
  * @property string $cod_externo
+ * @property string $referencia
  */
 class Produtos extends Model
 {
@@ -38,7 +39,7 @@ class Produtos extends Model
      * @var array
      */
     protected $fillable = [
-        'descr', 'preco', 'validade', 'lixeira', 'ca', 'foto', 'cod_externo', 'id_categoria', 'created_at', 'updated_at'
+        'descr', 'preco', 'validade', 'lixeira', 'ca', 'foto', 'cod_externo', 'id_categoria', 'created_at', 'updated_at', 'referencia'
     ];
 
     /**
@@ -56,7 +57,7 @@ class Produtos extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'descr' => 'string', 'validade' => 'int', 'lixeira' => 'int', 'ca' => 'string', 'foto' => 'string', 'cod_externo' => 'string', 'id_categoria' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp'
+        'id' => 'int', 'descr' => 'string', 'validade' => 'int', 'lixeira' => 'int', 'ca' => 'string', 'foto' => 'string', 'cod_externo' => 'string', 'id_categoria' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp', 'referencia' => 'string'
     ];
 
     /**

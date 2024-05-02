@@ -149,20 +149,18 @@ class ApiController extends Controller {
         $modelo->save();
         $maquinas = new MaquinasController;
         $maquinas->mov_estoque($linha->id, true);
-        $consulta = DB::table("produtos")
-            ->select(
-                "id",
-                "descr",
-                "preco",
-                "validade",
-                "ca",
-                "lixeira",
-                "id_categoria AS idCategoria",
-                "cod_externo AS codExterno",
-                "foto"
-            )
-            ->where("id", $linha->id)
-            ->first();
+        $consulta = DB::select(DB::raw("
+            SELECT
+                id,
+                descr,
+                preco,
+                validade,
+                IFNULL(ca, '') AS ca,
+                IFNULL(foto, '') AS foto,
+                lixeira,
+                id_categoria AS idCategoria,
+                cod_externo AS codExterno
+        "));
         $consulta->preco = floatval($consulta->preco);
         $consulta->lixeira = intval($consulta->lixeira);
         return json_encode($consulta);
