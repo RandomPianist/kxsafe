@@ -40,7 +40,7 @@
                                 <span class = "custom-label-form tam-max"></span>
                             </div>
                             <div class = "col-9">
-                                <label for = "referencia" class = "custom-label-form">Referência: *</label>
+                                <label for = "referencia" class = "custom-label-form">Referência:</label>
                                 <input id = "referencia" name = "referencia" class = "form-control" autocomplete = "off" type = "text" onkeyup = "contar_char(this, 50)" />
                                 <span class = "custom-label-form tam-max"></span>
                             </div>
