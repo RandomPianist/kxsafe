@@ -6,6 +6,7 @@ use App\Http\Controllers\SetoresController;
 use App\Http\Controllers\EmpresasController;
 use App\Http\Controllers\PessoasController;
 use App\Http\Controllers\ProdutosController;
+use App\Http\Controllers\AtribuicoesController;
 use App\Http\Controllers\MaquinasController;
 use App\Http\Controllers\RelatoriosController;
 use Illuminate\Support\Facades\Route;
@@ -75,6 +76,13 @@ Route::middleware("auth")->group(function () {
         Route::get ("/aviso/{id}",     [ProdutosController::class, "aviso"]);
         Route::post("/salvar",         [ProdutosController::class, "salvar"]);
         Route::post("/excluir",        [ProdutosController::class, "excluir"]);
+    });
+
+    Route::group(["prefix" => "atribuicoes"], function() {
+        Route::get ("/ver-maximo/{id}", [AtribuicoesController::class, "verMaximo"]);
+        Route::get ("/mostrar/{id}",    [AtribuicoesController::class, "mostrar"]);
+        Route::post("/salvar",          [AtribuicoesController::class, "salvar"]);
+        Route::post("/excluir",         [AtribuicoesController::class, "excluir"]);
     });
 
     Route::group(["prefix" => "maquinas"], function() {

@@ -518,6 +518,9 @@ function limitar(el) {
     if (!texto.length) el.value = 1;
     else if (texto.length > 11) el.value = "".padStart(11, "9");
     else if (parseInt(texto) < 1) el.value = 1;
+    if (el.id == "quantidade" && location.href.indexOf("colaboradores") > -1) {
+        if (parseInt(texto) > limite_maximo) el.value = limite_maximo;
+    }
 }
 
 function extrato_maquina(id_maquina) {

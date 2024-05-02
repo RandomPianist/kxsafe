@@ -57,6 +57,8 @@
         <i class = "my-icon fas fa-plus"></i>
     </button>
     <script type = "text/javascript" language = "JavaScript">
+        let pessoa_atribuindo, limite_maximo;
+
         function listar() {
             $.get(URL + "/colaboradores/listar", {
                 filtro : document.getElementById("busca").value
@@ -70,8 +72,9 @@
                         "<td width = '25%'>" + linha.empresa + "</td>" +
                         "<td width = '20%'>" + linha.setor + "</td>" +
                         "<td class = 'text-center btn-table-action' width = '10%'>" +
-                            "<i class = 'my-icon far fa-edit'      title = 'Editar'  onclick = 'pessoa = new Pessoa(" + linha.id + ")'></i>" +
-                            "<i class = 'my-icon far fa-trash-alt' title = 'Excluir' onclick = 'excluir(" + linha.id + ", " + '"/colaboradores"' + ")'></i>"
+                            "<i class = 'my-icon far fa-hand-holding' title = 'Atribuir produtos' onclick = 'atribuicao(" + linha.id + ")'></i>" +
+                            "<i class = 'my-icon far fa-edit'         title = 'Editar'            onclick = 'pessoa = new Pessoa(" + linha.id + ")'></i>" +
+                            "<i class = 'my-icon far fa-trash-alt'    title = 'Excluir'           onclick = 'excluir(" + linha.id + ", " + '"/colaboradores"' + ")'></i>"
                         "</td>" +
                     "</tr>";
                 });
@@ -79,5 +82,89 @@
                 $($(".sortable-columns").children()[0]).trigger("click");
             });
         }
+
+        function mostrar_atribuicoes() {
+            $.get(URL + "/atribuicoes/mostrar/" + pessoa_atribuindo, function(data) {
+                let resultado = "";
+                let elRes = document.getElementById("table-atribuicoes");
+                if (typeof data == "string") data = $.parseJSON(data);
+                if (data.length) {
+                    resultado += "<thead>" +
+                        "<tr>" +
+                            "<th>Produto</th>" +
+                            "<th class = 'text-right'>Quantidade</th>" +
+                            "<th>&nbsp;</th>" +
+                        "</tr>" +
+                    "</thead>" +
+                    "<tbody>";
+                    data.forEach((produto) => {
+                        resultado += "<tr>" +
+                            "<td>" + produto.descr + "</td>" +
+                            "<td class = 'text-right'>" + produto.qtd + "</td>" +
+                            "<td class = 'text-center'>" +
+                                "<i class = 'my-icon far fa-trash-alt' title = 'Excluir' onclick = 'excluir_atribuicao(" + produto.id + ")'></i>" +
+                            "</td>" +
+                        "</tr>";
+                    });
+                    resultado += "</tbody>";
+                    elRes.parentElement.classList.add("pb-4");
+                } else elRes.parentElement.classList.remove("pb-4");
+                elRes.innerHTML = resultado;
+            });
+        }
+
+        function atribuicao(id) {
+            modal("atribuicaoModal", 0, function() {
+                pessoa_atribuindo = id;
+                $.get(URL + "/colaboradores/mostrar/" + id, function(data) {
+                    if (typeof data == "string") data = $.parseJSON(data);
+                    document.getElementById("atribuicaoModalLabel").innerHTML = data.nome.toUpperCase() + " - Atribuindo produtos";
+                    mostrar_atribuicoes();
+                });
+            });
+        }
+
+        function atualizaLimiteMaximo() {
+            $.get(URL + "/atribuicoes/ver-maximo/" + document.getElementById("id_produto").value, function(maximo) {
+                limite_maximo = parseFloat(maximo);
+            });
+        }
+
+        function atribuir() {
+            $.post(URL + "/atribuicoes/salvar", {
+                _token : $("meta[name='csrf-token']").attr("content"),
+                id_produto : document.getElementById("id_produto").value,
+                fk : pessoa_atribuindo,
+                tabela : "pessoas",
+                qtd : document.getElementById("quantidade").value
+            }, function() {
+                document.getElementById("id_produto").value = "";
+                document.getElementById("produto").value = "";
+                document.getElementById("quantidade").value = 1;
+                mostrar_atribuicoes();
+            });
+        }
+
+        function excluir_atribuicao(_id) {
+            Swal.fire({
+                title: "Aviso",
+                html : "Tem certeza que deseja excluir esse produto?",
+                showDenyButton : true,
+                confirmButtonText : "NÃO",
+                confirmButtonColor : "rgb(31, 41, 55)",
+                denyButtonText : "SIM"
+            }).then((result) => {
+                if (result.isDenied) {
+                    $.post(URL + "/atribuicoes/excluir", {
+                        _token : $("meta[name='csrf-token']").attr("content"),
+                        id : _id
+                    }, function() {
+                        mostrar_atribuicoes();
+                    });
+                }
+            });
+        }
     </script>
+
+    @include("modals.atribuicao_modal")
 @endsection
