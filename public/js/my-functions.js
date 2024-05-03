@@ -69,8 +69,11 @@ window.onload = function() {
         el.parentElement.style.paddingTop = "1px";
     });
 
-    document.getElementById("busca").onkeyup = function(e) {
-        if (e.keyCode == 13) listar();
+    let el_busca = document.getElementById("busca");
+    if (el_busca !== null) {
+        el_busca.onkeyup = function(e) {
+            if (e.keyCode == 13) listar();
+        }
     }
 
     $(document).on("keydown", "form", function(event) { 
