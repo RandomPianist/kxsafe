@@ -143,6 +143,7 @@ class ProdutosController extends Controller {
         foreach ($consulta as $linha) {
             $modelo = Atribuicoes::find($linha->id);
             $modelo->lixeira = 1;
+            $modelo->save();
             $log = new LogController;
             $log->inserir("D", "atribuicoes", $linha->id);
         }
