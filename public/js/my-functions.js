@@ -592,11 +592,12 @@ function mostrar_atribuicoes() {
 function atribuicao(grade, id) {
     modal("atribuicaoModal", 0, function() {
         pessoa_atribuindo = id;
-        $.get(URL + "/colaboradores/mostrar/" + id, function(data) {
+        $.get(URL + "/" + (location.href.indexOf("colaboradores") > -1 ? "colaboradores" : "setores") + "/mostrar/" + id, function(data) {
             if (typeof data == "string") data = $.parseJSON(data);
             let div_produto = document.getElementById("div-produto").classList;
             let div_referencia = document.getElementById("div-referencia").classList;
-            document.getElementById("atribuicaoModalLabel").innerHTML = data.nome.toUpperCase() + " - Atribuindo " + (grade ? "grades" : "produtos");
+            let nome = location.href.indexOf("colaboradores") > -1 ? data.nome.toUpperCase() : data.descr.toUpperCase();
+            document.getElementById("atribuicaoModalLabel").innerHTML = nome + " - Atribuindo " + (grade ? "grades" : "produtos");
             if (grade) {
                 document.getElementById("referencia").dataset.filter = id;
                 div_produto.add("d-none");
