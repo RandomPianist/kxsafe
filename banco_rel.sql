@@ -145,6 +145,17 @@ CREATE TABLE atribuicoes (
 	FOREIGN KEY produto_ou_referencia_valor REFERENCES produtos(referencia)
 );
 
+CREATE TABLE retiradas (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	qtd NUMERIC(10,5),
+	id_atribuicao INT,
+	id_comodato INT,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	FOREIGN KEY id_atribuicao REFERENCES atribuicoes(id),
+	FOREIGN KEY id_comodato REFERENCES comodatos(id)
+);
+
 CREATE TABLE log (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	id_pessoa INT,

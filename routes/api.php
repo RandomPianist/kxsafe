@@ -33,4 +33,5 @@ Route::group(["prefix" => "app"], function() {
     Route::post("/ver-pessoa",          [ApiController::class, "verPessoa"]);
     Route::post("/produtos-por-pessoa", [ApiController::class, "produtosPorPessoa"]);
     Route::post("/validar",             [ApiController::class, "validarApp"]);
+    Route::post("/retirar",             [ApiController::class, "retirar"]);
 });

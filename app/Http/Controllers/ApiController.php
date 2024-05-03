@@ -10,6 +10,7 @@ use App\Http\Controllers\MaquinasController;
 use App\Models\Valores;
 use App\Models\Produtos;
 use App\Models\Estoque;
+use App\Models\Retiradas;
 
 class ApiController extends Controller {
     public function empresas() {
@@ -329,5 +330,13 @@ class ApiController extends Controller {
             array_push($resultado, $linha);
         }
         return json_encode($resultado);
+    }
+
+    public function retirar(Request $request) {
+        $retirada = new Retiradas;
+        $retirada->id_atribuicao = $request->id_atribuicao;
+        $retirada->id_comodato = $request->id_comodato;
+        $retirada->qtd = $request->qtd;
+        $retirada->save();
     }
 }
