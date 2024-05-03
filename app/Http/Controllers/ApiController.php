@@ -269,6 +269,46 @@ class ApiController extends Controller {
                     WHERE pessoa_ou_setor_chave = 'pessoa'
                       AND cpf = '".$request->cpf."'
                       AND produto_ou_referencia_chave = 'referencia'
+
+                    UNION ALL (
+                        SELECT
+                            produtos.id,
+                            produtos.descr,
+                            qtd,
+                            IFNULL(produtos.foto, '') AS foto
+                        
+                        FROM atribuicoes
+                        
+                        JOIN produtos
+                            ON produtos.descr = atribuicoes.produto_ou_referencia_valor
+                            
+                        JOIN pessoas
+                            ON pessoas.id_setor = atribuicoes.pessoa_ou_setor_valor
+                            
+                        WHERE pessoa_ou_setor_chave = 'setor'
+                          AND cpf = '".$request->cpf."'
+                          AND produto_ou_referencia_chave = 'produto'
+
+                        UNION ALL (
+                            SELECT
+                                produtos.id,
+                                produtos.descr,
+                                qtd,
+                                IFNULL(produtos.foto, '') AS foto
+                            
+                            FROM atribuicoes
+                            
+                            JOIN produtos
+                                ON produtos.referencia = atribuicoes.produto_ou_referencia_valor
+                                
+                            JOIN pessoas
+                                ON pessoas.id_setor = atribuicoes.pessoa_ou_setor_valor
+                                
+                            WHERE pessoa_ou_setor_chave = 'setor'
+                              AND cpf = '".$request->cpf."'
+                              AND produto_ou_referencia_chave = 'referencia'
+                        )
+                    )
                 )
             ) AS tab
             

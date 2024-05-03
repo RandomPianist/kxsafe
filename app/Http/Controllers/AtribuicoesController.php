@@ -23,8 +23,8 @@ class AtribuicoesController extends Controller {
                 FROM estoque
             ) AS estq
 
-            WHERE id_produto = ".$request->id."
-        " : "
+            WHERE id_produto = ".$request->id
+        : "
             SELECT IFNULL(SUM(qtd), 0) AS saldo
                         
             FROM (
@@ -96,6 +96,7 @@ class AtribuicoesController extends Controller {
                 )
                 ->where("pessoa_ou_setor_valor", $request->id)
                 ->where("produto_ou_referencia_chave", $request->tipo)
+                ->where("pessoa_ou_setor_chave", $request->tipo2)
                 ->where("lixeira", 0)
                 ->get()
         );
