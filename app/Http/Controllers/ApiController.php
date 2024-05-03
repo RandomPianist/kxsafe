@@ -212,4 +212,70 @@ class ApiController extends Controller {
             $modelo->save();
         }
     }
+
+    public function validarApp(Request $request) {
+        return sizeof(
+            DB::table("pessoas")
+                ->where("cpf", $request->cpf)
+                ->where("senha", $request->senha)
+                ->get()
+        ) ? 1 : 0;
+    }
+
+    public function verPessoa(Request $request) {
+        return json_encode(
+            DB::table("pessoas")
+                ->where("cpf", $request->cpf)
+                ->first()
+        );
+    }
+
+    public function produtosPorPessoa(Request $request) {
+        return json_encode(DB::select(DB::raw("
+            SELECT * FROM (
+                SELECT
+                    produtos.id,
+                    produto_ou_referencia_valor AS descr,
+                    qtd
+            
+                FROM atribuicoes
+            
+                JOIN produtos
+                    ON produtos.descr = atribuicoes.produto_ou_referencia_valor
+            
+                JOIN pessoas
+                    ON pessoas.id = atribuicoes.pessoa_ou_setor_valor
+                    
+                WHERE pessoa_ou_setor_chave = 'pessoa'
+                  AND cpf = '".$request->cpf."'
+                  AND produto_ou_referencia_chave = 'produto'
+                
+                UNION ALL (
+                    SELECT
+                        produtos.id,
+                        produtos.descr,
+                        qtd
+                    
+                    FROM atribuicoes
+                    
+                    JOIN produtos
+                        ON produtos.referencia = atribuicoes.produto_ou_referencia_valor
+                        
+                    JOIN pessoas
+                        ON pessoas.id = atribuicoes.pessoa_ou_setor_valor
+                        
+                    WHERE pessoa_ou_setor_chave = 'pessoa'
+                      AND cpf = '".$request->cpf."'
+                      AND produto_ou_referencia_chave = 'referencia'
+                )
+            ) AS tab
+            
+            GROUP BY
+                id,
+                descr,
+                qtd
+                
+            ORDER BY descr
+        ")));
+    }
 }
