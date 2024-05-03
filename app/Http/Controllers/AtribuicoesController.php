@@ -53,12 +53,14 @@ class AtribuicoesController extends Controller {
     public function salvar(Request $request) {
         if (!sizeof(
             DB::table("produtos")
-                ->where($request->produto_ou_referencia_chave, $request->produto_ou_referencia_valor)
+                ->where($request->produto_ou_referencia_chave == "produto" ? "descr" : "referencia", $request->produto_ou_referencia_valor)
                 ->where("lixeira", 0)
                 ->get()
         )) return 404;
         if (sizeof(
             DB::table("atribuicoes")
+                ->where("pessoa_ou_setor_chave", $request->pessoa_ou_setor_chave)
+                ->where("pessoa_ou_setor_valor", $request->pessoa_ou_setor_valor)
                 ->where("produto_ou_referencia_valor", $request->produto_ou_referencia_valor)
                 ->where("produto_ou_referencia_chave", $request->produto_ou_referencia_chave)
                 ->where("lixeira", 0)
