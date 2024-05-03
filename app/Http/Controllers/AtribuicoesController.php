@@ -8,10 +8,25 @@ use App\Http\Controllers\LogController;
 use App\Models\Atribuicoes;
 
 class AtribuicoesController extends Controller {
-    public function verMaximo($id) {
-        return DB::select(DB::raw("
+    public function verMaximo(Request $request) {
+        $query = $request->tipo == "referencia" ? "
             SELECT IFNULL(SUM(qtd), 0) AS saldo
-                
+                    
+            FROM (
+                SELECT
+                    CASE
+                        WHEN (es = 'E') THEN qtd
+                        ELSE qtd * -1
+                    END AS qtd,
+                    id_produto
+
+                FROM estoque
+            ) AS estq
+
+            WHERE id_produto = ".$request->id."
+        " : "
+            SELECT IFNULL(SUM(qtd), 0) AS saldo
+                        
             FROM (
                 SELECT
                     CASE
@@ -29,49 +44,58 @@ class AtribuicoesController extends Controller {
             WHERE referencia IN (
                 SELECT referencia
                 FROM produtos
-                WHERE id = ".$id."
+                WHERE id = ".$request->id."
             )
-        "))[0]->saldo;
+        ";
+        return DB::select(DB::raw($query))[0]->saldo;
     }
 
     public function salvar(Request $request) {
-        if (sizeof(
+        if (!sizeof(
             DB::table("produtos")
-                ->where("referencia", $request->referencia)
+                ->where($request->produto_ou_referencia_chave, $request->produto_ou_referencia_valor)
                 ->where("lixeira", 0)
                 ->get()
-        )) {
-            $linha = new Atribuicoes;
-            $linha->referencia = $request->referencia;
-            $linha->fk = $request->fk;
-            $linha->tabela = $request->tabela;
-            $linha->qtd = $request->qtd;        
-            $linha->save();
-            $log = new LogController;
-            $log->inserir("C", "atribuicoes", $linha->id);
-            return "1";
-        }
-        return "0";
+        )) return 404;
+        if (sizeof(
+            DB::table("atribuicoes")
+                ->where("produto_ou_referencia_valor", $request->produto_ou_referencia_valor)
+                ->where("produto_ou_referencia_chave", $request->produto_ou_referencia_chave)
+                ->where("lixeira", 0)
+                ->get()
+        )) return 403;
+        $linha = new Atribuicoes;
+        $linha->pessoa_ou_setor_chave = $request->pessoa_ou_setor_chave;
+        $linha->pessoa_ou_setor_valor = $request->pessoa_ou_setor_valor;
+        $linha->produto_ou_referencia_chave = $request->produto_ou_referencia_chave;
+        $linha->produto_ou_referencia_valor = $request->produto_ou_referencia_valor;
+        $linha->qtd = $request->qtd;
+        $linha->save();
+        $log = new LogController;
+        $log->inserir("C", "atribuicoes", $linha->id);
+        return 201;
     }
 
     public function excluir(Request $request) {
         $linha = Atribuicoes::find($request->id);
-        $id = $linha->id;
-        $linha->delete();
+        $linha->lixeira = 1;
+        $linha->save();
         $log = new LogController;
-        $log->inserir("D", "atribuicoes", $id);
+        $log->inserir("D", "atribuicoes", $linha->id);
     }
 
-    public function mostrar($id) {
-        return json_encode(DB::select(DB::raw("
-            SELECT
-                id,
-                referencia,
-                qtd
-
-            FROM atribuicoes
-
-            WHERE fk = ".$id
-        )));
+    public function mostrar(Request $request) {
+        return json_encode(
+            DB::table("atribuicoes")
+                ->select(
+                    "id",
+                    "produto_ou_referencia_valor",
+                    "qtd"
+                )
+                ->where("pessoa_ou_setor_valor", $request->id)
+                ->where("produto_ou_referencia_chave", $request->tipo)
+                ->where("lixeira", 0)
+                ->get()
+        );
     }
 }

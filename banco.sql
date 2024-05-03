@@ -97,11 +97,12 @@ CREATE TABLE comodatos (
 
 CREATE TABLE atribuicoes (
 	id INT AUTO_INCREMENT PRIMARY KEY,
-	tabela VARCHAR(16),
-	qtd NUMERIC(10, 5),
-	referencia VARCHAR(64),
-	produto VARCHAR(256),
-	fk INT,
+	pessoa_ou_setor_chave VARCHAR(16),
+	pessoa_ou_setor_valor INT,
+	produto_ou_referencia_chave VARCHAR(16),
+	produto_ou_referencia_valor VARCHAR(256),
+	qtd NUMERIC(10,5),
+	lixeira TINYINT DEFAULT 0,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

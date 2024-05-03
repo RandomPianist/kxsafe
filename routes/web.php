@@ -79,10 +79,10 @@ Route::middleware("auth")->group(function () {
     });
 
     Route::group(["prefix" => "atribuicoes"], function() {
-        Route::get ("/ver-maximo/{id}", [AtribuicoesController::class, "verMaximo"]);
-        Route::get ("/mostrar/{id}",    [AtribuicoesController::class, "mostrar"]);
-        Route::post("/salvar",          [AtribuicoesController::class, "salvar"]);
-        Route::post("/excluir",         [AtribuicoesController::class, "excluir"]);
+        Route::get ("/ver-maximo", [AtribuicoesController::class, "verMaximo"]);
+        Route::get ("/mostrar",    [AtribuicoesController::class, "mostrar"]);
+        Route::post("/salvar",     [AtribuicoesController::class, "salvar"]);
+        Route::post("/excluir",    [AtribuicoesController::class, "excluir"]);
     });
 
     Route::group(["prefix" => "maquinas"], function() {

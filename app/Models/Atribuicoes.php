@@ -6,12 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int    $id
- * @property int    $fk
+ * @property int    $pessoa_ou_setor_valor
+ * @property int    $lixeira
  * @property int    $created_at
  * @property int    $updated_at
- * @property string $tabela
- * @property string $produto
- * @property string $referencia
+ * @property string $pessoa_ou_setor_chave
+ * @property string $produto_ou_referencia_chave
+ * @property string $produto_ou_referencia_valor
  */
 class Atribuicoes extends Model
 {
@@ -35,7 +36,7 @@ class Atribuicoes extends Model
      * @var array
      */
     protected $fillable = [
-        'tabela', 'qtd', 'produto', 'referencia', 'fk', 'created_at', 'updated_at'
+        'pessoa_ou_setor_chave', 'pessoa_ou_setor_valor', 'produto_ou_referencia_chave', 'produto_ou_referencia_valor', 'lixeira', 'created_at', 'updated_at'
     ];
 
     /**
@@ -53,7 +54,7 @@ class Atribuicoes extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'tabela' => 'string', 'produto' => 'string', 'referencia' => 'string', 'fk' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp'
+        'id' => 'int', 'pessoa_ou_setor_chave' => 'string', 'pessoa_ou_setor_valor' => 'int', 'produto_ou_referencia_chave' => 'string', 'produto_ou_referencia_valor' => 'string', 'lixeira' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp'
     ];
 
     /**

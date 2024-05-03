@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\MaquinasController;
 use App\Models\Produtos;
+use App\Models\Atribuicoes;
 
 class ProdutosController extends Controller {
     private function busca($param) {
@@ -119,5 +120,31 @@ class ProdutosController extends Controller {
         $linha->save();
         $log = new LogController;
         $log->inserir("D", "produtos", $linha->id);
+        $lista = array();
+        $consulta = DB::select(DB::raw("
+            SELECT id
+
+            FROM atribuicoes
+
+            WHERE (
+                produto_ou_referencia_valor IN (
+                    SELECT descr
+                    FROM produtos
+                    WHERE id = ".$request->id."
+                ) AND produto_ou_referencia_chave = 'produto'
+            ) OR (
+                produto_ou_referencia_valor IN (
+                    SELECT referencia
+                    FROM produtos
+                    WHERE id = ".$request->id."
+                ) AND produto_ou_referencia_chave = 'referencia'
+            )
+        "));
+        foreach ($consulta as $linha) {
+            $modelo = Atribuicoes::find($linha->id);
+            $modelo->lixeira = 1;
+            $log = new LogController;
+            $log->inserir("D", "atribuicoes", $linha->id);
+        }
     }
 }

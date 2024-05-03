@@ -186,7 +186,12 @@ window.onload = function() {
     $(".modal").each(function() {
         let that = this;
         $(this).on("shown.bs.modal", function () {
-           $($("#" + that.id + " input[type=text]")[0]).focus();
+            let cont = 0;
+            do {
+                var el = $($("#" + that.id + " input[type=text]")[cont]);
+                el.focus();
+                cont++;
+            } while ($($(el).parent()).hasClass("d-none"))
         })
     });
 

@@ -46,11 +46,12 @@ class HomeController extends Controller {
                     ->get()
             );
         }
-        $where = "";
-        if ($request->filter) $where = " AND referencia NOT IN (
-            SELECT referencia
+        $where = " AND ".$request->column." LIKE '".$request->search."%'";
+        if ($request->filter) $where .= " AND referencia NOT IN (
+            SELECT produto_ou_referencia_valor
             FROM atribuicoes
-            WHERE fk = ".$request->filter."
+            WHERE pessoa_ou_setor_valor = ".$request->filter."
+              AND lixeira = 0
         )";
         return json_encode(DB::select(DB::raw("
             SELECT
@@ -62,6 +63,8 @@ class HomeController extends Controller {
             WHERE lixeira = 0".$where."
 
             GROUP BY referencia
+
+            ORDER BY referencia
         ")));
     }
 }

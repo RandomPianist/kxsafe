@@ -30,7 +30,7 @@
                             <th width = "10%" class = "text-right">
                                 <span>Código</span>
                             </th>
-                            <th width = "35%">
+                            <th width = "30%">
                                 <span>Nome</span>
                             </th>
                             <th width = "25%">
@@ -39,7 +39,7 @@
                             <th width = "20%">
                                 <span>Setor</span>
                             </th>
-                            <th width = "10%" class = "text-center nao-ordena">
+                            <th width = "15%" class = "text-center nao-ordena">
                                 <span>Ações</span>
                             </th>
                         </tr>
@@ -57,7 +57,7 @@
         <i class = "my-icon fas fa-plus"></i>
     </button>
     <script type = "text/javascript" language = "JavaScript">
-        let pessoa_atribuindo, limite_maximo;
+        let pessoa_atribuindo, limite_maximo, gradeGlobal;
 
         function listar() {
             $.get(URL + "/colaboradores/listar", {
@@ -68,13 +68,14 @@
                 data.forEach((linha) => {
                     resultado += "<tr>" +
                         "<td width = '10%' class = 'text-right'>" + linha.id.toString().padStart(4, "0") + "</td>" +
-                        "<td width = '35%'>" + linha.nome + "</td>" +
+                        "<td width = '30%'>" + linha.nome + "</td>" +
                         "<td width = '25%'>" + linha.empresa + "</td>" +
                         "<td width = '20%'>" + linha.setor + "</td>" +
-                        "<td class = 'text-center btn-table-action' width = '10%'>" +
-                            "<i class = 'my-icon far fa-hand-holding' title = 'Atribuir produtos' onclick = 'atribuicao(" + linha.id + ")'></i>" +
-                            "<i class = 'my-icon far fa-edit'         title = 'Editar'            onclick = 'pessoa = new Pessoa(" + linha.id + ")'></i>" +
-                            "<i class = 'my-icon far fa-trash-alt'    title = 'Excluir'           onclick = 'excluir(" + linha.id + ", " + '"/colaboradores"' + ")'></i>"
+                        "<td class = 'text-center btn-table-action' width = '15%'>" +
+                            "<i class = 'my-icon far fa-box'       title = 'Atribuir produto' onclick = 'atribuicao(false, " + linha.id + ")'></i>" +
+                            "<i class = 'my-icon far fa-tshirt'    title = 'Atribuir grade'   onclick = 'atribuicao(true, " + linha.id + ")'></i>" +
+                            "<i class = 'my-icon far fa-edit'      title = 'Editar'           onclick = 'pessoa = new Pessoa(" + linha.id + ")'></i>" +
+                            "<i class = 'my-icon far fa-trash-alt' title = 'Excluir'          onclick = 'excluir(" + linha.id + ", " + '"/colaboradores"' + ")'></i>"
                         "</td>" +
                     "</tr>";
                 });
@@ -84,14 +85,17 @@
         }
 
         function mostrar_atribuicoes() {
-            $.get(URL + "/atribuicoes/mostrar/" + pessoa_atribuindo, function(data) {
+            $.get(URL + "/atribuicoes/mostrar", {
+                id : pessoa_atribuindo,
+                tipo : gradeGlobal ? "referencia" : "produto"
+            }, function(data) {
                 let resultado = "";
                 let elRes = document.getElementById("table-atribuicoes");
                 if (typeof data == "string") data = $.parseJSON(data);
                 if (data.length) {
                     resultado += "<thead>" +
                         "<tr>" +
-                            "<th>Referência</th>" +
+                            "<th>" + (gradeGlobal ? "Referência" : "Produto") + "</th>" +
                             "<th class = 'text-right'>Quantidade</th>" +
                             "<th>&nbsp;</th>" +
                         "</tr>" +
@@ -99,7 +103,7 @@
                     "<tbody>";
                     data.forEach((atribuicao) => {
                         resultado += "<tr>" +
-                            "<td>" + atribuicao.referencia + "</td>" +
+                            "<td>" + atribuicao.produto_ou_referencia_valor + "</td>" +
                             "<td class = 'text-right'>" + atribuicao.qtd + "</td>" +
                             "<td class = 'text-center'>" +
                                 "<i class = 'my-icon far fa-trash-alt' title = 'Excluir' onclick = 'excluir_atribuicao(" + atribuicao.id + ")'></i>" +
@@ -113,13 +117,23 @@
             });
         }
 
-        function atribuicao(id) {
+        function atribuicao(grade, id) {
             modal("atribuicaoModal", 0, function() {
                 pessoa_atribuindo = id;
                 $.get(URL + "/colaboradores/mostrar/" + id, function(data) {
                     if (typeof data == "string") data = $.parseJSON(data);
-                    document.getElementById("atribuicaoModalLabel").innerHTML = data.nome.toUpperCase() + " - Atribuindo produtos";
-                    document.getElementById("referencia").dataset.filter = id;
+                    let div_produto = document.getElementById("div-produto").classList;
+                    let div_referencia = document.getElementById("div-referencia").classList;
+                    document.getElementById("atribuicaoModalLabel").innerHTML = data.nome.toUpperCase() + " - Atribuindo " + (grade ? "grades" : "produtos");
+                    if (grade) {
+                        document.getElementById("referencia").dataset.filter = id;
+                        div_produto.add("d-none");
+                        div_referencia.remove("d-none");
+                    } else {
+                        div_produto.remove("d-none");
+                        div_referencia.add("d-none");
+                    }
+                    gradeGlobal = grade;
                     mostrar_atribuicoes();
                 });
             });
@@ -128,33 +142,50 @@
         function atualizaLimiteMaximo() {
             id_produto = document.getElementById("id_produto").value;
             if (id_produto) {
-                $.get(URL + "/atribuicoes/ver-maximo/" + id_produto, function(maximo) {
+                $.get(URL + "/atribuicoes/ver-maximo", {
+                    id : id_produto,
+                    tipo : gradeGlobal ? "referencia" : "produto"
+                }, function(maximo) {
                     limite_maximo = parseFloat(maximo);
                 });
             }
         }
 
         function atribuir() {
+            const campo = gradeGlobal ? "referencia" : "produto";
             $.post(URL + "/atribuicoes/salvar", {
                 _token : $("meta[name='csrf-token']").attr("content"),
-                referencia : document.getElementById("referencia").value,
-                fk : pessoa_atribuindo,
-                tabela : "pessoas",
+                pessoa_ou_setor_chave : "pessoa",
+                pessoa_ou_setor_valor : pessoa_atribuindo,
+                produto_ou_referencia_chave : campo,
+                produto_ou_referencia_valor : document.getElementById(campo).value,
                 qtd : document.getElementById("quantidade").value
             }, function(ret) {
-                if (parseInt(ret)) {
-                    document.getElementById("id_produto").value = "";
-                    document.getElementById("referencia").value = "";
-                    document.getElementById("quantidade").value = 1;
-                    mostrar_atribuicoes();
-                } else s_alert("Referência não encontrada");
+                ret = parseInt(ret);
+                switch(ret) {
+                    case 201:
+                        document.getElementById("id_produto").value = "";
+                        document.getElementById("referencia").value = "";
+                        document.getElementById("produto").value = "";
+                        document.getElementById("quantidade").value = 1;
+                        mostrar_atribuicoes();
+                        break;
+                    case 403:
+                        s_alert(gradeGlobal ? "Referência inválida" : "Produto inválido");
+                        break;
+                    case 404:
+                        s_alert(gradeGlobal ? "Referência não encontrada" : "Produto não encontrado");
+                        break;
+                }
             });
         }
 
         function excluir_atribuicao(_id) {
+            let aviso = "Tem certeza que deseja excluir ess";
+            aviso += gradeGlobal ? "a referência?" : "e produto?";
             Swal.fire({
                 title: "Aviso",
-                html : "Tem certeza que deseja excluir essa referência?",
+                html : aviso,
                 showDenyButton : true,
                 confirmButtonText : "NÃO",
                 confirmButtonColor : "rgb(31, 41, 55)",

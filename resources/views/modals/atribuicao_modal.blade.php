@@ -12,7 +12,7 @@
             <div class = "modal-body">
                 <div class = "container">
                     <div class = "row pb-4">
-                        <div class = "col-6">
+                        <div class = "col-6 d-none" id = "div-referencia">
                             <label for = "referencia" class = "custom-label-form">Referência: *</label>
                             <input id = "referencia"
                                 class = "form-control autocomplete"
@@ -26,6 +26,20 @@
                                 style = "width:108%"
                             />
                             <input id = "id_produto" type = "hidden" onchange = "atualizaLimiteMaximo()" />
+                        </div>
+                        <div class = "col-6" id = "div-produto">
+                            <label for = "produto" class = "custom-label-form">Produto: *</label>
+                            <input id = "produto"
+                                class = "form-control autocomplete"
+                                data-input = "#id_produto"
+                                data-table = "produtos"
+                                data-column = "descr"
+                                data-filter_col = ""
+                                data-filter = ""
+                                type = "text"
+                                autocomplete = "off"
+                                style = "width:108%"
+                            />
                         </div>
                         <div class = "col-1 d-flex align-items-center pl-0 pt-3" style = "justify-content:end">
                             <a href = "{{ config('app.root_url') }}/produtos" title = "Cadastro de produtos" target = "_blank">
