@@ -69,6 +69,10 @@ window.onload = function() {
         el.parentElement.style.paddingTop = "1px";
     });
 
+    document.getElementById("busca").onkeyup = function(e) {
+        if (e.keyCode == 13) listar();
+    }
+
     $(document).on("keydown", "form", function(event) { 
         const enter = event.key == "Enter";
         if (enter && !validacao_bloqueada) {
