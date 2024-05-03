@@ -30,7 +30,7 @@ Route::post("movimentar-estoque",   [ApiController::class, "movimentar_estoque"]
 Route::post("gerenciar-estoque",    [ApiController::class, "gerenciar_estoque"]);
 
 Route::group(["prefix" => "app"], function() {
-    Route::get ("/ver-pessoa",          [ApiController::class, "verPessoa"]);
-    Route::get ("/produtos-por-pessoa", [ApiController::class, "produtosPorPessoa"]);
+    Route::post("/ver-pessoa",          [ApiController::class, "verPessoa"]);
+    Route::post("/produtos-por-pessoa", [ApiController::class, "produtosPorPessoa"]);
     Route::post("/validar",             [ApiController::class, "validarApp"]);
 });
