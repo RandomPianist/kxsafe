@@ -38,9 +38,9 @@ class ProdutosController extends Controller {
     public function listar(Request $request) {
         $filtro = trim($request->filtro);
         if (strlen($filtro)) {
-            $busca = $this->busca("descr LIKE '".$filtro."%'");
-            if (sizeof($busca) < 3) $busca = $this->busca("descr LIKE '%".$filtro."%'");
-            if (sizeof($busca) < 3) $busca = $this->busca("(descr LIKE '%".implode("%' AND descr LIKE '%", explode(" ", str_replace("  ", " ", $filtro)))."%')");
+            $busca = $this->busca("produtos.descr LIKE '".$filtro."%'");
+            if (sizeof($busca) < 3) $busca = $this->busca("produtos.descr LIKE '%".$filtro."%'");
+            if (sizeof($busca) < 3) $busca = $this->busca("(produtos.descr LIKE '%".implode("%' AND produtos.descr LIKE '%", explode(" ", str_replace("  ", " ", $filtro)))."%')");
         } else $busca = $this->busca("1");
         foreach($busca as $linha) $linha->foto = asset("storage/".$linha->foto);
         return json_encode($busca);

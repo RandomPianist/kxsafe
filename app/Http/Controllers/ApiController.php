@@ -231,12 +231,13 @@ class ApiController extends Controller {
     }
 
     public function produtosPorPessoa(Request $request) {
-        return json_encode(DB::select(DB::raw("
+        $consulta = DB::select(DB::raw("
             SELECT * FROM (
                 SELECT
                     produtos.id,
                     produto_ou_referencia_valor AS descr,
-                    qtd
+                    qtd,
+                    IFNULL(produtos.foto, '') AS foto
             
                 FROM atribuicoes
             
@@ -254,7 +255,8 @@ class ApiController extends Controller {
                     SELECT
                         produtos.id,
                         produtos.descr,
-                        qtd
+                        qtd,
+                        IFNULL(produtos.foto, '') AS foto
                     
                     FROM atribuicoes
                     
@@ -273,9 +275,19 @@ class ApiController extends Controller {
             GROUP BY
                 id,
                 descr,
-                qtd
+                qtd,
+                foto
                 
             ORDER BY descr
-        ")));
+        "));
+        $resultado = array();
+        foreach ($consulta as $linha) {
+            if ($linha->foto) {
+                $foto = explode("/", $linha->foto);
+                $linha->foto = $foto[sizeof($foto) - 1];
+            }
+            array_push($resultado, $linha);
+        }
+        return json_encode($resultado);
     }
 }
