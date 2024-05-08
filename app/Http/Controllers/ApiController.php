@@ -11,6 +11,7 @@ use App\Models\Valores;
 use App\Models\Produtos;
 use App\Models\Estoque;
 use App\Models\Retiradas;
+use App\Models\Atribuicoes;
 
 class ApiController extends Controller {
     public function empresas() {
@@ -235,6 +236,7 @@ class ApiController extends Controller {
         $consulta = DB::select(DB::raw("
             SELECT * FROM (
                 SELECT
+                    atribuicoes.id AS id_atribuicao,
                     produtos.id,
                     produto_ou_referencia_valor AS descr,
                     qtd,
@@ -254,6 +256,7 @@ class ApiController extends Controller {
                 
                 UNION ALL (
                     SELECT
+                        atribuicoes.id AS id_atribuicao,
                         produtos.id,
                         produtos.descr,
                         qtd,
@@ -273,6 +276,7 @@ class ApiController extends Controller {
 
                     UNION ALL (
                         SELECT
+                            atribuicoes.id AS id_atribuicao,
                             produtos.id,
                             produtos.descr,
                             qtd,
@@ -292,6 +296,7 @@ class ApiController extends Controller {
 
                         UNION ALL (
                             SELECT
+                                atribuicoes.id AS id_atribuicao,
                                 produtos.id,
                                 produtos.descr,
                                 qtd,
@@ -333,10 +338,48 @@ class ApiController extends Controller {
     }
 
     public function retirar(Request $request) {
+        $resultado = new \stdClass;
+        $atribuicao = Atribuicoes::find($request->id_atribuicao);
+        if ($atribuicao == null) {
+            $resultado->code = 404;
+            $resultado->msg = "Atribuição não encontrada";
+            return json_encode($resultado);
+        }
+        $maquina = Valores::find($request->id_maquina);
+        if ($maquina == null) {
+            $resultado->code = 404;
+            $resultado->msg = "Máquina não encontrada";
+            return json_encode($resultado);
+        }
+        if ($maquina->alias != "maquinas") {
+            $resultado->code = 404;
+            $resultado->msg = "Máquina não encontrada";
+            return json_encode($resultado);
+        }
+        $comodato = DB::table("comodatos")
+                        ->select("id")
+                        ->where("id_maquina", $maquina->id)
+                        ->whereRaw("inicio >= CURDATE()")
+                        ->whereRaw("fim <= CURDATE()")
+                        ->get();
+        if (!sizeof($comodato)) {
+            $resultado->code = 404;
+            $resultado->msg = "Máquina não comodatada para nenhuma empresa";
+            return json_encode($resultado);
+        }
+        if (floatval($atribuicao->qtd) < floatval($request->qtd)) {
+            $resultado->code = 401;
+            $resultado->msg = "Essa quantidade de produtos não é permitida para essa pessoa";
+            return json_encode($resultado);
+        }
+        $id_comodato = "";
         $retirada = new Retiradas;
         $retirada->id_atribuicao = $request->id_atribuicao;
-        $retirada->id_comodato = $request->id_comodato;
+        $retirada->id_comodato = $comodato[0]->id;
         $retirada->qtd = $request->qtd;
         $retirada->save();
+        $resutado->code = 201;
+        $resultado->msg = "Sucesso";
+        return json_encode($resultado);
     }
 }
