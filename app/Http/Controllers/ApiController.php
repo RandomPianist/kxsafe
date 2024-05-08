@@ -320,6 +320,7 @@ class ApiController extends Controller {
             
             GROUP BY
                 id,
+                id_atribuicao,
                 descr,
                 qtd,
                 foto
