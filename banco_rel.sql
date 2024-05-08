@@ -139,10 +139,10 @@ CREATE TABLE atribuicoes (
 	lixeira TINYINT DEFAULT 0,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	FOREIGN KEY pessoa_ou_setor_valor REFERENCES pessoas(id),
-	FOREIGN KEY pessoa_ou_setor_valor REFERENCES setores(id),
-	FOREIGN KEY produto_ou_referencia_valor REFERENCES produtos(descr),
-	FOREIGN KEY produto_ou_referencia_valor REFERENCES produtos(referencia)
+	FOREIGN KEY (pessoa_ou_setor_valor) REFERENCES pessoas(id),
+	FOREIGN KEY (pessoa_ou_setor_valor) REFERENCES setores(id),
+	FOREIGN KEY (produto_ou_referencia_valor) REFERENCES produtos(descr),
+	FOREIGN KEY (produto_ou_referencia_valor) REFERENCES produtos(referencia)
 );
 
 CREATE TABLE retiradas (
@@ -152,8 +152,8 @@ CREATE TABLE retiradas (
 	id_comodato INT,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	FOREIGN KEY id_atribuicao REFERENCES atribuicoes(id),
-	FOREIGN KEY id_comodato REFERENCES comodatos(id)
+	FOREIGN KEY (id_atribuicao) REFERENCES atribuicoes(id),
+	FOREIGN KEY (id_comodato) REFERENCES comodatos(id)
 );
 
 CREATE TABLE log (
