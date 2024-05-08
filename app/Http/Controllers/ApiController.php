@@ -373,7 +373,6 @@ class ApiController extends Controller {
             $resultado->msg = "Essa quantidade de produtos não é permitida para essa pessoa";
             return json_encode($resultado);
         }
-        $id_comodato = "";
         $retirada = new Retiradas;
         $retirada->id_atribuicao = $request->id_atribuicao;
         $retirada->id_comodato = $comodato[0]->id;
