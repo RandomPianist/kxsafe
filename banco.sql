@@ -58,7 +58,9 @@ CREATE TABLE produtos (
 	id_categoria INT,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	referencia VARCHAR(64)
+	referencia VARCHAR(64),
+	tamanho VARCHAR(32),
+	detalhes TEXT
 );
 
 CREATE TABLE estoque (

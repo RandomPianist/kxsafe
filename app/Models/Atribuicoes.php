@@ -36,7 +36,7 @@ class Atribuicoes extends Model
      * @var array
      */
     protected $fillable = [
-        'pessoa_ou_setor_chave', 'pessoa_ou_setor_valor', 'produto_ou_referencia_chave', 'produto_ou_referencia_valor', 'lixeira', 'created_at', 'updated_at'
+        'pessoa_ou_setor_chave', 'pessoa_ou_setor_valor', 'produto_ou_referencia_chave', 'produto_ou_referencia_valor', 'qtd', 'lixeira', 'created_at', 'updated_at'
     ];
 
     /**

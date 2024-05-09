@@ -39,9 +39,14 @@
                                 <input id = "ca" name = "ca" class = "form-control" autocomplete = "off" type = "text" onkeyup = "contar_char(this, 16)" />
                                 <span class = "custom-label-form tam-max"></span>
                             </div>
-                            <div class = "col-9">
+                            <div class = "col-6">
                                 <label for = "referencia" class = "custom-label-form">Referência:</label>
                                 <input id = "referencia" name = "referencia" class = "form-control" autocomplete = "off" type = "text" onkeyup = "contar_char(this, 50)" />
+                                <span class = "custom-label-form tam-max"></span>
+                            </div>
+                            <div class = "col-3">
+                                <label for = "tamanho" class = "custom-label-form">Tamanho: *</label>
+                                <input id = "tamanho" name = "tamanho" class = "form-control" autocomplete = "off" type = "text" onkeyup = "contar_char(this, 32)" />
                                 <span class = "custom-label-form tam-max"></span>
                             </div>
                         </div>
@@ -73,6 +78,13 @@
                             <div class = "col-3">
                                 <button type = "button" class = "btn btn-target btn-target-black w-100 mt-4" onclick = "$(this).next().trigger('click')">Adicionar imagem</button>
                                 <input type = "file" name = "foto" class = "d-none" />
+                            </div>
+                        </div>
+                        <div class = "row">
+                            <div class = "col-12">
+                                <label for = "detalhes" class = "custom-label-form">Detalhes:</label>
+                                <textarea class = "form-control" id = "detalhes" name = "detalhes" onkeyup = "contar_char(this, 21845)"></textarea>
+                                <span class = "custom-label-form tam-max"></span>
                             </div>
                         </div>
                     </div>

@@ -111,7 +111,7 @@
 
         function validar() {
             limpar_invalido();
-            const aux = verifica_vazios(["cod_externo", "descr", "ca", "validade", "categoria"]);
+            const aux = verifica_vazios(["cod_externo", "descr", "ca", "validade", "categoria", "tamanho"]);
             let erro = aux.erro;
             let alterou = aux.alterou;
             let preco = document.getElementById("preco");
@@ -150,7 +150,7 @@
             if (id) {
                 $.get(URL + "/produtos/mostrar/" + id, function(data) {
                     if (typeof data == "string") data = $.parseJSON(data);
-                    ["cod_externo", "descr", "preco", "ca", "validade", "categoria", "id_categoria", "referencia"].forEach((_id) => {
+                    ["cod_externo", "descr", "preco", "ca", "validade", "categoria", "id_categoria", "referencia", "tamanho", "detalhes"].forEach((_id) => {
                         document.getElementById(_id).value = data[_id];
                     });
                     modal("produtosModal", id, function() {

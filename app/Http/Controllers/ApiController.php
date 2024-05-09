@@ -144,6 +144,7 @@ class ApiController extends Controller {
         $linha->foto = $request->foto;
         $linha->lixeira = $request->lixeira;
         if (isset($request->refer)) $linha->referencia = $request->refer;
+        if (isset($request->tamanho)) $linha->tamanho = $request->tamanho;
         $linha->save();
         $log = new LogController;
         $letra_log = $request->id ? "E" : "C";
@@ -167,8 +168,8 @@ class ApiController extends Controller {
 
             FROM produtos
 
-            WHERE id = ".$linha->id."
-        "))[0];
+            WHERE id = ".$linha->id
+        ))[0];
         $consulta->preco = floatval($consulta->preco);
         $consulta->lixeira = intval($consulta->lixeira);
         return json_encode($consulta);
@@ -234,98 +235,40 @@ class ApiController extends Controller {
 
     public function produtosPorPessoa(Request $request) {
         $consulta = DB::select(DB::raw("
-            SELECT * FROM (
+            SELECT
+                produtos.id,
+                produtos.referencia,
+                produtos.descr AS nome,
+                produtos.detalhes,
+                produtos.cod_externo AS codbar,
+                IFNULL(produtos.tamanho, '') AS tamanho,
+                IFNULL(produtos.foto, '') AS foto,
+
+                atribuicoes.id AS id_atribuicao,
+                atribuicoes.qtd
+
+            FROM produtos
+
+            JOIN atribuicoes ON atribuicoes.id = (
                 SELECT
-                    atribuicoes.id AS id_atribuicao,
-                    produtos.id,
-                    produto_ou_referencia_valor AS descr,
-                    qtd,
-                    IFNULL(produtos.foto, '') AS foto
-            
+                    atribuicoes.id
+                
                 FROM atribuicoes
-            
-                JOIN produtos
-                    ON produtos.descr = atribuicoes.produto_ou_referencia_valor
-            
+
                 JOIN pessoas
-                    ON pessoas.id = atribuicoes.pessoa_ou_setor_valor
-                    
-                WHERE pessoa_ou_setor_chave = 'pessoa'
-                  AND cpf = '".$request->cpf."'
-                  AND produto_ou_referencia_chave = 'produto'
+                    ON (atribuicoes.pessoa_ou_setor_chave = 'pessoa' AND atribuicoes.pessoa_ou_setor_valor = pessoas.id)
+                        OR (atribuicoes.pessoa_ou_setor_chave = 'setor' AND atribuicoes.pessoa_ou_setor_valor = pessoas.id_setor)
                 
-                UNION ALL (
-                    SELECT
-                        atribuicoes.id AS id_atribuicao,
-                        produtos.id,
-                        produtos.descr,
-                        qtd,
-                        IFNULL(produtos.foto, '') AS foto
-                    
-                    FROM atribuicoes
-                    
-                    JOIN produtos
-                        ON produtos.referencia = atribuicoes.produto_ou_referencia_valor
-                        
-                    JOIN pessoas
-                        ON pessoas.id = atribuicoes.pessoa_ou_setor_valor
-                        
-                    WHERE pessoa_ou_setor_chave = 'pessoa'
-                      AND cpf = '".$request->cpf."'
-                      AND produto_ou_referencia_chave = 'referencia'
+                WHERE (
+                    (produto_ou_referencia_chave = 'produto' AND produto_ou_referencia_valor = produtos.descr)
+                   OR (produto_ou_referencia_chave = 'referencia' AND produto_ou_referencia_valor = produtos.referencia)
+                ) AND pessoas.cpf = '".$request->cpf."'
+                  AND pessoas.lixeira = 0
 
-                    UNION ALL (
-                        SELECT
-                            atribuicoes.id AS id_atribuicao,
-                            produtos.id,
-                            produtos.descr,
-                            qtd,
-                            IFNULL(produtos.foto, '') AS foto
-                        
-                        FROM atribuicoes
-                        
-                        JOIN produtos
-                            ON produtos.descr = atribuicoes.produto_ou_referencia_valor
-                            
-                        JOIN pessoas
-                            ON pessoas.id_setor = atribuicoes.pessoa_ou_setor_valor
-                            
-                        WHERE pessoa_ou_setor_chave = 'setor'
-                          AND cpf = '".$request->cpf."'
-                          AND produto_ou_referencia_chave = 'produto'
+                ORDER BY pessoa_ou_setor_chave
 
-                        UNION ALL (
-                            SELECT
-                                atribuicoes.id AS id_atribuicao,
-                                produtos.id,
-                                produtos.descr,
-                                qtd,
-                                IFNULL(produtos.foto, '') AS foto
-                            
-                            FROM atribuicoes
-                            
-                            JOIN produtos
-                                ON produtos.referencia = atribuicoes.produto_ou_referencia_valor
-                                
-                            JOIN pessoas
-                                ON pessoas.id_setor = atribuicoes.pessoa_ou_setor_valor
-                                
-                            WHERE pessoa_ou_setor_chave = 'setor'
-                              AND cpf = '".$request->cpf."'
-                              AND produto_ou_referencia_chave = 'referencia'
-                        )
-                    )
-                )
-            ) AS tab
-            
-            GROUP BY
-                id,
-                id_atribuicao,
-                descr,
-                qtd,
-                foto
-                
-            ORDER BY descr
+                LIMIT 1
+            )
         "));
         $resultado = array();
         foreach ($consulta as $linha) {
@@ -333,9 +276,27 @@ class ApiController extends Controller {
                 $foto = explode("/", $linha->foto);
                 $linha->foto = $foto[sizeof($foto) - 1];
             }
+            $linha->selecionado = intval($linha->selecionado);
             array_push($resultado, $linha);
         }
-        return json_encode($resultado);
+        return json_encode(collect($resultado))->groupBy("referencia")->map(function($itens) {
+            return [
+                "nome" => $itens[0]->nome,
+                "foto" => $itens[0]->foto,
+                "referencia" => $itens[0]->referencia,
+                "qtd" => $itens[0]->qtd,
+                "detalhes" => $itens[0]->detalhes,
+                "tamanhos" => $itens->map(function($tamanho) {
+                    return [
+                        "id" => $tamanho->id,
+                        "id_atribuicao" => $tamanho->id_atribuicao,
+                        "selecionado" => false,
+                        "codbar" => $tamanho->codbar,
+                        "tamanho" => $tamanho->tamanho
+                    ];
+                })->values()->all()
+            ];
+        })->sortBy("nome")->values()->all();
     }
 
     public function retirar(Request $request) {
