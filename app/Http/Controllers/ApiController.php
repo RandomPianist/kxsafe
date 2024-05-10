@@ -277,7 +277,7 @@ class ApiController extends Controller {
             }
             array_push($resultado, $linha);
         }
-        return json_encode(collect($resultado))->groupBy("referencia")->map(function($itens) {
+        return json_encode(collect($resultado)->groupBy("referencia")->map(function($itens) {
             return [
                 "nome" => $itens[0]->nome,
                 "foto" => $itens[0]->foto,
@@ -290,11 +290,11 @@ class ApiController extends Controller {
                         "id_atribuicao" => $tamanho->id_atribuicao,
                         "selecionado" => false,
                         "codbar" => $tamanho->codbar,
-                        "tamanho" => $tamanho->tamanho
+                        "numero" => $tamanho->tamanho ? $tamanho->tamanho : "UN"
                     ];
                 })->values()->all()
             ];
-        })->sortBy("nome")->values()->all();
+        })->sortBy("nome")->values()->all());
     }
 
     public function retirar(Request $request) {
