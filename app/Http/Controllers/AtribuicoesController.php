@@ -57,11 +57,17 @@ class AtribuicoesController extends Controller {
                 ->where("lixeira", 0)
                 ->get()
         )) return 404;
+        $produto_ou_referencia_valor = $request->produto_ou_referencia_chave == "produto" ?
+            DB::table("produtos")
+                ->where("descr", $request->produto_ou_referencia_valor)
+                ->where("lixeira", 0)
+                ->value("cod_externo")
+        : $request->produto_ou_referencia_valor;
         if (sizeof(
             DB::table("atribuicoes")
                 ->where("pessoa_ou_setor_chave", $request->pessoa_ou_setor_chave)
                 ->where("pessoa_ou_setor_valor", $request->pessoa_ou_setor_valor)
-                ->where("produto_ou_referencia_valor", $request->produto_ou_referencia_valor)
+                ->where("produto_ou_referencia_valor", $produto_ou_referencia_valor)
                 ->where("produto_ou_referencia_chave", $request->produto_ou_referencia_chave)
                 ->where("lixeira", 0)
                 ->get()
@@ -70,7 +76,7 @@ class AtribuicoesController extends Controller {
         $linha->pessoa_ou_setor_chave = $request->pessoa_ou_setor_chave;
         $linha->pessoa_ou_setor_valor = $request->pessoa_ou_setor_valor;
         $linha->produto_ou_referencia_chave = $request->produto_ou_referencia_chave;
-        $linha->produto_ou_referencia_valor = $request->produto_ou_referencia_valor;
+        $linha->produto_ou_referencia_valor = $produto_ou_referencia_valor;
         $linha->qtd = $request->qtd;
         $linha->save();
         $log = new LogController;
@@ -88,17 +94,31 @@ class AtribuicoesController extends Controller {
 
     public function mostrar(Request $request) {
         return json_encode(
-            DB::table("atribuicoes")
-                ->select(
-                    "id",
-                    "produto_ou_referencia_valor",
-                    "qtd"
-                )
-                ->where("pessoa_ou_setor_valor", $request->id)
-                ->where("produto_ou_referencia_chave", $request->tipo)
-                ->where("pessoa_ou_setor_chave", $request->tipo2)
-                ->where("lixeira", 0)
-                ->get()
+            $request->tipo == "produto" ?
+                DB::table("atribuicoes")
+                    ->select(
+                        "atribuicoes.id",
+                        "produtos.descr AS produto_ou_referencia_valor",
+                        "atribuicoes.qtd"
+                    )
+                    ->join("produtos", "produtos.cod_externo", "atribuicoes.produto_ou_referencia_valor")
+                    ->where("pessoa_ou_setor_valor", $request->id)
+                    ->where("produto_ou_referencia_chave", $request->tipo)
+                    ->where("pessoa_ou_setor_chave", $request->tipo2)
+                    ->where("atribuicoes.lixeira", 0)
+                    ->get()
+            :
+                DB::table("atribuicoes")
+                    ->select(
+                        "id",
+                        "produto_ou_referencia_valor",
+                        "qtd"
+                    )
+                    ->where("pessoa_ou_setor_valor", $request->id)
+                    ->where("produto_ou_referencia_chave", $request->tipo)
+                    ->where("pessoa_ou_setor_chave", $request->tipo2)
+                    ->where("lixeira", 0)
+                    ->get()
         );
     }
 }
