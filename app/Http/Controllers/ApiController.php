@@ -275,7 +275,6 @@ class ApiController extends Controller {
                 $foto = explode("/", $linha->foto);
                 $linha->foto = $foto[sizeof($foto) - 1];
             }
-            $linha->selecionado = intval($linha->selecionado);
             array_push($resultado, $linha);
         }
         return json_encode(collect($resultado))->groupBy("referencia")->map(function($itens) {
