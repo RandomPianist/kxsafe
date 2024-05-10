@@ -250,8 +250,7 @@ class ApiController extends Controller {
             FROM produtos
 
             JOIN atribuicoes ON atribuicoes.id = (
-                SELECT
-                    atribuicoes.id
+                SELECT atribuicoes.id
                 
                 FROM atribuicoes
 
