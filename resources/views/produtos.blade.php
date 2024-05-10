@@ -152,6 +152,7 @@
                     if (typeof data == "string") data = $.parseJSON(data);
                     ["cod_externo", "descr", "preco", "ca", "validade", "categoria", "id_categoria", "referencia", "tamanho", "detalhes"].forEach((_id) => {
                         document.getElementById(_id).value = data[_id];
+                        document.getElementById("cod_externo").disabled = true;
                     });
                     modal("produtosModal", id, function() {
                         if (data.foto) {
@@ -163,8 +164,14 @@
             } else {
                 modal("produtosModal", id, function() {
                     el_img.parentElement.classList.add("d-none");
+                    document.getElementById("cod_externo").disabled = false;
                 });
             }
+        }
+
+        function atualiza_cod_externo(el) {
+            contar_char(el, 8);
+            document.getElementById("cod_externo_real").value = document.getElementById("cod_externo").value;
         }
     </script>
 

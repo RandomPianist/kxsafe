@@ -198,7 +198,7 @@ window.onload = function() {
                 var el = $($("#" + that.id + " input[type=text]")[cont]);
                 el.focus();
                 cont++;
-            } while ($($(el).parent()).hasClass("d-none"))
+            } while ($($(el).parent()).hasClass("d-none") || $(el).attr("disabled"))
         })
     });
 

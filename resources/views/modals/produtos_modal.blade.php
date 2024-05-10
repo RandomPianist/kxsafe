@@ -19,8 +19,9 @@
                         </div>
                         <div class = "row">
                             <div class = "col-3">
+                                <input type = "hidden" id = "cod_externo_real" name = "cod_externo" />
                                 <label for = "cod_externo" class = "custom-label-form">Código Kx-safe: *</label>
-                                <input id = "cod_externo" name = "cod_externo" class = "form-control" autocomplete = "off" type = "text" onkeyup = "contar_char(this, 8)" />
+                                <input id = "cod_externo" class = "form-control" autocomplete = "off" type = "text" onkeyup = "atualiza_cod_externo(this)" />
                                 <span class = "custom-label-form tam-max"></span>
                             </div>
                             <div class = "col-6">
