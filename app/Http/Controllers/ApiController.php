@@ -263,6 +263,7 @@ class ApiController extends Controller {
                    OR (produto_ou_referencia_chave = 'referencia' AND produto_ou_referencia_valor = produtos.referencia)
                 ) AND pessoas.cpf = '".$request->cpf."'
                   AND pessoas.lixeira = 0
+                  AND atribuicoes.lixeira = 0
 
                 ORDER BY pessoa_ou_setor_chave
 
