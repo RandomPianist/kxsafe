@@ -300,44 +300,47 @@ class ApiController extends Controller {
 
     public function retirar(Request $request) {
         $resultado = new \stdClass;
-        $atribuicao = Atribuicoes::find($request->id_atribuicao);
-        if ($atribuicao == null) {
-            $resultado->code = 404;
-            $resultado->msg = "Atribuição não encontrada";
-            return json_encode($resultado);
-        }
-        $maquina = Valores::find($request->id_maquina);
-        if ($maquina == null) {
-            $resultado->code = 404;
-            $resultado->msg = "Máquina não encontrada";
-            return json_encode($resultado);
-        }
-        if ($maquina->alias != "maquinas") {
-            $resultado->code = 404;
-            $resultado->msg = "Máquina não encontrada";
-            return json_encode($resultado);
-        }
-        $comodato = DB::table("comodatos")
-                        ->select("id")
-                        ->where("id_maquina", $maquina->id)
-                        ->whereRaw("inicio >= CURDATE()")
-                        ->whereRaw("fim <= CURDATE()")
+        $cont = 0;
+        while (isset($request[$cont]["id_atribuicao"])) {
+            $retirada = $request[$cont];
+            $atribuicao = Atribuicoes::find($retirada["id_atribuicao"]);
+            if ($atribuicao == null) {
+                $resultado->code = 404;
+                $resultado->msg = "Atribuição não encontrada";
+                return json_encode($resultado);
+            }
+            $maquinas = DB::table("valores")
+                        ->where("seq", $retirada["id_maquina"])
+                        ->where("alias", "maquinas")
                         ->get();
-        if (!sizeof($comodato)) {
-            $resultado->code = 404;
-            $resultado->msg = "Máquina não comodatada para nenhuma empresa";
-            return json_encode($resultado);
+            if (!sizeof($maquinas)) {
+                $resultado->code = 404;
+                $resultado->msg = "Máquina não encontrada";
+                return json_encode($resultado);
+            }
+            $comodato = DB::table("comodatos")
+                            ->select("id")
+                            ->where("id_maquina", $maquinas[0]->id)
+                            ->whereRaw("inicio >= CURDATE()")
+                            ->whereRaw("fim <= CURDATE()")
+                            ->get();
+            if (!sizeof($comodato)) {
+                $resultado->code = 404;
+                $resultado->msg = "Máquina não comodatada para nenhuma empresa";
+                return json_encode($resultado);
+            }
+            if (floatval($atribuicao->qtd) < floatval($retirada["qtd"])) {
+                $resultado->code = 401;
+                $resultado->msg = "Essa quantidade de produtos não é permitida para essa pessoa";
+                return json_encode($resultado);
+            }
+            $linha = new Retiradas;
+            $linha->id_atribuicao = $retirada["id_atribuicao"];
+            $linha->id_comodato = $comodato[0]->id;
+            $linha->qtd = $retirada["qtd"];
+            $linha->save();
+            $cont++;
         }
-        if (floatval($atribuicao->qtd) < floatval($request->qtd)) {
-            $resultado->code = 401;
-            $resultado->msg = "Essa quantidade de produtos não é permitida para essa pessoa";
-            return json_encode($resultado);
-        }
-        $retirada = new Retiradas;
-        $retirada->id_atribuicao = $request->id_atribuicao;
-        $retirada->id_comodato = $comodato[0]->id;
-        $retirada->qtd = $request->qtd;
-        $retirada->save();
         $resutado->code = 201;
         $resultado->msg = "Sucesso";
         return json_encode($resultado);
