@@ -315,6 +315,7 @@ class ApiController extends Controller {
     }
 
     public function retirar(Request $request) {
+        $log = new LogController;
         $resultado = new \stdClass;
         $cont = 0;
         while (isset($request[$cont]["id_atribuicao"])) {
@@ -345,7 +346,19 @@ class ApiController extends Controller {
                 $resultado->msg = "Máquina não comodatada para nenhuma empresa";
                 return json_encode($resultado);
             }
-            if (floatval($atribuicao->qtd) < floatval($retirada["qtd"])) {
+            $ja_retirados = DB::select(DB::raw("
+                SELECT IFNULL(SUM(retiradas.qtd), 0) AS qtd
+                FROM retiradas
+                JOIN atribuicoes
+                    ON atribuicoes.id = retiradas.id_atribuicao
+                JOIN produtos
+                    ON (produto_ou_referencia_chave = 'produto' AND produto_ou_referencia_valor = produtos.cod_externo)
+                        OR (produto_ou_referencia_chave = 'referencia' AND produto_ou_referencia_valor = produtos.referencia)
+                WHERE DATE_ADD(DATE(retiradas.created_at), INTERVAL produtos.validade DAY) > CURDATE()
+                  AND atribuicoes.id = ".$retirada["id_atribuicao"]
+            ));
+            $ja_retirados = sizeof($ja_retirados) ? floatval($ja_retirados[0]->qtd) : 0;
+            if (floatval($atribuicao->qtd) < (floatval($retirada["qtd"]) + $ja_retirados)) {
                 $resultado->code = 401;
                 $resultado->msg = "Essa quantidade de produtos não é permitida para essa pessoa";
                 return json_encode($resultado);
@@ -355,6 +368,9 @@ class ApiController extends Controller {
             $linha->id_comodato = $comodato[0]->id;
             $linha->qtd = $retirada["qtd"];
             $linha->save();
+            $modelo = $log->inserir("C", "retiradas", $linha->id, true);
+            $modelo->nome = "APP";
+            $modelo->save();
             $cont++;
         }
         $resultado->code = 201;
