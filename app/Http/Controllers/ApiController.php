@@ -321,8 +321,8 @@ class ApiController extends Controller {
             $comodato = DB::table("comodatos")
                             ->select("id")
                             ->where("id_maquina", $maquinas[0]->id)
-                            ->whereRaw("inicio >= CURDATE()")
-                            ->whereRaw("fim <= CURDATE()")
+                            ->whereRaw("inicio <= CURDATE()")
+                            ->whereRaw("fim >= CURDATE()")
                             ->get();
             if (!sizeof($comodato)) {
                 $resultado->code = 404;
