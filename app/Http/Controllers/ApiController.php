@@ -341,7 +341,7 @@ class ApiController extends Controller {
             $linha->save();
             $cont++;
         }
-        $resutado->code = 201;
+        $resultado->code = 201;
         $resultado->msg = "Sucesso";
         return json_encode($resultado);
     }
