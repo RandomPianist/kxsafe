@@ -269,6 +269,22 @@ class ApiController extends Controller {
 
                 LIMIT 1
             )
+
+            LEFT JOIN (
+                SELECT
+                    SUM(retiradas.qtd) AS qtd,
+                    id_atribuicao
+                FROM retiradas
+                JOIN atribuicoes
+                    ON atribuicoes.id = retiradas.id_atribuicao
+                JOIN produtos
+                    ON (produto_ou_referencia_chave = 'produto' AND produto_ou_referencia_valor = produtos.cod_externo)
+                        OR (produto_ou_referencia_chave = 'referencia' AND produto_ou_referencia_valor = produtos.referencia)
+                WHERE DATE_ADD(DATE(retiradas.created_at), INTERVAL produtos.validade DAY) > CURDATE()
+                GROUP BY id_atribuicao
+            ) AS ret ON ret.id_atribuicao = atribuicoes.id
+
+            WHERE (ret.qtd < atribuicoes.qtd)
         "));
         $resultado = array();
         foreach ($consulta as $linha) {
