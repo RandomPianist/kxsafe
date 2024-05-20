@@ -284,7 +284,7 @@ class ApiController extends Controller {
                 GROUP BY id_atribuicao
             ) AS ret ON ret.id_atribuicao = atribuicoes.id
 
-            WHERE (ret.qtd < atribuicoes.qtd)
+            WHERE (ret.qtd < atribuicoes.qtd) OR ret.qtd IS NULL
         "));
         $resultado = array();
         foreach ($consulta as $linha) {
