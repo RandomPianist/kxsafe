@@ -245,7 +245,7 @@ class ApiController extends Controller {
                 IFNULL(produtos.foto, '') AS foto,
 
                 atribuicoes.id AS id_atribuicao,
-                (ret.qtd < atribuicoes.qtd) AS qtd
+                (atribuicoes.qtd - ISNULL(ret.qtd, 0)) AS qtd
 
             FROM produtos
 
