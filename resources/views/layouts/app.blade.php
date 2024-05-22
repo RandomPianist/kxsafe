@@ -95,6 +95,9 @@
                                     <li onclick = "relatorio = new RelatorioBilateral('maquinas-por-empresa')">
                                         <span>Máquinas por empresa</span>
                                     </li>
+                                    <li onclick = "relatorio = new RelatorioRetiradas()">
+                                        <span>Retiradas</span>
+                                    </li>
                                 </ul>
                             </a>
                         @endif
@@ -137,6 +140,7 @@
                 @include("modals.pessoas_modal")
                 @include("modals.reports.bilateral_modal")
                 @include("modals.reports.itens_modal")
+                @include("modals.reports.retiradas_modal")
             </main>
         </div>
         <script type = "text/javascript" language = "JavaScript">

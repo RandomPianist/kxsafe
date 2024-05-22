@@ -525,6 +525,38 @@ function RelatorioItens() {
     }, 0);
 }
 
+function RelatorioRetiradas() {
+    let el_inicio = document.getElementById("rel-inicio2");
+    let el_fim = document.getElementById("rel-fim2");
+
+    this.validar = function() {
+        limpar_invalido();
+        let erro = "";
+        let el_pessoa = document.getElementById("rel-pessoa");
+        if (el_inicio.value.length && el_fim.value.length) erro = validar_datas(el_inicio, el_fim, false);
+        $.get(URL + "/relatorios/retiradas/consultar", {
+            pessoa : el_pessoa.value,
+            id_pessoa : document.getElementById("rel-id_pessoa").value
+        }, function(data) {
+            if (data) {
+                if (!erro) {
+                    el_pessoa.classList.add("invalido");
+                    erro = "Colaborador não encontrado";
+                }
+                s_alert(erro);
+            } else document.querySelector("#relatorioRetiradasModal form").submit();
+        });
+    }
+    
+    limpar_invalido();
+    setTimeout(function() {
+        modal("relatorioRetiradasModal", 0, function() {
+            el_inicio.value = hoje();
+            el_fim.value = hoje();
+        });
+    }, 0);
+}
+
 function limitar(el) {
     let texto = el.value.toString();
     if (!texto.length) el.value = 1;

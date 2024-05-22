@@ -107,6 +107,10 @@ Route::middleware("auth")->group(function () {
             Route::get("/",          [RelatoriosController::class, "bilateral"]);
             Route::get("/consultar", [RelatoriosController::class, "bilateral_consultar"]);
         });
+        Route::group(["prefix" => "retiradas"], function() {
+            Route::get("/",          [RelatoriosController::class, "retiradas"]);
+            Route::get("/consultar", [RelatoriosController::class, "retiradas_consultar"]);
+        });
     });
 });
 

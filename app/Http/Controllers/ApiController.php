@@ -365,7 +365,9 @@ class ApiController extends Controller {
                 return json_encode($resultado);
             }
             $linha = new Retiradas;
+            $linha->id_pessoa = $retirada["id_pessoa"];
             $linha->id_atribuicao = $retirada["id_atribuicao"];
+            $linha->id_produto = $retirada["id_produto"];
             $linha->id_comodato = $comodato[0]->id;
             $linha->qtd = $retirada["qtd"];
             $linha->save();
@@ -423,8 +425,10 @@ class ApiController extends Controller {
             }
             $linha = new Retiradas;
             $linha->id_pessoa = $retirada["id_pessoa"];
+            $linha->id_supervisor = $retirada["id_supervisor"];
             $linha->observacao = $retirada["obs"];
             $linha->id_atribuicao = $retirada["id_atribuicao"];
+            $linha->id_produto = $retirada["id_produto"];
             $linha->id_comodato = $comodato[0]->id;
             $linha->qtd = $retirada["qtd"];
             $linha->save();

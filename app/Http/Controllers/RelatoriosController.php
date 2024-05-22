@@ -233,4 +233,83 @@ class RelatoriosController extends Controller {
         )) $erro = "produto";
         return $erro;
     }
+
+    public function retiradas(Request $request) {
+        $filtro = array();
+        $criterios = array();
+        $periodo = "";
+        if ($request->inicio || $request->fim) $periodo = "Período";
+        if ($request->inicio) {
+            $inicio = Carbon::createFromFormat('d/m/Y', $request->inicio)->format('Y-m-d');
+            array_push($filtro, "DATE(log.created_at) >= '".$inicio."'");
+            $periodo .= " de ".$request->inicio;
+        }
+        if ($request->fim) {
+            $fim = Carbon::createFromFormat('d/m/Y', $request->fim)->format('Y-m-d');
+            array_push($filtro, "DATE(log.created_at) <= '".$fim."'");
+            $periodo .= " até ".$request->fim;
+        }
+        if ($periodo) array_push($criterios, $periodo);
+        if ($request->id_pessoa) {
+            array_push($criterios, "Colaborador: ".$request->pessoa);
+            array_push($filtro, "retiradas.id_pessoa = ".$request->id_pessoa);
+        }
+        $filtro = join(" AND ", $filtro);
+        if (!$filtro) $filtro = "1";
+        
+        $resultado = collect(DB::select(DB::raw("
+            SELECT
+                retiradas.id_pessoa,
+                pessoas.nome,
+                produtos.descr AS produto,
+                valores.descr AS maquina,
+                DATE_FORMAT(retiradas.created_at, '%d/%m/%Y') AS data,
+                IFNULL(CONCAT('Liberado por ', supervisor.nome, IFNULL(CONCAT(' - ', retiradas.obs), '')), '') AS obs
+
+            FROM retiradas
+
+            JOIN produtos
+                ON produtos.id = retiradas.id_produto
+
+            JOIN pessoas
+                ON pessoas.id = retiradas.id_pessoa
+
+            JOIN comodatos
+                ON comodatos.id = retiradas.id_comodato
+
+            JOIN valores
+                ON valores.id = comodatos.id_maquina
+
+            LEFT JOIN pessoas AS supervisor
+                ON supervisor.id = retiradas.id_supervisor
+
+            WHERE ".$filtro."
+
+            ORDER BY retiradas.id
+        ")))->groupBy("id_pessoa")->map(function($itens) {
+            return [
+                "nome" => $itens[0]->nome,
+                "retiradas" => $itens->map(function($retirada) {
+                    return [
+                        "produto" => $retirada->produto,
+                        "maquina" => $retirada->maquina,
+                        "data"    => $retirada->data,
+                        "obs"     => $retirada->obs
+                    ];
+                })->values()->all()
+            ];
+        })->sortBy("nome")->values()->all();
+        $criterios = join(" | ", $criterios);
+        return sizeof($resultado) ? view("reports/retiradas", compact("resultado", "criterios")) : view("nada");
+    }
+
+    public function retiradas_consultar(Request $request) {
+        return (!sizeof(
+            DB::table("pessoas")
+                ->where("id", $request->id_pessoa)
+                ->where("nome", $request->pessoa)
+                ->where("lixeira", 0)
+                ->get()
+        )) ? "erro" : "";
+    }
 }
