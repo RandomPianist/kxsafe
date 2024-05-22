@@ -50,6 +50,7 @@ CREATE TABLE pessoas (
 	admissao DATE,
 	senha INT,
 	foto VARCHAR(512),
+	supervisor TINYINT DEFAULT 0,
 	FOREIGN KEY (id_setor) REFERENCES setores(id),
 	FOREIGN KEY (id_empresa) REFERENCES empresas(id)
 );
@@ -152,10 +153,13 @@ CREATE TABLE retiradas (
 	qtd NUMERIC(10,5),
 	id_atribuicao INT,
 	id_comodato INT,
+	id_pessoa INT,
+	observacao TEXT,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	FOREIGN KEY (id_atribuicao) REFERENCES atribuicoes(id),
-	FOREIGN KEY (id_comodato) REFERENCES comodatos(id)
+	FOREIGN KEY (id_comodato) REFERENCES comodatos(id),
+	FOREIGN KEY (id_pessoa) REFERENCES pessoas(id)
 );
 
 CREATE TABLE log (

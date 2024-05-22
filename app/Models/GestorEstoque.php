@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int    $id
+ * @property int    $created_at
  * @property int    $id_maquina
  * @property int    $id_produto
- * @property int    $created_at
  * @property int    $updated_at
  * @property string $descr
  */
@@ -34,7 +34,7 @@ class GestorEstoque extends Model
      * @var array
      */
     protected $fillable = [
-        'descr', 'minimo', 'maximo', 'id_maquina', 'id_produto', 'created_at', 'updated_at', 'preco'
+        'created_at', 'descr', 'id_maquina', 'id_produto', 'maximo', 'minimo', 'preco', 'updated_at'
     ];
 
     /**
@@ -52,7 +52,7 @@ class GestorEstoque extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'descr' => 'string', 'id_maquina' => 'int', 'id_produto' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp'
+        'id' => 'int', 'created_at' => 'timestamp', 'descr' => 'string', 'id_maquina' => 'int', 'id_produto' => 'int', 'updated_at' => 'timestamp'
     ];
 
     /**

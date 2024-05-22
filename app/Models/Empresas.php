@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int    $id
- * @property int    $lixeira
- * @property int    $id_matriz
  * @property int    $created_at
+ * @property int    $id_matriz
+ * @property int    $lixeira
  * @property int    $updated_at
- * @property string $razao_social
- * @property string $nome_fantasia
  * @property string $cnpj
+ * @property string $nome_fantasia
+ * @property string $razao_social
  */
 class Empresas extends Model
 {
@@ -36,7 +36,7 @@ class Empresas extends Model
      * @var array
      */
     protected $fillable = [
-        'razao_social', 'nome_fantasia', 'cnpj', 'lixeira', 'id_matriz', 'created_at', 'updated_at'
+        'cnpj', 'created_at', 'id_matriz', 'lixeira', 'nome_fantasia', 'razao_social', 'updated_at'
     ];
 
     /**
@@ -54,7 +54,7 @@ class Empresas extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'razao_social' => 'string', 'nome_fantasia' => 'string', 'cnpj' => 'string', 'lixeira' => 'int', 'id_matriz' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp'
+        'id' => 'int', 'cnpj' => 'string', 'created_at' => 'timestamp', 'id_matriz' => 'int', 'lixeira' => 'int', 'nome_fantasia' => 'string', 'razao_social' => 'string', 'updated_at' => 'timestamp'
     ];
 
     /**

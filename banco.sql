@@ -43,7 +43,8 @@ CREATE TABLE pessoas (
 	funcao VARCHAR(64),
 	admissao DATE,
 	senha INT,
-	foto VARCHAR(512)
+	foto VARCHAR(512),
+	supervisor TINYINT DEFAULT 0
 );
 
 CREATE TABLE produtos (
@@ -114,6 +115,8 @@ CREATE TABLE retiradas (
 	qtd NUMERIC(10,5),
 	id_atribuicao INT,
 	id_comodato INT,
+	id_pessoa INT,
+	observacao TEXT,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

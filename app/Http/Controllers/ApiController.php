@@ -223,6 +223,7 @@ class ApiController extends Controller {
             DB::table("pessoas")
                 ->where("cpf", $request->cpf)
                 ->where("senha", $request->senha)
+                ->where("lixeira", 0)
                 ->get()
         ) ? 1 : 0;
     }
@@ -285,8 +286,6 @@ class ApiController extends Controller {
                 WHERE DATE_ADD(DATE(retiradas.created_at), INTERVAL produtos.validade DAY) > CURDATE()
                 GROUP BY id_atribuicao
             ) AS ret ON ret.id_atribuicao = atribuicoes.id
-
-            WHERE (ret.qtd < atribuicoes.qtd) OR ret.qtd IS NULL
         "));
         $resultado = array();
         foreach ($consulta as $linha) {
@@ -329,9 +328,9 @@ class ApiController extends Controller {
                 return json_encode($resultado);
             }
             $maquinas = DB::table("valores")
-                        ->where("seq", $retirada["id_maquina"])
-                        ->where("alias", "maquinas")
-                        ->get();
+                            ->where("seq", $retirada["id_maquina"])
+                            ->where("alias", "maquinas")
+                            ->get();
             if (!sizeof($maquinas)) {
                 $resultado->code = 404;
                 $resultado->msg = "Máquina não encontrada";
@@ -366,6 +365,65 @@ class ApiController extends Controller {
                 return json_encode($resultado);
             }
             $linha = new Retiradas;
+            $linha->id_atribuicao = $retirada["id_atribuicao"];
+            $linha->id_comodato = $comodato[0]->id;
+            $linha->qtd = $retirada["qtd"];
+            $linha->save();
+            $modelo = $log->inserir("C", "retiradas", $linha->id, true);
+            $modelo->nome = "APP";
+            $modelo->save();
+            $cont++;
+        }
+        $resultado->code = 201;
+        $resultado->msg = "Sucesso";
+        return json_encode($resultado);
+    }
+
+    public function validarSpv(Request $request) {
+        $consulta = DB::table("pessoas")
+                        ->where("cpf", $request->cpf)
+                        ->where("senha", $request->senha)
+                        ->where("supervisor", 1)
+                        ->where("lixeira", 0)
+                        ->get();
+        return sizeof($consulta) ? $consulta[0]->id : 0;
+    }
+
+    public function retirarComSupervisao(Request $request) {
+        $log = new LogController;
+        $resultado = new \stdClass;
+        $cont = 0;
+        while (isset($request[$cont]["id_atribuicao"])) {
+            $retirada = $request[$cont];
+            $atribuicao = Atribuicoes::find($retirada["id_atribuicao"]);
+            if ($atribuicao == null) {
+                $resultado->code = 404;
+                $resultado->msg = "Atribuição não encontrada";
+                return json_encode($resultado);
+            }
+            $maquinas = DB::table("valores")
+                            ->where("seq", $retirada["id_maquina"])
+                            ->where("alias", "maquinas")
+                            ->get();
+            if (!sizeof($maquinas)) {
+                $resultado->code = 404;
+                $resultado->msg = "Máquina não encontrada";
+                return json_encode($resultado);
+            }
+            $comodato = DB::table("comodatos")
+                            ->select("id")
+                            ->where("id_maquina", $maquinas[0]->id)
+                            ->whereRaw("inicio <= CURDATE()")
+                            ->whereRaw("fim >= CURDATE()")
+                            ->get();
+            if (!sizeof($comodato)) {
+                $resultado->code = 404;
+                $resultado->msg = "Máquina não comodatada para nenhuma empresa";
+                return json_encode($resultado);
+            }
+            $linha = new Retiradas;
+            $linha->id_pessoa = $retirada["id_pessoa"];
+            $linha->observacao = $retirada["obs"];
             $linha->id_atribuicao = $retirada["id_atribuicao"];
             $linha->id_comodato = $comodato[0]->id;
             $linha->qtd = $retirada["qtd"];

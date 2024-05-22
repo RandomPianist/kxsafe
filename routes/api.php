@@ -32,8 +32,10 @@ Route::group(["prefix" => "erp"], function() {
 });
 
 Route::group(["prefix" => "app"], function() {
-    Route::post("/ver-pessoa",          [ApiController::class, "verPessoa"]);
-    Route::post("/produtos-por-pessoa", [ApiController::class, "produtosPorPessoa"]);
-    Route::post("/validar",             [ApiController::class, "validarApp"]);
-    Route::post("/retirar",             [ApiController::class, "retirar"]);
+    Route::post("/ver-pessoa",             [ApiController::class, "verPessoa"]);
+    Route::post("/produtos-por-pessoa",    [ApiController::class, "produtosPorPessoa"]);
+    Route::post("/validar",                [ApiController::class, "validarApp"]);
+    Route::post("/retirar",                [ApiController::class, "retirar"]);
+    Route::post("/retirar-com-supervisao", [ApiController::class, "retirarComSupervisao"]);
+    Route::post("/validar-spv",            [ApiController::class, "validarSpv"]);
 });

@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int  $id
- * @property int  $id_maquina
- * @property int  $id_empresa
  * @property int  $created_at
+ * @property int  $id_empresa
+ * @property int  $id_maquina
  * @property int  $updated_at
- * @property Date $inicio
  * @property Date $fim
  * @property Date $fim_orig
+ * @property Date $inicio
  */
 class Comodatos extends Model
 {
@@ -36,7 +36,7 @@ class Comodatos extends Model
      * @var array
      */
     protected $fillable = [
-        'inicio', 'fim', 'fim_orig', 'id_maquina', 'id_empresa', 'created_at', 'updated_at'
+        'created_at', 'fim', 'fim_orig', 'id_empresa', 'id_maquina', 'inicio', 'updated_at'
     ];
 
     /**
@@ -54,7 +54,7 @@ class Comodatos extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'inicio' => 'date', 'fim' => 'date', 'fim_orig' => 'date', 'id_maquina' => 'int', 'id_empresa' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp'
+        'id' => 'int', 'created_at' => 'timestamp', 'fim' => 'date', 'fim_orig' => 'date', 'id_empresa' => 'int', 'id_maquina' => 'int', 'inicio' => 'date', 'updated_at' => 'timestamp'
     ];
 
     /**
@@ -63,7 +63,7 @@ class Comodatos extends Model
      * @var array
      */
     protected $dates = [
-        'inicio', 'fim', 'fim_orig', 'created_at', 'updated_at'
+        'created_at', 'fim', 'fim_orig', 'inicio', 'updated_at'
     ];
 
     /**

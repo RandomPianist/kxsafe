@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int    $id
- * @property int    $seq
- * @property int    $lixeira
  * @property int    $created_at
+ * @property int    $lixeira
+ * @property int    $seq
  * @property int    $updated_at
- * @property string $descr
  * @property string $alias
+ * @property string $descr
  */
 class Valores extends Model
 {
@@ -35,7 +35,7 @@ class Valores extends Model
      * @var array
      */
     protected $fillable = [
-        'seq', 'descr', 'alias', 'lixeira', 'created_at', 'updated_at'
+        'alias', 'created_at', 'descr', 'lixeira', 'seq', 'updated_at'
     ];
 
     /**
@@ -53,7 +53,7 @@ class Valores extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'seq' => 'int', 'descr' => 'string', 'alias' => 'string', 'lixeira' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp'
+        'id' => 'int', 'alias' => 'string', 'created_at' => 'timestamp', 'descr' => 'string', 'lixeira' => 'int', 'seq' => 'int', 'updated_at' => 'timestamp'
     ];
 
     /**

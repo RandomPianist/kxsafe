@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property int $id
- * @property int $id_atribuicao
- * @property int $id_comodato
- * @property int $created_at
- * @property int $updated_at
+ * @property int    $id
+ * @property int    $created_at
+ * @property int    $id_atribuicao
+ * @property int    $id_comodato
+ * @property int    $id_pessoa
+ * @property int    $updated_at
+ * @property string $observacao
  */
 class Retiradas extends Model
 {
@@ -33,7 +35,7 @@ class Retiradas extends Model
      * @var array
      */
     protected $fillable = [
-        'qtd', 'id_atribuicao', 'id_comodato', 'created_at', 'updated_at'
+        'created_at', 'id_atribuicao', 'id_comodato', 'id_pessoa', 'observacao', 'qtd', 'updated_at'
     ];
 
     /**
@@ -51,7 +53,7 @@ class Retiradas extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'id_atribuicao' => 'int', 'id_comodato' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp'
+        'id' => 'int', 'created_at' => 'timestamp', 'id_atribuicao' => 'int', 'id_comodato' => 'int', 'id_pessoa' => 'int', 'observacao' => 'string', 'updated_at' => 'timestamp'
     ];
 
     /**

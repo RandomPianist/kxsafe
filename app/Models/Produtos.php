@@ -6,18 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int    $id
- * @property int    $validade
- * @property int    $lixeira
- * @property int    $id_categoria
  * @property int    $created_at
+ * @property int    $id_categoria
+ * @property int    $lixeira
  * @property int    $updated_at
- * @property string $descr
+ * @property int    $validade
  * @property string $ca
- * @property string $foto
  * @property string $cod_externo
+ * @property string $descr
+ * @property string $detalhes
+ * @property string $foto
  * @property string $referencia
  * @property string $tamanho
- * @property string $detalhes
  */
 class Produtos extends Model
 {
@@ -41,7 +41,7 @@ class Produtos extends Model
      * @var array
      */
     protected $fillable = [
-        'descr', 'preco', 'validade', 'lixeira', 'ca', 'foto', 'cod_externo', 'id_categoria', 'created_at', 'updated_at', 'referencia', 'tamanho', 'detalhes'
+        'ca', 'cod_externo', 'created_at', 'descr', 'detalhes', 'foto', 'id_categoria', 'lixeira', 'preco', 'referencia', 'tamanho', 'updated_at', 'validade'
     ];
 
     /**
@@ -59,7 +59,7 @@ class Produtos extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'descr' => 'string', 'validade' => 'int', 'lixeira' => 'int', 'ca' => 'string', 'foto' => 'string', 'cod_externo' => 'string', 'id_categoria' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp', 'referencia' => 'string', 'tamanho' => 'string', 'detalhes' => 'string'
+        'id' => 'int', 'ca' => 'string', 'cod_externo' => 'string', 'created_at' => 'timestamp', 'descr' => 'string', 'detalhes' => 'string', 'foto' => 'string', 'id_categoria' => 'int', 'lixeira' => 'int', 'referencia' => 'string', 'tamanho' => 'string', 'updated_at' => 'timestamp', 'validade' => 'int'
     ];
 
     /**
