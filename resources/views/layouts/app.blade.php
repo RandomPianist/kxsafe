@@ -255,7 +255,7 @@
                             else erro = "Preencha os campos";
                             _cpf.classList.add("invalido");
                         }
-                        let lista = ["nome", "setor", "pessoa-empresa", "funcao"];
+                        let lista = ["nome", "setor", "pessoa-empresa", "funcao", "supervisor"];
                         if (!parseInt(document.getElementById("pessoa-id").value)) lista.push(parseInt(data.cria_usuario) ? "password" : "senha");
                         let aux = verifica_vazios(lista, erro);
                         erro = aux.erro;
