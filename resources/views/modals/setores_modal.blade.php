@@ -21,12 +21,19 @@
                                 <span class = "custom-label-form tam-max"></span>
                             </div>
                         </div>
-                        <div class = "row mb-3" style = "padding-top:5px">
-                            <div class = "col-12">
+                        <div class = "row mb-3 pt-3">
+                            <div class = "col-7">
                                 <div class = "custom-control custom-switch">
                                     <input id = "cria_usuario" name = "cria_usuario" type = "hidden" />
                                     <input id = "cria_usuario-chk" class = "checkbox custom-control-input" type = "checkbox" onchange = "muda_cria_usuario(this)" />
                                     <label for = "cria_usuario-chk" class = "custom-control-label">Cria usuários<label>
+                                </div>
+                            </div>
+                            <div class = "col-5 pl-4">
+                                <div class = "custom-control custom-switch">
+                                    <input id = "setor_padrao" name = "setor_padrao" type = "hidden" />
+                                    <input id = "setor_padrao-chk" class = "checkbox custom-control-input" type = "checkbox" onchange = "document.getElementById('setor_padrao').value = this.checked ? 1 : 0" />
+                                    <label for = "setor_padrao-chk" class = "custom-control-label">Setor padrão<label>
                                 </div>
                             </div>
                         </div>

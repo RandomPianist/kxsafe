@@ -56,6 +56,11 @@ Route::middleware("auth")->group(function () {
         Route::get ("/aviso/{id}",   [EmpresasController::class, "aviso"]);
         Route::post("/salvar",       [EmpresasController::class, "salvar"]);
         Route::post("/excluir",      [EmpresasController::class, "excluir"]);
+        Route::group(["prefix" => "setores"], function() {
+            Route::get ("/listar/{id}", [EmpresasController::class, "listarSetores"]);
+            Route::post("/salvar",      [EmpresasController::class, "salvarSetor"]);
+            Route::post("/excluir",     [EmpresasController::class, "excluirSetor"]);
+        });
     });
 
     Route::group(["prefix" => "colaboradores"], function() {

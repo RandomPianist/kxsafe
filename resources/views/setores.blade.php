@@ -52,6 +52,7 @@
     </button>
     <script type = "text/javascript" language = "JavaScript">
         let ant_usr = false;
+        let ant_padrao = false;
 
         function listar() {
             $.get(URL + "/setores/listar", {
@@ -80,6 +81,7 @@
             limpar_invalido();
             const id = parseInt(document.getElementById("id").value);
             let el_chk = document.getElementById("cria_usuario-chk");
+            let el_chk2 = document.getElementById("setor_padrao-chk");
             let invalida_descricao = false;
             let erro = "";
             let el = document.getElementById("descr");
@@ -96,6 +98,7 @@
                 id &&
                 !erro &&
                 el_chk.checked == ant_usr &&
+                el_chk2.checked == ant_padrao &&
                 el.value.toUpperCase().trim() == anteriores.descr.toUpperCase().trim()
             ) erro = "Não há alterações para salvar";
             $.get(URL + "/setores/consultar", {
@@ -118,18 +121,25 @@
             document.getElementById("setoresModalLabel").innerHTML = titulo;
             let el_cria_usuario = document.getElementById("cria_usuario");
             let el_cria_usuario_chk = document.getElementById("cria_usuario-chk");
+            let el_setor_padrao = document.getElementById("setor_padrao");
+            let el_setor_padrao_chk = document.getElementById("setor_padrao-chk");
             if (id) {
                 $.get(URL + "/setores/mostrar/" + id, function(data) {
                     if (typeof data == "string") data = $.parseJSON(data);
                     document.getElementById("descr").value = data.descr;
                     el_cria_usuario.value = parseInt(data.cria_usuario) ? "S" : "N";
                     el_cria_usuario_chk.checked = el_cria_usuario.value == "S";
+                    el_setor_padrao.value = data.padrao;
+                    el_setor_padrao_chk.checked = parseInt(data.padrao) == 1;
                     ant_usr = el_cria_usuario_chk.checked;
+                    ant_padrao = el_setor_padrao_chk.checked;
                     modal("setoresModal", id);
                 });
             } else modal("setoresModal", id, function() {
                 el_cria_usuario.value = "N";
+                el_setor_padrao.value = 0;
                 el_cria_usuario_chk.checked = false;
+                el_setor_padrao_chk.checked = false;
             }); 
         }
 

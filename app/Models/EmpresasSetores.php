@@ -5,22 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property int    $id
- * @property int    $created_at
- * @property int    $cria_usuario
- * @property int    $lixeira
- * @property int    $padrao
- * @property int    $updated_at
- * @property string $descr
+ * @property int $id
+ * @property int $created_at
+ * @property int $id_empresa
+ * @property int $id_setor
+ * @property int $lixeira
+ * @property int $updated_at
  */
-class Setores extends Model
+class EmpresasSetores extends Model
 {
     /**
      * The database table used by the model.
      *
      * @var string
      */
-    protected $table = 'setores';
+    protected $table = 'empresas_setores';
 
     /**
      * The primary key for the model.
@@ -35,7 +34,7 @@ class Setores extends Model
      * @var array
      */
     protected $fillable = [
-        'created_at', 'cria_usuario', 'descr', 'lixeira', 'padrao', 'updated_at'
+        'created_at', 'id_empresa', 'id_setor', 'lixeira', 'updated_at'
     ];
 
     /**
@@ -53,7 +52,7 @@ class Setores extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'created_at' => 'timestamp', 'cria_usuario' => 'int', 'descr' => 'string', 'lixeira' => 'int', 'padrao' => 'int', 'updated_at' => 'timestamp'
+        'id' => 'int', 'created_at' => 'timestamp', 'id_empresa' => 'int', 'id_setor' => 'int', 'lixeira' => 'int', 'updated_at' => 'timestamp'
     ];
 
     /**

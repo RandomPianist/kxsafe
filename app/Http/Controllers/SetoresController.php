@@ -6,6 +6,7 @@ use DB;
 use Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\LogController;
+use App\Models\EmpresasSetores;
 use App\Models\Pessoas;
 use App\Models\Setores;
 
@@ -84,7 +85,8 @@ class SetoresController extends Controller {
             return DB::table("setores")
                 ->select(
                     "descr",
-                    "cria_usuario"
+                    "cria_usuario",
+                    "padrao"
                 )
                 ->where("id", $id)
                 ->first();
@@ -157,8 +159,29 @@ class SetoresController extends Controller {
         }
         $linha->descr = mb_strtoupper($request->descr);
         $linha->cria_usuario = $cria_usuario;
+        $linha->padrao = $request->setor_padrao;
         $linha->save();
         $log->inserir($request->id ? "E" : "C", "setores", $linha->id);
+        if ($linha->padrao) {
+            $consulta = DB::table("empresas")
+                            ->select("id")
+                            ->get();
+            foreach ($consulta as $empresa) {
+                if (!sizeof(
+                    DB::table("empresas_setores")
+                        ->where("id_empresa", $empresa->id)
+                        ->where("id_setor", $linha->id)
+                        ->get()
+                )) {
+                    $modelo = new EmpresasSetores;
+                    $modelo->id_empresa = $empresa->id;
+                    $modelo->id_setor = $linha->id;
+                    $modelo->save();
+                    $log = new LogController;
+                    $log->inserir("C", "empresas_setores", $modelo->id);
+                }
+            }
+        }
         return redirect("/setores");
     }
 

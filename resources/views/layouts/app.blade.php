@@ -51,6 +51,12 @@
                                 </li>
                                 <li onclick = "redirect('/kxsafe/colaboradores')">
                                     <span>Colaboradores</span>
+                                    <!--
+                                        <span>Colaboradores<img class="dropdown-icon" src="/kxsafe/img/sort-down.png"></span>
+                                        <ul class="subdropdown-toolbar">
+                                            <li onclick="redirect('/')"></li>
+                                        </ul>
+                                    -->
                                 </li>
                             </ul>
                         </a>
