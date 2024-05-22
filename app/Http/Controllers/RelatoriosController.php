@@ -264,7 +264,7 @@ class RelatoriosController extends Controller {
                 produtos.descr AS produto,
                 valores.descr AS maquina,
                 DATE_FORMAT(retiradas.created_at, '%d/%m/%Y') AS data,
-                IFNULL(CONCAT('Liberado por ', supervisor.nome, IFNULL(CONCAT(' - ', retiradas.obs), '')), '') AS obs
+                IFNULL(CONCAT('Liberado por ', supervisor.nome, IFNULL(CONCAT(' - ', retiradas.observacao), '')), '') AS obs
 
             FROM retiradas
 
