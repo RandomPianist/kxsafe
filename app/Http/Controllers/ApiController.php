@@ -104,6 +104,7 @@ class ApiController extends Controller {
               AND produtos.lixeira = 0
         "));
         foreach ($consulta as $linha) {
+            $linha->preco = floatval($linha->preco);
             $linha->saldo = floatval($linha->saldo);
             $linha->minimo = floatval($linha->minimo);
             $linha->maximo = floatval($linha->maximo);
