@@ -96,9 +96,17 @@
                                 <input id = "senha" name = "senha" class = "form-control" autocomplete = "off" type = "password" onkeyup = "numerico(this)" />
                             </div>
                         </div>
+                        <div class = "row mb-3" style = "padding-top:5px">
+                            <div class = "col-12">
+                                <div class = "custom-control custom-switch">
+                                    <input id = "supervisor" name = "supervisor" type = "hidden" />
+                                    <input id = "supervisor-chk" class = "checkbox custom-control-input" type = "checkbox" onchange = "document.getElementById('supervisor').value = this.checked ? 1 : 0" />
+                                    <label for = "supervisor-chk" class = "custom-control-label">Supervisor<label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
                 <div class = "d-flex">
                     <button type = "button" class = "btn btn-target mx-auto my-4 mb-4 px-5" onclick = "pessoa.validar()">Salvar</button>
                 </div>

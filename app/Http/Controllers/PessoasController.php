@@ -71,6 +71,7 @@ class PessoasController extends Controller {
         $modelo->id_empresa = $request->id_empresa;
         $modelo->id_setor = $request->id_setor;
         if (trim($request->senha)) $modelo->senha = $request->senha;
+        $modelo->supervisor = $request->supervisor;
         $modelo->save();
         $log->inserir($request->id ? "E" : "C", "pessoas", $modelo->id);
         return $modelo;
@@ -143,6 +144,7 @@ class PessoasController extends Controller {
                 pessoas.id_setor,
                 pessoas.id_empresa,
                 pessoas.funcao,
+                pessoas.supervisor,
                 DATE_FORMAT(pessoas.admissao, '%d/%m/%Y') AS admissao,
                 setores.descr AS setor,
                 empresas.nome_fantasia AS empresa,

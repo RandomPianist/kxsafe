@@ -318,7 +318,7 @@
                 if (id) {
                     $.get(URL + "/colaboradores/mostrar/" + id, function(data) {
                         if (typeof data == "string") data = $.parseJSON(data);
-                        ["nome", "cpf", "setor", "pessoa-empresa", "id_setor", "pessoa-id_empresa", "email", "funcao", "admissao"].forEach((_id) => {
+                        ["nome", "cpf", "setor", "pessoa-empresa", "id_setor", "pessoa-id_empresa", "email", "funcao", "admissao", "supervisor"].forEach((_id) => {
                             document.getElementById(_id).value = data[_id.replace("pessoa-", "")];
                         });
                         setTimeout(function() {
@@ -326,6 +326,7 @@
                                 that.toggle_user(parseInt(data.id_setor));
                                 estilo_bloco_senha.display = id != {{ Auth::user()->id_pessoa }} ? "none" : "";
                                 document.getElementById("setor").disabled = id == {{ Auth::user()->id_pessoa }};
+                                document.getElementById("supervisor-chk").checked = parseInt(data.supervisor) == 1;
                                 Array.from(document.getElementsByClassName("pessoa-senha")).forEach((el) => {
                                     el.innerHTML = "Senha:";
                                 });
