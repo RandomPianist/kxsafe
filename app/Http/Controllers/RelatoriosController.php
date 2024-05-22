@@ -151,9 +151,11 @@ class RelatoriosController extends Controller {
         $resultado = collect(DB::select(DB::raw("
             SELECT
                 /* GRUPO 1 */
+                valores.id AS id_maquina,
                 valores.descr AS maquina,
 
                 /* GRUPO 2 */
+                produtos.id AS id_produto,
                 produtos.descr AS produto,
                 IFNULL(ge.preco, produtos.preco) AS preco,
 
@@ -193,11 +195,11 @@ class RelatoriosController extends Controller {
               AND valores.lixeira = 0
 
             ORDER BY log.created_at
-        ")))->groupBy("maquina")->map(function($itens1) {
+        ")))->groupBy("id_maquina")->map(function($itens1) {
             return [
                 "maquina" => [
                     "descr" => $itens1[0]->maquina,
-                    "produtos" => collect($itens1)->groupBy("produto")->map(function($itens2) {
+                    "produtos" => collect($itens1)->groupBy("id_produto")->map(function($itens2) {
                         return [
                             "descr" => $itens2[0]->produto,
                             "preco" => $itens2[0]->preco,
