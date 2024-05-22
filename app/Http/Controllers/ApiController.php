@@ -165,7 +165,8 @@ class ApiController extends Controller {
                 IFNULL(foto, '') AS foto,
                 lixeira,
                 id_categoria AS idCategoria,
-                cod_externo AS codExterno
+                cod_externo AS codExterno,
+                '123' AS usu
 
             FROM produtos
 
