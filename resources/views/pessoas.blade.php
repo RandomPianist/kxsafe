@@ -69,7 +69,9 @@
                         "<td width = '30%'>" + linha.nome + "</td>" +
                         "<td width = '25%'>" + linha.empresa + "</td>" +
                         "<td width = '20%'>" + linha.setor + "</td>" +
-                        "<td class = 'text-center btn-table-action' width = '15%'>" +
+                        "<td class = 'text-center btn-table-action' width = '15%'>";
+                    if (parseInt(linha.possui_retiradas)) resultado += "<i class = 'my-icon fa-light fa-file' title = 'Retiradas' onclick = 'retirada_pessoa(" + linha.id + ")'></i>";
+                    resultado += "" +
                             "<i class = 'my-icon far fa-box'       title = 'Atribuir produto' onclick = 'atribuicao(false, " + linha.id + ")'></i>" +
                             "<i class = 'my-icon far fa-tshirt'    title = 'Atribuir grade'   onclick = 'atribuicao(true, " + linha.id + ")'></i>" +
                             "<i class = 'my-icon far fa-edit'      title = 'Editar'           onclick = 'pessoa = new Pessoa(" + linha.id + ")'></i>" +
@@ -79,6 +81,22 @@
                 });
                 document.getElementById("table-dados").innerHTML = resultado;
                 $($(".sortable-columns").children()[0]).trigger("click");
+            });
+        }
+
+        function retirada_pessoa(id_pessoa) {
+            $.get(URL + "/pessoas/mostrar/" + id_pessoa, function(data) {
+                if (typeof data == "string") data = $.parseJSON(data);
+                let req = {};
+                ["inicio", "fim"].forEach((chave) => {
+                    req[chave] = "";
+                });
+                req.pessoa = data.nome;
+                req.id_pessoa = id_pessoa;
+                let link = document.createElement("a");
+                link.href = URL + "/relatorios/retiradas?" + $.param(req);
+                link.target = "_blank";
+                link.click();
             });
         }
     </script>

@@ -25,7 +25,11 @@ class PessoasController extends Controller {
                     END
                 ) AS nome,
                 IFNULL(setores.descr,          'A CLASSIFICAR') AS setor,
-                IFNULL(empresas.nome_fantasia, 'A CLASSIFICAR') AS empresa
+                IFNULL(empresas.nome_fantasia, 'A CLASSIFICAR') AS empresa,
+                CASE
+                    WHEN retiradas.id_pessoa IS NULL THEN 0
+                    ELSE 1
+                END AS possui_retiradas
             
             FROM pessoas
 
@@ -34,6 +38,9 @@ class PessoasController extends Controller {
 
             LEFT JOIN empresas
                 ON empresas.id = pessoas.id_empresa
+
+            LEFT JOIN retiradas
+                ON retiradas.id_pessoa = pessoas.id
 
             WHERE ".$param."
               AND pessoas.lixeira = 0
