@@ -243,12 +243,12 @@ class RelatoriosController extends Controller {
         if ($request->inicio || $request->fim) $periodo = "Período";
         if ($request->inicio) {
             $inicio = Carbon::createFromFormat('d/m/Y', $request->inicio)->format('Y-m-d');
-            array_push($filtro, "DATE(log.created_at) >= '".$inicio."'");
+            array_push($filtro, "DATE(retiradas.created_at) >= '".$inicio."'");
             $periodo .= " de ".$request->inicio;
         }
         if ($request->fim) {
             $fim = Carbon::createFromFormat('d/m/Y', $request->fim)->format('Y-m-d');
-            array_push($filtro, "DATE(log.created_at) <= '".$fim."'");
+            array_push($filtro, "DATE(retiradas.created_at) <= '".$fim."'");
             $periodo .= " até ".$request->fim;
         }
         if ($periodo) array_push($criterios, $periodo);
