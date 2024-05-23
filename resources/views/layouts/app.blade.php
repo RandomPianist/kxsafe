@@ -49,14 +49,15 @@
                                 <li onclick = "redirect('/kxsafe/empresas')">
                                     <span>Empresas</span>
                                 </li>
-                                <li onclick = "redirect('/kxsafe/colaboradores')">
-                                    <span>Colaboradores</span>
-                                    <!--
-                                        <span>Colaboradores<img class="dropdown-icon" src="/kxsafe/img/sort-down.png"></span>
-                                        <ul class="subdropdown-toolbar">
-                                            <li onclick="redirect('/')"></li>
-                                        </ul>
-                                    -->
+                                <li>
+                                    <!-- <span>Colaboradores</span> -->
+                                    <span>Colaboradores<img class="dropdown-icon" src="/kxsafe/img/sort-down.png"></span>
+                                    <ul class="subdropdown-toolbar">
+                                        <li onclick="redirect('/kxsafe/colaboradores/pagina/A')">Administradores</li>
+                                        <li onclick="redirect('/kxsafe/colaboradores/pagina/F')">Funcionários</li>
+                                        <li onclick="redirect('/kxsafe/colaboradores/pagina/S')">Supervisores</li>
+                                        <li onclick="redirect('/kxsafe/colaboradores/pagina/U')">Usuários</li>
+                                    </ul>
                                 </li>
                             </ul>
                         </a>
@@ -352,6 +353,18 @@
                             Array.from(document.getElementsByClassName("pessoa-senha")).forEach((el) => {
                                 el.innerHTML = "Senha: *";
                             });
+                            const tipo = document.getElementById("titulo-tela").innerHTML.charAt(0);
+                            if (tipo == "A" || tipo == "U") {
+                                $.get(URL + "/setores/primeiro-admin", function(data) {
+                                    if (typeof data == "string") data = $.parseJSON(data);
+                                    document.getElementById("setor").value = data.descr;
+                                    document.getElementById("id_setor").value = data.id;
+                                    that.toggle_user(data.id);
+                                });
+                            } else if (tipo == "S") {
+                                document.getElementById("supervisor-chk").checked = true;
+                                document.getElementById("supervisor").value = 1;
+                            }
                         });
                     }, 0);
                 }

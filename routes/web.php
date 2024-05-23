@@ -37,15 +37,16 @@ Route::middleware("auth")->group(function () {
     });
 
     Route::group(["prefix" => "setores"], function() {
-        Route::get ("/",              [SetoresController::class, "ver"]);
-        Route::get ("/listar",        [SetoresController::class, "listar"]);
-        Route::get ("/consultar",     [SetoresController::class, "consultar"]);
-        Route::get ("/usuarios/{id}", [SetoresController::class, "usuarios"]);
-        Route::get ("/pessoas/{id}",  [SetoresController::class, "pessoas"]);
-        Route::get ("/mostrar/{id}",  [SetoresController::class, "mostrar"]);
-        Route::get ("/aviso/{id}",    [SetoresController::class, "aviso"]);
-        Route::post("/salvar",        [SetoresController::class, "salvar"]);
-        Route::post("/excluir",       [SetoresController::class, "excluir"]);
+        Route::get ("/",               [SetoresController::class, "ver"]);
+        Route::get ("/listar",         [SetoresController::class, "listar"]);
+        Route::get ("/consultar",      [SetoresController::class, "consultar"]);
+        Route::get ("/usuarios/{id}",  [SetoresController::class, "usuarios"]);
+        Route::get ("/pessoas/{id}",   [SetoresController::class, "pessoas"]);
+        Route::get ("/mostrar/{id}",   [SetoresController::class, "mostrar"]);
+        Route::get ("/aviso/{id}",     [SetoresController::class, "aviso"]);
+        Route::get ("/primeiro-admin", [SetoresController::class, "primeiroAdmin"]);
+        Route::post("/salvar",         [SetoresController::class, "salvar"]);
+        Route::post("/excluir",        [SetoresController::class, "excluir"]);
     });
 
     Route::group(["prefix" => "empresas"], function() {
@@ -64,13 +65,13 @@ Route::middleware("auth")->group(function () {
     });
 
     Route::group(["prefix" => "colaboradores"], function() {
-        Route::get ("/",             [PessoasController::class, "ver"]);
-        Route::get ("/listar",       [PessoasController::class, "listar"]);
-        Route::get ("/consultar",    [PessoasController::class, "consultar"]);
-        Route::get ("/mostrar/{id}", [PessoasController::class, "mostrar"]);
-        Route::get ("/aviso/{id}",   [PessoasController::class, "aviso"]);
-        Route::post("/salvar",       [PessoasController::class, "salvar"]);
-        Route::post("/excluir",      [PessoasController::class, "excluir"]);
+        Route::get ("/pagina/{tipo}", [PessoasController::class, "ver"]);
+        Route::get ("/listar",        [PessoasController::class, "listar"]);
+        Route::get ("/consultar",     [PessoasController::class, "consultar"]);
+        Route::get ("/mostrar/{id}",  [PessoasController::class, "mostrar"]);
+        Route::get ("/aviso/{id}",    [PessoasController::class, "aviso"]);
+        Route::post("/salvar",        [PessoasController::class, "salvar"]);
+        Route::post("/excluir",       [PessoasController::class, "excluir"]);
     });
 
     Route::group(["prefix" => "produtos"], function() {

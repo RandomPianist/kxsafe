@@ -13,7 +13,11 @@ use App\Http\Controllers\EmpresasController;
 use App\Models\Pessoas;
 
 class PessoasController extends Controller {
-    private function busca($param) {
+    private function busca($param, $tipo) {
+        if (in_array($tipo, ["A", "U"])) {
+            $param .= " AND setores.cria_usuario = 1";
+            if ($tipo == "A") $param .= " AND pessoas.id_empresa = 0";
+        } else $param .= " AND setores.cria_usuario = 0 AND pessoas.supervisor = ".($tipo == "S" ? "1" : "0");
         $query = "
             SELECT
                 pessoas.id,
@@ -89,19 +93,33 @@ class PessoasController extends Controller {
         return intval($setor->mostrar($id)->cria_usuario);
     }
 
-    public function ver() {
+    public function ver($tipo) {
+        switch($tipo) {
+            case "A":
+                $titulo = "Administradores";
+                break;
+            case "F":
+                $titulo = "Funcionários";
+                break;
+            case "S":
+                $titulo = "Supervisores";
+                break;
+            case "U":
+                $titulo = "Usuários";
+                break;
+        }
         $log = new LogController;
         $ultima_atualizacao = $log->consultar("pessoas");
-        return view("pessoas", compact("ultima_atualizacao"));
+        return view("pessoas", compact("ultima_atualizacao", "titulo"));
     }
 
     public function listar(Request $request) {
         $filtro = trim($request->filtro);
         if (strlen($filtro)) {
-            $busca = $this->busca("nome LIKE '".$filtro."%'");
-            if (sizeof($busca) < 3) $busca = $this->busca("nome LIKE '%".$filtro."%'");
-            if (sizeof($busca) < 3) $busca = $this->busca("(nome LIKE '%".implode("%' AND nome LIKE '%", explode(" ", str_replace("  ", " ", $filtro)))."%')");
-        } else $busca = $this->busca("1");
+            $busca = $this->busca("nome LIKE '".$filtro."%'", $request->tipo);
+            if (sizeof($busca) < 3) $busca = $this->busca("nome LIKE '%".$filtro."%'", $request->tipo);
+            if (sizeof($busca) < 3) $busca = $this->busca("(nome LIKE '%".implode("%' AND nome LIKE '%", explode(" ", str_replace("  ", " ", $filtro)))."%')", $request->tipo);
+        } else $busca = $this->busca("1", $request->tipo);
         return json_encode($busca);
     }
 

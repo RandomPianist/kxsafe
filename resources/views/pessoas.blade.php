@@ -6,7 +6,7 @@
             <table class = "w-100">
                 <tr>
                     <td class = "w-100">
-                        <h3 class = "col header-color mb-3">Colaboradores</h3>
+                        <h3 class = "col header-color mb-3" id = "titulo-tela">{{ $titulo }}</h3>
                     </td>
                     <td class = "ultima-atualizacao">
                         <span class = "custom-label-form">{{ $ultima_atualizacao }}</span>
@@ -58,8 +58,9 @@
     </button>
     <script type = "text/javascript" language = "JavaScript">
         function listar() {
-            $.get(URL + "/colaboradores/listar", {
-                filtro : document.getElementById("busca").value
+            $.get(URL + "/colaboradores/listar/", {
+                filtro : document.getElementById("busca").value,
+                tipo : document.getElementById("titulo-tela").innerHTML.charAt(0)
             }, function(data) {
                 let resultado = "";
                 if (typeof data == "string") data = $.parseJSON(data);

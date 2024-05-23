@@ -192,4 +192,13 @@ class SetoresController extends Controller {
         $log = new LogController;
         $log->inserir("D", "setores", $linha->id);
     }
+
+    public function primeiroAdmin() {
+        return json_encode(
+            DB::table("setores")
+                ->where("lixeira", 0)
+                ->where("cria_usuario", 1)
+                ->first()
+        );
+    }
 }
