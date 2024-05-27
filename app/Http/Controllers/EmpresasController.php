@@ -33,7 +33,7 @@ class EmpresasController extends Controller {
 
     public function ver() {
         $log = new LogController;
-        $ultima_atualizacao = $log->consultar("empresas");
+        $ultima_atualizacao = $log->consultar(["empresas", "empresas_setores"]);
         $pode_criar_matriz = !intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa);
         return view("empresas", compact("ultima_atualizacao", "pode_criar_matriz"));
     }

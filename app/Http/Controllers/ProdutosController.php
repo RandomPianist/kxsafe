@@ -31,7 +31,7 @@ class ProdutosController extends Controller {
 
     public function ver() {
         $log = new LogController;
-        $ultima_atualizacao = $log->consultar("produtos");
+        $ultima_atualizacao = $log->consultar(["produtos"]);
         return view("produtos", compact("ultima_atualizacao"));
     }
 

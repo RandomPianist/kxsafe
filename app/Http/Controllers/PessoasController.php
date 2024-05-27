@@ -109,7 +109,7 @@ class PessoasController extends Controller {
                 break;
         }
         $log = new LogController;
-        $ultima_atualizacao = $log->consultar("pessoas");
+        $ultima_atualizacao = $log->consultar(["pessoas"]);
         return view("pessoas", compact("ultima_atualizacao", "titulo"));
     }
 

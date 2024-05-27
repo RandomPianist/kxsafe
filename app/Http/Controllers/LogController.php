@@ -18,7 +18,8 @@ class LogController extends Controller {
         return $linha;
     }
 
-    public function consultar($tabela, $alias = "") {
+    public function consultar($arr_tabelas, $alias = "") {
+        $tabelas = "'".join("' OR '", $arr_tabelas)."'";
         $query = "
             SELECT
                 IFNULL(pessoas.nome, CONCAT(
@@ -38,7 +39,7 @@ class LogController extends Controller {
 
             WHERE alias = '".$alias."'
         " : "
-            WHERE tabela = '".$tabela."'
+            WHERE tabela IN (".$tabelas.")
         ";
         $query .= " ORDER BY log.id DESC";
         $consulta = DB::select(DB::raw($query));
