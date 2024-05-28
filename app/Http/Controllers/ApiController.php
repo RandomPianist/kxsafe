@@ -301,6 +301,7 @@ class ApiController extends Controller {
         }
         return json_encode(collect($resultado)->groupBy("referencia")->map(function($itens) {
             return [
+                "id_pessoa" => DB::table("pessoas")->where("cpf", $request->cpf)->value("id"),
                 "nome" => $itens[0]->nome,
                 "foto" => $itens[0]->foto,
                 "referencia" => $itens[0]->referencia,
