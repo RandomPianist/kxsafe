@@ -248,7 +248,8 @@ class ApiController extends Controller {
                 IFNULL(produtos.foto, '') AS foto,
 
                 atribuicoes.id AS id_atribuicao,
-                (atribuicoes.qtd - IFNULL(ret.qtd, 0)) AS qtd
+                (atribuicoes.qtd - IFNULL(ret.qtd, 0)) AS qtd,
+                IFNULL(ret.proxima_retirada, DATE_FORMAT(CURDATE(), '%d/%m/%Y')) AS proxima_retirada
 
             FROM produtos
 
@@ -276,7 +277,8 @@ class ApiController extends Controller {
             LEFT JOIN (
                 SELECT
                     SUM(retiradas.qtd) AS qtd,
-                    id_atribuicao
+                    id_atribuicao,
+                    DATE_FORMAT(DATE_ADD(MAX(retiradas.created_at), INTERVAL produtos.validade DAY), '%d/%m/%Y') AS proxima_retirada
                 FROM retiradas
                 JOIN atribuicoes
                     ON atribuicoes.id = retiradas.id_atribuicao
@@ -284,7 +286,9 @@ class ApiController extends Controller {
                     ON (produto_ou_referencia_chave = 'produto' AND produto_ou_referencia_valor = produtos.cod_externo)
                         OR (produto_ou_referencia_chave = 'referencia' AND produto_ou_referencia_valor = produtos.referencia)
                 WHERE DATE_ADD(DATE(retiradas.created_at), INTERVAL produtos.validade DAY) > CURDATE()
-                GROUP BY id_atribuicao
+                GROUP BY
+                    id_atribuicao,
+                    produtos.validade
             ) AS ret ON ret.id_atribuicao = atribuicoes.id
         "));
         $resultado = array();
@@ -302,6 +306,7 @@ class ApiController extends Controller {
                 "referencia" => $itens[0]->referencia,
                 "qtd" => $itens[0]->qtd,
                 "detalhes" => $itens[0]->detalhes,
+                "proxima_retirada" => $itens[0]->proxima_retirada,
                 "tamanhos" => $itens->map(function($tamanho) {
                     return [
                         "id" => $tamanho->id,
