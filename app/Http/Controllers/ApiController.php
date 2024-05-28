@@ -287,7 +287,7 @@ class ApiController extends Controller {
                 JOIN produtos
                     ON (produto_ou_referencia_chave = 'produto' AND produto_ou_referencia_valor = produtos.cod_externo)
                         OR (produto_ou_referencia_chave = 'referencia' AND produto_ou_referencia_valor = produtos.referencia)
-                WHERE DATE_ADD(DATE(retiradas.created_at), INTERVAL produtos.validade DAY) > CURDATE()
+                WHERE DATE_ADD(DATE(retiradas.created_at), INTERVAL produtos.validade DAY) >= CURDATE()
                 GROUP BY
                     id_atribuicao,
                     produtos.validade
