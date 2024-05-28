@@ -31,7 +31,7 @@ class PessoasController extends Controller {
                 IFNULL(setores.descr,          'A CLASSIFICAR') AS setor,
                 IFNULL(empresas.nome_fantasia, 'A CLASSIFICAR') AS empresa,
                 CASE
-                    WHEN retiradas.id_pessoa IS NULL THEN 0
+                    WHEN ret.id_pessoa IS NULL THEN 0
                     ELSE 1
                 END AS possui_retiradas
             
@@ -43,8 +43,11 @@ class PessoasController extends Controller {
             LEFT JOIN empresas
                 ON empresas.id = pessoas.id_empresa
 
-            LEFT JOIN retiradas
-                ON retiradas.id_pessoa = pessoas.id
+            LEFT JOIN (
+                SELECT id_pessoa
+                FROM retiradas
+                GROUP BY id_pessoa
+            ) AS ret ON ret.id_pessoa = pessoas.id
 
             WHERE ".$param."
               AND pessoas.lixeira = 0

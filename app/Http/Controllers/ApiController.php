@@ -164,6 +164,8 @@ class ApiController extends Controller {
                 IFNULL(ca, '') AS ca,
                 IFNULL(foto, '') AS foto,
                 lixeira,
+                referencia AS refer,
+                IFNULL(tamanho, '') AS tamanho,
                 id_categoria AS idCategoria,
                 cod_externo AS codExterno,
                 '123' AS usu
