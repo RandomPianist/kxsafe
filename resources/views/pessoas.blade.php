@@ -86,7 +86,7 @@
         }
 
         function retirada_pessoa(id_pessoa) {
-            $.get(URL + "/pessoas/mostrar/" + id_pessoa, function(data) {
+            $.get(URL + "/colaboradores/mostrar/" + id_pessoa, function(data) {
                 if (typeof data == "string") data = $.parseJSON(data);
                 let req = {};
                 ["inicio", "fim"].forEach((chave) => {
