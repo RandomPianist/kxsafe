@@ -312,6 +312,6 @@ class RelatoriosController extends Controller {
                 ->where("nome", $request->pessoa)
                 ->where("lixeira", 0)
                 ->get()
-        )) ? "erro" : "";
+        ) && trim($request->pessoa)) ? "erro" : "";
     }
 }
