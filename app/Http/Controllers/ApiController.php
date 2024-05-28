@@ -249,6 +249,7 @@ class ApiController extends Controller {
 
                 atribuicoes.id AS id_atribuicao,
                 (atribuicoes.qtd - IFNULL(ret.qtd, 0)) AS qtd,
+                IFNULL(ret.ultima_retirada, '') AS ultima_retirada,
                 IFNULL(ret.proxima_retirada, DATE_FORMAT(CURDATE(), '%d/%m/%Y')) AS proxima_retirada
 
             FROM produtos
@@ -278,6 +279,7 @@ class ApiController extends Controller {
                 SELECT
                     SUM(retiradas.qtd) AS qtd,
                     id_atribuicao,
+                    DATE_FORMAT(MAX(retiradas.created_at), '%d/%m/%Y') AS ultima_retirada,
                     DATE_FORMAT(DATE_ADD(MAX(retiradas.created_at), INTERVAL produtos.validade DAY), '%d/%m/%Y') AS proxima_retirada
                 FROM retiradas
                 JOIN atribuicoes
@@ -307,6 +309,7 @@ class ApiController extends Controller {
                 "referencia" => $itens[0]->referencia,
                 "qtd" => $itens[0]->qtd,
                 "detalhes" => $itens[0]->detalhes,
+                "ultima_retirada" => $itens[0]->ultima_retirada,
                 "proxima_retirada" => $itens[0]->proxima_retirada,
                 "tamanhos" => $itens->map(function($tamanho) {
                     return [
