@@ -370,7 +370,7 @@ class ApiController extends Controller {
                   AND atribuicoes.id = ".$retirada["id_atribuicao"]
             ));
             $ja_retirados = sizeof($ja_retirados) ? floatval($ja_retirados[0]->qtd) : 0;
-            if (floatval($atribuicao->qtd) <= (floatval($retirada["qtd"]) + $ja_retirados)) {
+            if (floatval($atribuicao->qtd) < (floatval($retirada["qtd"]) + $ja_retirados)) {
                 $resultado->code = 401;
                 $resultado->msg = "Essa quantidade de produtos não é permitida para essa pessoa";
                 return json_encode($resultado);
