@@ -230,27 +230,33 @@ function modal(nome, id, callback) {
     callback();
 }
 
+function excluirMain(_id, prefixo, aviso, callback) {
+    Swal.fire({
+        title: "Aviso",
+        html : aviso,
+        showDenyButton : true,
+        confirmButtonText : "NÃO",
+        confirmButtonColor : "rgb(31, 41, 55)",
+        denyButtonText : "SIM"
+    }).then((result) => {
+        if (result.isDenied) {
+            $.post(URL + prefixo + "/excluir", {
+                _token : $("meta[name='csrf-token']").attr("content"),
+                id : _id
+            }, function() {
+                callback();
+            });
+        }
+    });
+}
+
 function excluir(_id, prefixo, e) {
     if (e !== undefined) e.preventDefault();
     $.get(URL + prefixo + "/aviso/" + _id, function(data) {
         if (typeof data == "string") data = $.parseJSON(data);
         if (parseInt(data.permitir)) {
-            Swal.fire({
-                title: "Aviso",
-                html : data.aviso,
-                showDenyButton : true,
-                confirmButtonText : "NÃO",
-                confirmButtonColor : "rgb(31, 41, 55)",
-                denyButtonText : "SIM"
-            }).then((result) => {
-                if (result.isDenied) {
-                    $.post(URL + prefixo + "/excluir", {
-                        _token : $("meta[name='csrf-token']").attr("content"),
-                        id : _id
-                    }, function() {
-                        location.reload();
-                    });
-                }
+            excluirMain(_id, prefixo, data.aviso, function() {
+                location.reload();
             });
         } else s_alert(data.aviso);
     });
@@ -672,21 +678,7 @@ function atribuir() {
 function excluir_atribuicao(_id) {
     let aviso = "Tem certeza que deseja excluir ess";
     aviso += gradeGlobal ? "a referência?" : "e produto?";
-    Swal.fire({
-        title: "Aviso",
-        html : aviso,
-        showDenyButton : true,
-        confirmButtonText : "NÃO",
-        confirmButtonColor : "rgb(31, 41, 55)",
-        denyButtonText : "SIM"
-    }).then((result) => {
-        if (result.isDenied) {
-            $.post(URL + "/atribuicoes/excluir", {
-                _token : $("meta[name='csrf-token']").attr("content"),
-                id : _id
-            }, function() {
-                mostrar_atribuicoes();
-            });
-        }
+    excluirMain(_id, "/atribuicoes", aviso, function() {
+        mostrar_atribuicoes();
     });
 }

@@ -252,7 +252,7 @@ class ApiController extends Controller {
                 atribuicoes.id AS id_atribuicao,
                 (atribuicoes.qtd - IFNULL(ret.qtd, 0)) AS qtd,
                 IFNULL(ret.ultima_retirada, '') AS ultima_retirada,
-                IFNULL(ret.proxima_retirada, DATE_FORMAT(CURDATE(), '%d/%m/%Y')) AS proxima_retirada
+                DATE_FORMAT(IFNULL(ret.proxima_retirada, CURDATE()), '%d/%m/%Y') AS proxima_retirada
 
             FROM produtos
 
@@ -282,7 +282,7 @@ class ApiController extends Controller {
                     SUM(retiradas.qtd) AS qtd,
                     id_atribuicao,
                     DATE_FORMAT(MAX(retiradas.created_at), '%d/%m/%Y') AS ultima_retirada,
-                    DATE_FORMAT(DATE_ADD(MAX(retiradas.created_at), INTERVAL produtos.validade DAY), '%d/%m/%Y') AS proxima_retirada
+                    DATE_ADD(MAX(retiradas.created_at), INTERVAL produtos.validade DAY) AS proxima_retirada
                 FROM retiradas
                 JOIN atribuicoes
                     ON atribuicoes.id = retiradas.id_atribuicao

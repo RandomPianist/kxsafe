@@ -192,25 +192,18 @@ main {
     opacity: 1;
     height: unset;
     margin-top: -1.9%;
-    padding-top: 3%;
+    padding-top: 3%
 }
 
 .main-toolbar a:hover .dropdown-toolbar {
-    display: block;
-}
-.filtro-valor {
-    max-width: 12.1%;
-    flex: 0 0 12.1%;
-}
-.filtro-valor input {
-    text-align: end;
+    display: block
 }
 
 .subdropdown-toolbar {
-    width: 180px;
+    width: 180px
 }
 
-.main-toolbar a:hover .dropdown-toolbar>li>.subdropdown-toolbar {
+.main-toolbar a:hover .dropdown-toolbar > li > .subdropdown-toolbar {
     position: absolute;
     left: 100%;
     padding: 0;
@@ -219,20 +212,20 @@ main {
     display: none;
     border: 1px solid rgba(0, 0, 0, .125);
     border-radius: .5rem;
-    transition: 0.3s;
+    transition: 0.3s
 }
 
 .subdropdown-toolbar>li {
-    padding: 10px 20px;
+    padding: 10px 20px
 }
 
-.main-toolbar a:hover .dropdown-toolbar>li:hover>.subdropdown-toolbar {
-    display: block;
+.main-toolbar a:hover .dropdown-toolbar > li:hover > .subdropdown-toolbar {
+    display: block
 }
 
 .user-card:hover .dropdown-icon,
 .main-toolbar a:hover>.dropdown-icon {
-    transform: rotate(180deg);
+    transform: rotate(180deg)
 }
 
 .dropdown-icon {
@@ -240,7 +233,7 @@ main {
     right: 5px;
     top: calc(50% - 5px);
     transition: 0.3s;
-    width: 12px;
+    width: 12px
 }
 
 .dropdown-toolbar {
@@ -254,7 +247,7 @@ main {
     padding: 0;
     position: absolute;
     top: 75px;
-    width: 180px;
+    width: 180px
 }
 
 .dropdown-toolbar:before {
@@ -264,7 +257,7 @@ main {
     border-color: transparent transparent #ced4da transparent;
     position: absolute;
     right: calc(50% - 15px);
-    top: -20px;
+    top: -20px
 }
 
 .dropdown-toolbar:after {
@@ -274,7 +267,7 @@ main {
     border-color: transparent transparent #FFF transparent;
     position: absolute;
     right: calc(50% - 15px);
-    top: -19px;
+    top: -19px
 }
 
 .dropdown-toolbar-user {
@@ -292,33 +285,33 @@ main {
     transition: 0.3s;
     width: 95px;
     opacity: 0;
-    z-index: -1;
+    z-index: -1
 }
 
-.dropdown-toolbar-user>li,
-.dropdown-toolbar>li {
+.dropdown-toolbar-user > li,
+.dropdown-toolbar > li {
     border-radius: .5rem;
     display: grid;
     font-size: 12px;
     font-weight: 600;
     padding: 0 20px;
     position: relative;
-    text-align: left;
+    text-align: left
 }
 
-.dropdown-toolbar>li>span {
-    padding: 10px 0;
+.dropdown-toolbar > li > span {
+    padding: 10px 0
 }
 
-.dropdown-toolbar>li>span>.dropdown-icon {
+.dropdown-toolbar > li > span > .dropdown-icon {
     top: calc(50% - 6px);
-    transform: rotate(-90deg);
+    transform: rotate(-90deg)
 }
 
-.dropdown-toolbar-user>li:hover,
-.dropdown-toolbar>li:hover,
-.subdropdown-toolbar>li:hover {
-    background: #f7f7f7;
+.dropdown-toolbar-user > li:hover,
+.dropdown-toolbar > li:hover,
+.subdropdown-toolbar > li:hover {
+    background: #f7f7f7
 }
 
 .autocomplete {
@@ -610,24 +603,24 @@ span, label, table, h1, h2, h3, h4, h5, h6, .texto-tabela {
 }
 
 .modal-body .btn-target-black {
-    color:#FFF;
-    background:rgb(31, 41, 55)
+    color: #FFF;
+    background: rgb(31, 41, 55)
 }
 
 .modal-body .btn-target-black:hover {
-    background:rgb(59, 77, 84)
+    background: rgb(59, 77, 84)
 }
 
 .modal-lg {
-    max-width:650px
+    max-width: 650px
 }
 
 .modal-xl {
-    max-width:900px
+    max-width: 900px
 }
 
 #produtosModal .form-search::after, #estoqueModal .form-search::after {
-    bottom:30px
+    bottom: 30px
 }
 
 #table-atribuicoes th, #table-atribuicoes td  {

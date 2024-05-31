@@ -245,22 +245,8 @@
         }
 
         function excluir_spe(_id) {
-            Swal.fire({
-                title: "Aviso",
-                html : "Tem certeza que deseja excluir?",
-                showDenyButton : true,
-                confirmButtonText : "NÃO",
-                confirmButtonColor : "rgb(31, 41, 55)",
-                denyButtonText : "SIM"
-            }).then((result) => {
-                if (result.isDenied) {
-                    $.post(URL + "/empresas/setores/excluir", {
-                        _token : $("meta[name='csrf-token']").attr("content"),
-                        id : _id
-                    }, function() {
-                        mostrar_spe();
-                    });
-                }
+            excluirMain(_id, "/empresas/setores", "Tem certeza que deseja excluir?", function() {
+                mostrar_spe();
             });
         }
 
