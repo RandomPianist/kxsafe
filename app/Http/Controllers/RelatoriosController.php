@@ -226,7 +226,7 @@ class RelatoriosController extends Controller {
     public function extrato_consultar(Request $request) {
         $erro = "";
         if ($this->consultar_maquina($request) && trim($request->maquina)) $erro = "maquina";
-        if (!$erro && trim($request->produto) && (
+        if (!$erro && trim($request->produto) && !sizeof(
             DB::table("produtos")
                 ->where("id", $request->id_produto)
                 ->where("descr", $request->produto)
