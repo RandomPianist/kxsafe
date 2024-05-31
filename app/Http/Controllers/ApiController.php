@@ -313,9 +313,10 @@ class ApiController extends Controller {
                 "detalhes" => $itens[0]->detalhes,
                 "ultima_retirada" => $itens[0]->ultima_retirada,
                 "proxima_retirada" => $itens[0]->proxima_retirada,
-                "tamanhos" => $itens->map(function($tamanho) {
+                "tamanhos" => $itens->map(function($tamanho) use($request) {
                     return [
                         "id" => $tamanho->id,
+                        "id_pessoa" => DB::table("pessoas")->where("cpf", $request->cpf)->value("id"),
                         "id_atribuicao" => $tamanho->id_atribuicao,
                         "selecionado" => false,
                         "codbar" => $tamanho->codbar,
