@@ -208,6 +208,11 @@ window.onload = function() {
         });
     });
 
+    let usuario = document.querySelector(".user-pic .m-auto").innerHTML;
+    while (usuario.indexOf("\n") > -1) usuario = usuario.replace("\n", "");
+    while (usuario.indexOf(" ") > -1) usuario = usuario.replace(" ", "");
+    document.querySelector(".user-pic .m-auto").innerHTML = usuario;
+
     listar();
 }
 
