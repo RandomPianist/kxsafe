@@ -281,9 +281,10 @@ main {
     padding: 5px 0px 0px 1%;
     overflow: hidden;
     position: absolute;
-    top: 65px;
+    top: 59px;
     transition: 0.3s;
-    width: 95px;
+    width: 100%;
+    right: 1px;
     opacity: 0;
     z-index: -1
 }
