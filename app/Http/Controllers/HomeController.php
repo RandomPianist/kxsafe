@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class HomeController extends Controller {
     public function index() {
-        if (intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa)) return redirect("/colaboradores");
+        if (intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa)) return redirect("/colaboradores/pagina/F");
         return redirect("/valores/categorias");
     }
 
