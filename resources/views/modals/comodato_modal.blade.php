@@ -73,7 +73,7 @@
     function encerrar(_id_maquina) {
         Swal.fire({
             title: "Aviso",
-            html : "Tem certeza que deseja encerrar esse comodato?",
+            html : "Tem certeza que deseja encerrar essa locação?",
             showDenyButton : true,
             confirmButtonText : "NÃO",
             confirmButtonColor : "rgb(31, 41, 55)",
