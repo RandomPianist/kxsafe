@@ -28,13 +28,13 @@
                     <thead>
                         <tr class = "sortable-columns" for = "#table-dados">
                             <th width = "5%" class = "nao-ordena">&nbsp;</span>
-                            <th width = "15%" class = "text-center">
+                            <th width = "20%" class = "text-center">
                                 <span>Código Kx-safe</span>
                             </th>
-                            <th width = "30%">
+                            <th width = "27.5%">
                                 <span>Descrição</span>
                             </th>
-                            <th width = "30%">
+                            <th width = "27.5%">
                                 <span>Categoria</span>
                             </th>
                             <th width = "10%" class = "text-right">
@@ -70,9 +70,9 @@
                             "<img class = 'user-photo-sm' src = '" + linha.foto + "'" + ' onerror = "this.onerror=null;' + "this.classList.add('d-none');$(this).next().removeClass('d-none')" + '" />' +
                             "<i class = 'fa-light fa-image d-none' style = 'font-size:20px'></i>" +
                         "</td>" +
-                        "<td width = '15%' class = 'text-center'>" + linha.cod_externo + "</td>" +
-                        "<td width = '30%'>" + linha.descr + "</td>" +
-                        "<td width = '30%'>" + linha.categoria + "</td>" +
+                        "<td width = '20%' class = 'text-center'>" + linha.cod_externo + "</td>" +
+                        "<td width = '27.5%'>" + linha.descr + "</td>" +
+                        "<td width = '27.5%'>" + linha.categoria + "</td>" +
                         "<td width = '10%' class = 'dinheiro'>" + linha.preco + "</td>" +
                         "<td class = 'text-center btn-table-action' width = '10%'>" +
                             "<i class = 'my-icon far fa-edit'      title = 'Editar'  onclick = 'chamar_modal(" + linha.id + ")'></i>" +
