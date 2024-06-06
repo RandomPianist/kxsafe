@@ -595,7 +595,8 @@ function mostrar_atribuicoes() {
             resultado += "<thead>" +
                 "<tr>" +
                     "<th>" + (gradeGlobal ? "Referência" : "Produto") + "</th>" +
-                    "<th class = 'text-right'>Quantidade</th>" +
+                    "<th class = 'text-right'>Qtde.</th>" +
+                    "<th class = 'text-right'>Validade</th>" +
                     "<th>&nbsp;</th>" +
                 "</tr>" +
             "</thead>" +
@@ -604,6 +605,7 @@ function mostrar_atribuicoes() {
                 resultado += "<tr>" +
                     "<td>" + atribuicao.produto_ou_referencia_valor + "</td>" +
                     "<td class = 'text-right'>" + atribuicao.qtd + "</td>" +
+                    "<td class = 'text-right'>" + atribuicao.validade + "</td>" +
                     "<td class = 'text-center'>" +
                         "<i class = 'my-icon far fa-trash-alt' title = 'Excluir' onclick = 'excluir_atribuicao(" + atribuicao.id + ")'></i>" +
                     "</td>" +
@@ -645,8 +647,10 @@ function atualizaLimiteMaximo() {
         $.get(URL + "/atribuicoes/ver-maximo", {
             id : id_produto,
             tipo : gradeGlobal ? "referencia" : "produto"
-        }, function(maximo) {
-            limite_maximo = parseFloat(maximo);
+        }, function(data) {
+            if (typeof data == "string") data = $.parseJSON(data);
+            document.getElementById("validade").value = data.validade;
+            limite_maximo = parseFloat(data.maximo);
         });
     }
 }
@@ -659,6 +663,7 @@ function atribuir() {
         pessoa_ou_setor_valor : pessoa_atribuindo,
         produto_ou_referencia_chave : campo,
         produto_ou_referencia_valor : document.getElementById(campo).value,
+        validade : document.getElementById("validade").value,
         qtd : document.getElementById("quantidade").value
     }, function(ret) {
         ret = parseInt(ret);
@@ -668,6 +673,7 @@ function atribuir() {
                 document.getElementById("referencia").value = "";
                 document.getElementById("produto").value = "";
                 document.getElementById("quantidade").value = 1;
+                document.getElementById("validade").value = 1;
                 mostrar_atribuicoes();
                 break;
             case 403:

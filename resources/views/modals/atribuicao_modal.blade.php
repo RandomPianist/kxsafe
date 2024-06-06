@@ -12,7 +12,7 @@
             <div class = "modal-body">
                 <div class = "container">
                     <div class = "row pb-4">
-                        <div class = "col-6 d-none" id = "div-referencia">
+                        <div class = "col-4 d-none" id = "div-referencia">
                             <label for = "referencia" class = "custom-label-form">Referência: *</label>
                             <input id = "referencia"
                                 class = "form-control autocomplete"
@@ -27,7 +27,7 @@
                             />
                             <input id = "id_produto" type = "hidden" onchange = "atualizaLimiteMaximo()" />
                         </div>
-                        <div class = "col-6" id = "div-produto">
+                        <div class = "col-4" id = "div-produto">
                             <label for = "produto" class = "custom-label-form">Produto: *</label>
                             <input id = "produto"
                                 class = "form-control autocomplete"
@@ -46,9 +46,13 @@
                                 <i class="fa-sharp fa-regular fa-arrow-up-right-from-square"></i>
                             </a>
                         </div>
-                        <div class = "col-3">
-                            <label for = "quantidade" class = "custom-label-form">Quantidade.: *</label>
+                        <div class = "col-2">
+                            <label for = "quantidade" class = "custom-label-form">Qtde.: *</label>
                             <input id = "quantidade" name = "quantidade" class = "form-control text-right" autocomplete = "off" type = "number" onkeyup = "$(this).trigger('change')" onchange = "limitar(this)" />
+                        </div>
+                        <div class = "col-3">
+                            <label for = "validade" class = "custom-label-form">Validade: *</label>
+                            <input id = "validade" name = "validade" class = "form-control text-right" autocomplete = "off" type = "number" onkeyup = "$(this).trigger('change')" onchange = "limitar(this)" />
                         </div>
                         <div class = "col-2 text-right">
                             <button type = "button" class = "btn btn-target mx-auto px-3 mt-4 w-100" onclick = "atribuir()">+</button>

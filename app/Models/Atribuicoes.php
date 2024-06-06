@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int    $lixeira
  * @property int    $pessoa_ou_setor_valor
  * @property int    $updated_at
+ * @property int    $validade
  * @property string $pessoa_ou_setor_chave
  * @property string $produto_ou_referencia_chave
  * @property string $produto_ou_referencia_valor
@@ -36,7 +37,7 @@ class Atribuicoes extends Model
      * @var array
      */
     protected $fillable = [
-        'created_at', 'lixeira', 'pessoa_ou_setor_chave', 'pessoa_ou_setor_valor', 'produto_ou_referencia_chave', 'produto_ou_referencia_valor', 'qtd', 'updated_at'
+        'created_at', 'lixeira', 'pessoa_ou_setor_chave', 'pessoa_ou_setor_valor', 'produto_ou_referencia_chave', 'produto_ou_referencia_valor', 'qtd', 'updated_at', 'validade'
     ];
 
     /**
@@ -54,7 +55,7 @@ class Atribuicoes extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'created_at' => 'timestamp', 'lixeira' => 'int', 'pessoa_ou_setor_chave' => 'string', 'pessoa_ou_setor_valor' => 'int', 'produto_ou_referencia_chave' => 'string', 'produto_ou_referencia_valor' => 'string', 'updated_at' => 'timestamp'
+        'id' => 'int', 'created_at' => 'timestamp', 'lixeira' => 'int', 'pessoa_ou_setor_chave' => 'string', 'pessoa_ou_setor_valor' => 'int', 'produto_ou_referencia_chave' => 'string', 'produto_ou_referencia_valor' => 'string', 'updated_at' => 'timestamp', 'validade' => 'int'
     ];
 
     /**

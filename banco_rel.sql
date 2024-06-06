@@ -151,6 +151,7 @@ CREATE TABLE atribuicoes (
 	produto_ou_referencia_chave VARCHAR(16),
 	produto_ou_referencia_valor VARCHAR(256),
 	qtd NUMERIC(10,5),
+	validade INT,
 	lixeira TINYINT DEFAULT 0,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

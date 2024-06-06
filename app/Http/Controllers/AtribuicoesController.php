@@ -9,7 +9,9 @@ use App\Models\Atribuicoes;
 
 class AtribuicoesController extends Controller {
     public function verMaximo(Request $request) {
-        $query = $request->tipo == "referencia" ? "
+        $resultado = new \stdClass;
+
+        $query = $request->tipo == "produto" ? "
             SELECT IFNULL(SUM(qtd), 0) AS saldo
                     
             FROM (
@@ -47,7 +49,28 @@ class AtribuicoesController extends Controller {
                 WHERE id = ".$request->id."
             )
         ";
-        return DB::select(DB::raw($query))[0]->saldo;
+        $resultado->maximo = DB::select(DB::raw($query))[0]->saldo;
+
+        $query = $request->tipo == "produto" ? "
+            SELECT validade
+
+            FROM produtos
+
+            WHERE id_produto = ".$request->id
+        : "
+            SELECT MAX(validade) AS validade
+                        
+            FROM produtos
+
+            WHERE referencia IN (
+                SELECT referencia
+                FROM produtos
+                WHERE id = ".$request->id."
+            )
+        ";
+        $resultado->validade = DB::select(DB::raw($query))[0]->validade;
+
+        return json_encode($resultado);
     }
 
     public function salvar(Request $request) {
@@ -78,6 +101,7 @@ class AtribuicoesController extends Controller {
         $linha->produto_ou_referencia_chave = $request->produto_ou_referencia_chave;
         $linha->produto_ou_referencia_valor = $produto_ou_referencia_valor;
         $linha->qtd = $request->qtd;
+        $linha->validade = $request->validade;
         $linha->save();
         $log = new LogController;
         $log->inserir("C", "atribuicoes", $linha->id);
@@ -99,7 +123,8 @@ class AtribuicoesController extends Controller {
                     ->select(
                         "atribuicoes.id",
                         "produtos.descr AS produto_ou_referencia_valor",
-                        "atribuicoes.qtd"
+                        "atribuicoes.qtd",
+                        "atribuicoes.validade"
                     )
                     ->join("produtos", "produtos.cod_externo", "atribuicoes.produto_ou_referencia_valor")
                     ->where("pessoa_ou_setor_valor", $request->id)
@@ -112,7 +137,8 @@ class AtribuicoesController extends Controller {
                     ->select(
                         "id",
                         "produto_ou_referencia_valor",
-                        "qtd"
+                        "qtd",
+                        "validade"
                     )
                     ->where("pessoa_ou_setor_valor", $request->id)
                     ->where("produto_ou_referencia_chave", $request->tipo)

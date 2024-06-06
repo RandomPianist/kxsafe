@@ -282,17 +282,14 @@ class ApiController extends Controller {
                     SUM(retiradas.qtd) AS qtd,
                     id_atribuicao,
                     DATE_FORMAT(MAX(retiradas.created_at), '%d/%m/%Y') AS ultima_retirada,
-                    DATE_ADD(MAX(retiradas.created_at), INTERVAL produtos.validade DAY) AS proxima_retirada
+                    DATE_ADD(MAX(retiradas.created_at), INTERVAL atribuicoes.validade DAY) AS proxima_retirada
                 FROM retiradas
                 JOIN atribuicoes
                     ON atribuicoes.id = retiradas.id_atribuicao
-                JOIN produtos
-                    ON (produto_ou_referencia_chave = 'produto' AND produto_ou_referencia_valor = produtos.cod_externo)
-                        OR (produto_ou_referencia_chave = 'referencia' AND produto_ou_referencia_valor = produtos.referencia)
-                WHERE DATE_ADD(DATE(retiradas.created_at), INTERVAL produtos.validade DAY) >= CURDATE()
+                WHERE DATE_ADD(DATE(retiradas.created_at), INTERVAL atribuicoes.validade DAY) >= CURDATE()
                 GROUP BY
                     id_atribuicao,
-                    produtos.validade
+                    atribuicoes.validade
             ) AS ret ON ret.id_atribuicao = atribuicoes.id
         "));
         $resultado = array();
@@ -364,10 +361,7 @@ class ApiController extends Controller {
                 FROM retiradas
                 JOIN atribuicoes
                     ON atribuicoes.id = retiradas.id_atribuicao
-                JOIN produtos
-                    ON (produto_ou_referencia_chave = 'produto' AND produto_ou_referencia_valor = produtos.cod_externo)
-                        OR (produto_ou_referencia_chave = 'referencia' AND produto_ou_referencia_valor = produtos.referencia)
-                WHERE DATE_ADD(DATE(retiradas.created_at), INTERVAL produtos.validade DAY) >= CURDATE()
+                WHERE DATE_ADD(DATE(retiradas.created_at), INTERVAL atribuicoes.validade DAY) >= CURDATE()
                   AND atribuicoes.id = ".$retirada["id_atribuicao"]
             ));
             $ja_retirados = sizeof($ja_retirados) ? floatval($ja_retirados[0]->qtd) : 0;
