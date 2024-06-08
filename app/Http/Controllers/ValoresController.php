@@ -55,7 +55,9 @@ class ValoresController extends Controller {
 
             LEFT JOIN (
                 SELECT DISTINCTROW id_maquina
-                FROM maquinas_produtos
+                FROM maquinas_produtos AS mp
+                JOIN estoque
+                    ON estoque.id_mp = mp.id
             ) AS aux3 ON aux3.id_maquina = valores.id
 
             WHERE ".$param."
