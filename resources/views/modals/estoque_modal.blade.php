@@ -68,6 +68,7 @@
             });
             document.getElementById("obs-1").value = "";
             document.getElementById("qtd-1").value = "";
+            limpar_invalido();
             $("#estoqueModal").modal();
             $("#obs-1").trigger("keyup");
             $("#qtd-1").trigger("keyup");

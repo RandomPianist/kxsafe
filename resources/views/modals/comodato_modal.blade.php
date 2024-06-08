@@ -66,6 +66,7 @@
             document.getElementById("comodato-fim").value = "";
             document.getElementById("comodato-empresa").value = "";
             document.getElementById("comodato-id_empresa").value = "";
+            limpar_invalido();
             $("#comodatoModal").modal();
         });
     }
