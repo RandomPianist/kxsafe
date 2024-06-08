@@ -67,18 +67,17 @@ class ApiController extends Controller {
             SELECT
                 produtos.id,
                 produtos.descr,
-                IFNULL(ge.preco, 0) AS preco,
+                IFNULL(mp.preco, 0) AS preco,
                 IFNULL(tab.saldo, 0) AS saldo,
-                IFNULL(ge.minimo, 0) AS minimo,
-                IFNULL(ge.maximo, 0) AS maximo
+                IFNULL(mp.minimo, 0) AS minimo,
+                IFNULL(mp.maximo, 0) AS maximo
 
-            FROM gestor_estoque AS ge
+            FROM maquinas_produtos AS mp
             
             LEFT JOIN (
                 SELECT
                     IFNULL(SUM(qtd), 0) AS saldo,
-                    id_maquina,
-                    id_produto
+                    id_mp
                     
                 FROM (
                     SELECT
@@ -86,21 +85,18 @@ class ApiController extends Controller {
                             WHEN (es = 'E') THEN qtd
                             ELSE qtd * -1
                         END AS qtd,
-                        id_maquina,
-                        id_produto
+                        id_mp
             
                     FROM estoque
                 ) AS estq
             
-                GROUP BY
-                    id_maquina,
-                    id_produto
-            ) AS tab ON tab.id_maquina = ge.id_maquina AND tab.id_produto = ge.id_produto
+                GROUP BY id_mp
+            ) AS tab ON tab.id_mp = mp.id
 
             JOIN produtos
-                ON produtos.id = ge.id_produto
+                ON produtos.id = mp.id_produto
 
-            WHERE ge.id_maquina = ".$request->idMaquina."
+            WHERE mp.id_maquina = ".$request->idMaquina."
               AND produtos.lixeira = 0
         "));
         foreach ($consulta as $linha) {
@@ -185,8 +181,10 @@ class ApiController extends Controller {
             $linha->es = $request->es[$i];
             $linha->descr = $request->descr[$i];
             $linha->qtd = $request->qtd[$i];
-            $linha->id_produto = $request->idProduto[$i];
-            $linha->id_maquina = $request->idMaquina;
+            $linha->id_mp = DB::table("maquinas_produtos")
+                                ->where("id_produto", $request->idProduto[$i])
+                                ->where("id_maquina", $request->idMaquina)
+                                ->value("id");
             $linha->save();
             $log = new LogController;
             $modelo = $log->inserir("C", "estoque", $linha->id, true);
@@ -201,20 +199,20 @@ class ApiController extends Controller {
         else $precoProd = floatval(DB::select("produtos")->where("id", $request->idProduto)->value("preco"));
         $log = new LogController;
         DB::statement("
-            UPDATE gestor_estoque SET
+            UPDATE maquinas_produtos SET
                 minimo = ".$request->minimo.",
                 maximo = ".$request->maximo.",
                 preco = ".$precoProd."
             WHERE id_produto = ".$request->idProduto."
               AND id_maquina = ".$request->idMaquina
         );
-        $consulta = DB::table("gestor_estoque")
+        $consulta = DB::table("maquinas_produtos")
                     ->select("id")
                     ->where("id_produto", $request->idProduto)
                     ->where("id_maquina", $request->idMaquina)
                     ->get();
         foreach ($consulta as $linha) {
-            $modelo = $log->inserir("E", "gestor_estoque", $linha->id, true);
+            $modelo = $log->inserir("E", "maquinas_produtos", $linha->id, true);
             if (isset($request->usu)) $modelo->nome = $request->usu;
             $modelo->save();
         }

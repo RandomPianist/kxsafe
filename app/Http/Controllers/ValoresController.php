@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\LogController;
 use App\Models\Pessoas;
 use App\Models\Valores;
-use App\Models\GestorEstoque;
+use App\Models\MaquinasProdutos;
 
 class ValoresController extends Controller {
     private function busca($alias, $param) {
@@ -55,7 +55,7 @@ class ValoresController extends Controller {
 
             LEFT JOIN (
                 SELECT DISTINCTROW id_maquina
-                FROM estoque
+                FROM maquinas_produtos
             ) AS aux3 ON aux3.id_maquina = valores.id
 
             WHERE ".$param."
@@ -124,7 +124,7 @@ class ValoresController extends Controller {
                 LEFT JOIN (
                     SELECT
                         IFNULL(SUM(qtd), 0) AS saldo,
-                        id_maquina
+                        mp.id_maquina
                         
                     FROM (
                         SELECT
@@ -132,12 +132,15 @@ class ValoresController extends Controller {
                                 WHEN (es = 'E') THEN qtd
                                 ELSE qtd * -1
                             END AS qtd,
-                            id_maquina
+                            id_mp
                 
                         FROM estoque
                     ) AS estq
+
+                    JOIN maquinas_produtos AS mp
+                        ON mp.id = estq.id_mp
                 
-                    GROUP BY id_maquina
+                    GROUP BY mp.id_maquina
                 ) AS tab_estoque ON tab_estoque.id_maquina = valores.id
                 
                 LEFT JOIN (
@@ -197,16 +200,16 @@ class ValoresController extends Controller {
                             ->get();
             foreach ($produtos as $produto) {
                 if (!sizeof(
-                    DB::table("gestor_estoque")
+                    DB::table("maquinas_produtos")
                         ->where("id_produto", $produto->id)
                         ->where("id_maquina", $linha->id)
                         ->get()
                 )) {
-                    $gestor = new GestorEstoque;
+                    $gestor = new MaquinasProdutos;
                     $gestor->id_maquina = $linha->id;
                     $gestor->id_produto = $produto->id;
                     $gestor->save();
-                    $log->inserir("C", "gestor_estoque", $gestor->id);
+                    $log->inserir("C", "maquinas_produtos", $gestor->id);
                 }
             }
         }

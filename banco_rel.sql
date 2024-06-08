@@ -100,24 +100,7 @@ CREATE TABLE produtos (
 	FOREIGN KEY (id_categoria) REFERENCES valores(id)
 );
 
-CREATE TABLE estoque (
-	id INT AUTO_INCREMENT PRIMARY KEY,
-	es CHAR,
-	descr VARCHAR(16),
-	qtd NUMERIC(10,5),
-	id_maquina INT,
-	id_produto INT,
-	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	FOREIGN KEY (id_maquina) REFERENCES valores(id),
-	FOREIGN KEY (id_produto) REFERENCES produtos(id)
-);
-
-------------------------------------------------------------------------------------------------------------------------------------------------------------
-------------------------------------------------------------------------- RESTANTE -------------------------------------------------------------------------
-------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-CREATE TABLE gestor_estoque (
+CREATE TABLE maquinas_produtos (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	descr VARCHAR(16),
 	minimo NUMERIC(10,5),
@@ -130,6 +113,21 @@ CREATE TABLE gestor_estoque (
 	FOREIGN KEY (id_maquina) REFERENCES valores(id),
 	FOREIGN KEY (id_produto) REFERENCES produtos(id)
 );
+
+CREATE TABLE estoque (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	es CHAR,
+	descr VARCHAR(16),
+	qtd NUMERIC(10,5),
+	id_mp INT,
+	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	FOREIGN KEY (id_mp) REFERENCES maquinas_produtos(id)
+);
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------- RESTANTE -------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 CREATE TABLE comodatos (
 	id INT AUTO_INCREMENT PRIMARY KEY,
@@ -184,7 +182,7 @@ CREATE TABLE log (
 	id_pessoa INT,
 	nome VARCHAR(32),
 	acao CHAR,
-	tabela VARCHAR(16),
+	tabela VARCHAR(32),
 	fk INT,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

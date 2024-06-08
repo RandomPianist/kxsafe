@@ -12,14 +12,14 @@ use Illuminate\Database\Eloquent\Model;
  * @property int    $updated_at
  * @property string $descr
  */
-class GestorEstoque extends Model
+class MaquinasProdutos extends Model
 {
     /**
      * The database table used by the model.
      *
      * @var string
      */
-    protected $table = 'gestor_estoque';
+    protected $table = 'maquinas_produtos';
 
     /**
      * The primary key for the model.

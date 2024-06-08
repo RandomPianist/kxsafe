@@ -9,7 +9,7 @@ use App\Http\Controllers\LogController;
 use App\Http\Controllers\EmpresasController;
 use App\Models\Comodatos;
 use App\Models\Estoque;
-use App\Models\GestorEstoque;
+use App\Models\MaquinasProdutos;
 
 class MaquinasController extends Controller {
     public function estoque(Request $request) {
@@ -18,8 +18,10 @@ class MaquinasController extends Controller {
             $linha->es = $request->es[$i];
             $linha->descr = $request->obs[$i];
             $linha->qtd = $request->qtd[$i];
-            $linha->id_produto = $request->id_produto[$i];
-            $linha->id_maquina = $request->id_maquina;
+            $linha->id_mp = DB::table("maquinas_produtos")
+                                ->where("id_produto", $request->id_produto[$i])
+                                ->where("id_maquina", $request->id_maquina)
+                                ->value("id");
             $linha->save();
             $log = new LogController;
             $log->inserir("C", "estoque", $linha->id);
@@ -62,14 +64,16 @@ class MaquinasController extends Controller {
                                 WHEN (es = 'E') THEN qtd
                                 ELSE qtd * -1
                             END AS qtd,
-                            id_maquina,
-                            id_produto
+                            id_mp
                 
                         FROM estoque
                     ) AS estq
 
-                    WHERE id_maquina = ".$request->id_maquina."
-                      AND id_produto = ".$produtos_id[$i]
+                    JOIN maquinas_produtos AS mp
+                        ON mp.id = estq.id_mp
+
+                    WHERE mp.id_maquina = ".$request->id_maquina."
+                      AND mp.id_produto = ".$produtos_id[$i]
                 ));
                 $erro = !sizeof($consulta);
                 if (!$erro) {
@@ -175,16 +179,16 @@ class MaquinasController extends Controller {
                         ->get();
         foreach ($maquinas as $maquina) {
             if (!sizeof(
-                DB::table("gestor_estoque")
+                DB::table("maquinas_produtos")
                     ->where("id_produto", $id_produto)
                     ->where("id_maquina", $maquina->id)
                     ->get()
             )) {
-                $gestor = new GestorEstoque;
+                $gestor = new MaquinasProdutos;
                 $gestor->id_maquina = $maquina->id;
                 $gestor->id_produto = $id_produto;
                 $gestor->save();
-                $log->inserir("C", "gestor_estoque", $gestor->id, $api);
+                $log->inserir("C", "maquinas_produtos", $gestor->id, $api);
             }
         }
     }

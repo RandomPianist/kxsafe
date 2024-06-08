@@ -23,6 +23,9 @@ class AtribuicoesController extends Controller {
                     id_produto
 
                 FROM estoque
+
+                JOIN maquinas_produtos AS mp
+                    ON mp.id = estoque.id_mp
             ) AS estq
 
             WHERE id_produto = ".$request->id
@@ -39,8 +42,11 @@ class AtribuicoesController extends Controller {
 
                 FROM estoque
 
+                JOIN maquinas_produtos AS mp
+                    ON mp.id = estoque.id_mp
+
                 JOIN produtos
-                    ON produtos.id = estoque.id_produto
+                    ON produtos.id = mp.id_produto
             ) AS estq
 
             WHERE referencia IN (
