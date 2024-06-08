@@ -194,5 +194,5 @@ return [
         // ...
     ])->toArray(),
 
-    'root_url' => '/kxsafe-consulta'
+    'root_url' => '/kxsafe'
 ];
