@@ -235,6 +235,14 @@ function modal(nome, id, callback) {
     callback();
 }
 
+function modal2(nome, limpar) {
+    limpar_invalido();
+    limpar.forEach((id) => {
+        document.getElementById(id).value = "";
+    });
+    $("#" + nome).modal();
+}
+
 function excluirMain(_id, prefixo, aviso, callback) {
     Swal.fire({
         title: "Aviso",

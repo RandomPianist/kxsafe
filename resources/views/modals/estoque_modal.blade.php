@@ -66,10 +66,7 @@
             Array.from(document.getElementsByClassName("id_maquina")).forEach((el) => {
                 el.value = id;
             });
-            document.getElementById("obs-1").value = "";
-            document.getElementById("qtd-1").value = "";
-            limpar_invalido();
-            $("#estoqueModal").modal();
+            modal2("estoqueModal", ["obs-1", "qtd-1"]);
             $("#obs-1").trigger("keyup");
             $("#qtd-1").trigger("keyup");
             $("#es-1").trigger("change");

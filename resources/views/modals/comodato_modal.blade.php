@@ -63,11 +63,7 @@
                 el.value = id;
             });
             document.getElementById("comodato-inicio").value = hoje();
-            document.getElementById("comodato-fim").value = "";
-            document.getElementById("comodato-empresa").value = "";
-            document.getElementById("comodato-id_empresa").value = "";
-            limpar_invalido();
-            $("#comodatoModal").modal();
+            modal2("comodatoModal", ["comodato-fim", "comodato-empresa", "comodato-id_empresa"]);
         });
     }
 
