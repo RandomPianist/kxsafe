@@ -15,7 +15,7 @@
                         <div class = "col-4 d-none" id = "div-referencia">
                             <label for = "referencia" class = "custom-label-form">Referência: *</label>
                             <input id = "referencia"
-                                class = "form-control autocomplete"
+                                class = "form-control autocomplete w-108"
                                 data-input = "#id_produto"
                                 data-table = "produtos"
                                 data-column = "referencia"
@@ -23,14 +23,13 @@
                                 data-filter = ""
                                 type = "text"
                                 autocomplete = "off"
-                                style = "width:108%"
                             />
                             <input id = "id_produto" type = "hidden" onchange = "atualizaLimiteMaximo()" />
                         </div>
                         <div class = "col-4" id = "div-produto">
                             <label for = "produto" class = "custom-label-form">Produto: *</label>
                             <input id = "produto"
-                                class = "form-control autocomplete"
+                                class = "form-control autocomplete w-108"
                                 data-input = "#id_produto"
                                 data-table = "produtos"
                                 data-column = "descr"
@@ -38,10 +37,9 @@
                                 data-filter = ""
                                 type = "text"
                                 autocomplete = "off"
-                                style = "width:108%"
                             />
                         </div>
-                        <div class = "col-1 d-flex align-items-center pl-0 pt-3" style = "justify-content:end">
+                        <div class = "col-1 d-flex align-items-center pl-0 pt-3 j-end">
                             <a href = "{{ config('app.root_url') }}/produtos" title = "Cadastro de produtos" target = "_blank">
                                 <i class="fa-sharp fa-regular fa-arrow-up-right-from-square"></i>
                             </a>

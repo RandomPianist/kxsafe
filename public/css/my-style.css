@@ -627,3 +627,16 @@ span, label, table, h1, h2, h3, h4, h5, h6, .texto-tabela {
 #table-atribuicoes th, #table-atribuicoes td  {
     padding: 4px 10px
 }
+
+.j-end {
+    justify-content: end
+}
+
+.w-108 {
+    width: 108%
+}
+
+.px-20 {
+    padding-left: 20px;
+    padding-right: 20px
+}

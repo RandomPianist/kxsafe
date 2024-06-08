@@ -27,7 +27,7 @@
             </ul>
         </div>
     </div>
-    <div class = "mt-2 mb-3" style = "border-top:solid #000 1px"></div>
+    <div class = "mt-2 mb-3 linha"></div>
     @foreach ($resultado AS $item)
         <h5>{{ $item["nome"] }}</h5>
         <table class = "report-body table table-sm table-bordered table-striped px-5">

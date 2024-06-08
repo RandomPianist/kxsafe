@@ -27,7 +27,7 @@
                             />
                             <input id = "id_setor2" name = "id_setor" type = "hidden"/>
                         </div>
-                        <div class = "col-1 d-flex align-items-center pl-0 pt-3" style = "justify-content:end">
+                        <div class = "col-1 d-flex align-items-center pl-0 pt-3 j-end">
                             <a href = "{{ config('app.root_url') }}/setores" title = "Cadastro de setores" target = "_blank">
                                 <i class="fa-sharp fa-regular fa-arrow-up-right-from-square"></i>
                             </a>

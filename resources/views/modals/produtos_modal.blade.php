@@ -59,7 +59,7 @@
                             <div class = "col-5 pr-0 form-search form-search-3">
                                 <label for = "categoria" class = "custom-label-form">Categoria: *</label>
                                 <input id = "categoria"
-                                    class = "form-control autocomplete"
+                                    class = "form-control autocomplete w-108"
                                     data-input = "#id_categoria"
                                     data-table = "valores"
                                     data-column = "descr"
@@ -67,11 +67,10 @@
                                     data-filter = "categorias"
                                     type = "text"
                                     autocomplete = "off"
-                                    style = "width:108%"
                                 />
                                 <input id = "id_categoria" name = "id_categoria" type = "hidden"/>
                             </div>
-                            <div class = "col-1 d-flex align-items-center pl-0 pt-3" style = "justify-content:end">
+                            <div class = "col-1 d-flex align-items-center pl-0 pt-3 j-end">
                                 <a href = "{{ config('app.root_url') }}/valores/categorias" title = "Cadastro de categorias" target = "_blank">
                                     <i class="fa-sharp fa-regular fa-arrow-up-right-from-square"></i>
                                 </a>
