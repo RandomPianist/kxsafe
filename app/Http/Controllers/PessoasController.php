@@ -252,8 +252,8 @@ class PessoasController extends Controller {
         $tipo = $request->tipo;
         if (!$tipo) {
             $tipo = "U";
-            if (intval(Pessoas::find($request->id)->supervisor)) $tipo = "S";
-            if (!intval(Pessoas::find($request->id)->id_empresa)) $tipo = "A";
+            if (intval(Pessoas::find($modelo->id)->supervisor)) $tipo = "S";
+            if (!intval(Pessoas::find($modelo->id)->id_empresa)) $tipo = "A";
         }
         return redirect("/colaboradores/pagina/".$tipo);
     }

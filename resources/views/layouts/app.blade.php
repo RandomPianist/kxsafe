@@ -344,6 +344,7 @@
                                 Array.from(document.getElementsByClassName("pessoa-senha")).forEach((el) => {
                                     el.innerHTML = "Senha:";
                                 });
+                                document.querySelector("#pessoasModal .user-pic").parentElement.classList.remove("d-none");
                                 foto_pessoa("#pessoasModal .user-pic", data.foto ? data.foto : "");
                             });
                         }, 0);
@@ -357,7 +358,8 @@
                             Array.from(document.getElementsByClassName("pessoa-senha")).forEach((el) => {
                                 el.innerHTML = "Senha: *";
                             });
-                            foto_pessoa("#pessoasModal .user-pic", "");
+                            document.querySelector("#pessoasModal .user-pic").parentElement.classList.add("d-none");
+                            document.getElementById("supervisor").value = "0";
                             const tipo = document.getElementById("titulo-tela").innerHTML.charAt(0);
                             if (tipo == "A" || tipo == "U") {
                                 $.get(URL + "/setores/primeiro-admin", function(data) {
