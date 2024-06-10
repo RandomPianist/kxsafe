@@ -1,7 +1,7 @@
 
 <!-- Modal -->
 <div class = "modal fade" id = "atribuicaoModal" aria-labelledby = "atribuicaoModalLabel" aria-hidden = "true">
-    <div class = "modal-dialog modal-lg" role = "document">
+    <div class = "modal-dialog modal-xl" role = "document">
         <div class = "modal-content">
             <div class = "modal-header">
                 <h6 class = "modal-title header-color" id = "atribuicaoModalLabel"></h6>
@@ -12,7 +12,7 @@
             <div class = "modal-body">
                 <div class = "container">
                     <div class = "row pb-4">
-                        <div class = "col-4 d-none" id = "div-referencia">
+                        <div class = "col-5 d-none" id = "div-referencia">
                             <label for = "referencia" class = "custom-label-form">Referência: *</label>
                             <input id = "referencia"
                                 class = "form-control autocomplete w-108"
@@ -26,7 +26,7 @@
                             />
                             <input id = "id_produto" type = "hidden" onchange = "atualizaLimiteMaximo()" />
                         </div>
-                        <div class = "col-4" id = "div-produto">
+                        <div class = "col-5" id = "div-produto">
                             <label for = "produto" class = "custom-label-form">Produto: *</label>
                             <input id = "produto"
                                 class = "form-control autocomplete w-108"
@@ -45,11 +45,11 @@
                             </a>
                         </div>
                         <div class = "col-2">
-                            <label for = "quantidade" class = "custom-label-form">Qtde.: *</label>
+                            <label for = "quantidade" class = "custom-label-form">Quantidade: *</label>
                             <input id = "quantidade" name = "quantidade" class = "form-control text-right" autocomplete = "off" type = "number" onkeyup = "$(this).trigger('change')" onchange = "limitar(this)" />
                         </div>
-                        <div class = "col-3">
-                            <label for = "validade" class = "custom-label-form">Validade: *</label>
+                        <div class = "col-2">
+                            <label for = "validade" class = "custom-label-form">Validade em dias: *</label>
                             <input id = "validade" name = "validade" class = "form-control text-right" autocomplete = "off" type = "number" onkeyup = "$(this).trigger('change')" onchange = "limitar(this)" />
                         </div>
                         <div class = "col-2 text-right">

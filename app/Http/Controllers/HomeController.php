@@ -42,6 +42,7 @@ class HomeController extends Controller {
                         }
                     })
                     ->where("lixeira", 0)
+                    ->orderby($request->column)
                     ->take(30)
                     ->get()
             );
