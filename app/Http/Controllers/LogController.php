@@ -18,7 +18,7 @@ class LogController extends Controller {
         return $linha;
     }
 
-    public function consultar($arr_tabelas, $alias = "") {
+    public function consultar($arr_tabelas, $alias = "", $where = "") {
         $tabelas = "'".join("' OR '", $arr_tabelas)."'";
         $query = "
             SELECT
@@ -33,7 +33,16 @@ class LogController extends Controller {
             LEFT JOIN pessoas
                 ON log.id_pessoa = pessoas.id
         ";
-        $query .= $alias != "" ? "
+        if (in_array("pessoas", $arr_tabelas)) {
+            $query .= "
+                LEFT JOIN pessoas AS aux
+                    ON aux.id = log.fk
+
+                LEFT JOIN setores
+                    ON setores.id = aux.id_setor
+            ";
+        }
+        $query .= $alias ? "
             JOIN valores
                 ON valores.id = log.fk
 
@@ -41,7 +50,7 @@ class LogController extends Controller {
         " : "
             WHERE tabela IN (".$tabelas.")
         ";
-        $query .= " ORDER BY log.id DESC";
+        $query .= $where." ORDER BY log.id DESC";
         $consulta = DB::select(DB::raw($query));
         return !intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa) ? sizeof($consulta) ? "Última atualização feita por ".$consulta[0]->nome." em ".$consulta[0]->data : "Nenhuma atualização feita" : "";
     }
