@@ -26,18 +26,23 @@ class HomeController extends Controller {
                         if ($request->filter) $sql->where($request->filter_col, $request->filter);
                     })
                     ->where(function($sql) use($request) {
-                        if ($request->table == "empresas") {
-                            $id_emp = intval(Pessoas::find(Auth::user()->id_pessoa)->id_emp);
-                            if ($id_emp) {
-                                if (sizeof(
-                                    DB::table("empresas")
-                                        ->where("id_matriz", $id_emp)
-                                        ->where("lixeira", 0)
-                                        ->get()
-                                ) > 0) {
-                                    $sql->where("id", $id_emp)
-                                        ->orWhere("id_matriz", $id_emp);
-                                } else $sql->where("id", $id_emp);
+                        $id_emp = intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa);
+                        if ($id_emp) {
+                            switch($request->table) {
+                                case "empresas":
+                                    if (sizeof(
+                                        DB::table("empresas")
+                                            ->where("id_matriz", $id_emp)
+                                            ->where("lixeira", 0)
+                                            ->get()
+                                    ) > 0) {
+                                        $sql->where("id", $id_emp)
+                                            ->orWhere("id_matriz", $id_emp);
+                                    } else $sql->where("id", $id_emp);
+                                    break;
+                                case "setores":
+                                    $sql->where("cria_usuario", 0);
+                                    break;
                             }
                         }
                     })

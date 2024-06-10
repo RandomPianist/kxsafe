@@ -338,13 +338,20 @@
                         setTimeout(function() {
                             modal("pessoasModal", id, function() {
                                 that.toggle_user(parseInt(data.id_setor));
-                                estilo_bloco_senha.display = id != {{ Auth::user()->id_pessoa }} ? "none" : "";
-                                document.getElementById("setor").disabled = id == {{ Auth::user()->id_pessoa }};
+                                estilo_bloco_senha.display = id != USUARIO && document.getElementById("pessoasModalLabel").innerHTML.indexOf("administrador") > -1 ? "none" : "";
+                                document.getElementById("setor").disabled = id == USUARIO;
                                 document.getElementById("supervisor-chk").checked = parseInt(data.supervisor) == 1;
                                 Array.from(document.getElementsByClassName("pessoa-senha")).forEach((el) => {
                                     el.innerHTML = "Senha:";
                                 });
                                 document.querySelector("#pessoasModal .user-pic").parentElement.classList.remove("d-none");
+                                if (!data.foto) {
+                                    let nome = data.nome.toUpperCase().replace("DE ", "").split(" ");
+                                    iniciais = "";
+                                    iniciais += nome[0][0];
+                                    if (nome.length > 1) iniciais += nome[nome.length - 1][0];
+                                    document.querySelector("#pessoasModal .user-pic span").innerHTML = iniciais;
+                                }
                                 foto_pessoa("#pessoasModal .user-pic", data.foto ? data.foto : "");
                             });
                         }, 0);
