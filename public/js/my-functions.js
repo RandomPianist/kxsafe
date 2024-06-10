@@ -208,10 +208,17 @@ window.onload = function() {
         });
     });
 
-    let usuario = document.querySelector(".user-pic .m-auto").innerHTML;
-    while (usuario.indexOf("\n") > -1) usuario = usuario.replace("\n", "");
-    while (usuario.indexOf(" ") > -1) usuario = usuario.replace(" ", "");
-    document.querySelector(".user-pic .m-auto").innerHTML = usuario;
+    Array.from(document.querySelectorAll(".user-pic .m-auto")).forEach((el) => {
+        let conteudo = el.innerHTML;
+        while (conteudo.indexOf("\n") > -1) conteudo = conteudo.replace("\n", "");
+        while (conteudo.indexOf(" ") > -1) conteudo = conteudo.replace(" ", "");
+        el.innerHTML = conteudo;
+    });
+
+    $.get(URL + "/colaboradores/mostrar/" + USUARIO, function(data) {
+        if (typeof data == "string") data = $.parseJSON(data);
+        foto_pessoa(".main-toolbar .user-pic", data.foto ? data.foto : "");
+    });
 
     listar();
 }
@@ -700,4 +707,15 @@ function excluir_atribuicao(_id) {
     excluirMain(_id, "/atribuicoes", aviso, function() {
         mostrar_atribuicoes();
     });
+}
+
+function foto_pessoa(seletor, caminho) {
+    let el = document.querySelector(seletor);
+    if (caminho) caminho = URL + "/storage/" + caminho;
+    el.style.backgroundImage = caminho ? "url('" + caminho + "')" : "";
+    el.firstElementChild.classList.remove("d-none");
+    if (caminho) {
+        el.style.backgroundSize = "100% 100%";
+        el.firstElementChild.classList.add("d-none");
+    }
 }

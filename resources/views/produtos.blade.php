@@ -134,7 +134,7 @@
                     erro = "Já existe um registro com esse código";
                     document.getElementById("cod_externo").classList.add("invalido");
                 }
-                if (!erro && !alterou && !document.querySelector("input[type=file]").value) erro = "Altere pelo menos um campo para salvar";
+                if (!erro && !alterou && !document.querySelector("#produtosModal input[type=file]").value) erro = "Altere pelo menos um campo para salvar";
                 if (!erro) {
                     preco.value = parseInt(preco.value.replace(/\D/g, "")) / 100;
                     document.querySelector("#produtosModal form").submit();

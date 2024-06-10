@@ -9,16 +9,30 @@
                     <span aria-hidden = "true">&times;</span>
                 </button>
             </div>
-            <form action = "{{ config('app.root_url') }}/colaboradores/salvar" method = "POST">
+            <form action = "{{ config('app.root_url') }}/colaboradores/salvar" method = "POST" enctype = "multipart/form-data">
                 <div class = "modal-body">
                     <div class = "container">
                         @csrf
                         <input id = "pessoa-id" name = "id" type = "hidden" />
+                        <input name = "tipo" value = "{{ $tipo ?? '' }}" type = "hidden" />
+                        <div class = "row py-4">
+                            <div class = "user-pic" style = "scale:2">
+                                <span class = "m-auto">
+                                    @foreach(explode(" ", Auth::user()->name, 2) as $nome)
+                                        {{ substr($nome, 0, 1) }}
+                                    @endforeach
+                                </span>
+                            </div>
+                        </div>
                         <div class = "row">
-                            <div class = "col-12">
+                            <div class = "col-6">
                                 <label for = "nome" class = "custom-label-form">Nome: *</label>
                                 <input id = "nome" name = "nome" class = "form-control" autocomplete = "off" type = "text" onkeyup = "contar_char(this, 64)" />
                                 <span class = "custom-label-form tam-max"></span>
+                            </div>
+                            <div class = "col-6">
+                                <button type = "button" class = "btn btn-target btn-target-black w-100 mt-4" onclick = "$(this).next().trigger('click')">Adicionar imagem</button>
+                                <input type = "file" name = "foto" class = "d-none" />
                             </div>
                         </div>
                         <div class = "row">

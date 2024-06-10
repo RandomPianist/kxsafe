@@ -86,6 +86,7 @@ class PessoasController extends Controller {
         $modelo->id_setor = $request->id_setor;
         if (trim($request->senha)) $modelo->senha = $request->senha;
         $modelo->supervisor = $request->supervisor;
+        if ($request->file("foto")) $modelo->foto = $request->file("foto")->store("uploads", "public");
         $modelo->save();
         $log->inserir($request->id ? "E" : "C", "pessoas", $modelo->id);
         return $modelo;
@@ -113,7 +114,7 @@ class PessoasController extends Controller {
         }
         $log = new LogController;
         $ultima_atualizacao = $log->consultar(["pessoas"]);
-        return view("pessoas", compact("ultima_atualizacao", "titulo"));
+        return view("pessoas", compact("ultima_atualizacao", "titulo", "tipo"));
     }
 
     public function listar(Request $request) {
@@ -173,6 +174,7 @@ class PessoasController extends Controller {
                 pessoas.id_empresa,
                 pessoas.funcao,
                 pessoas.supervisor,
+                pessoas.foto,
                 DATE_FORMAT(pessoas.admissao, '%d/%m/%Y') AS admissao,
                 setores.descr AS setor,
                 empresas.nome_fantasia AS empresa,
@@ -242,7 +244,13 @@ class PessoasController extends Controller {
             $linha = $this->salvar_main($modelo, $request);
             if ($this->cria_usuario($linha->id_setor)) $this->criar_usuario($linha->id, $request);
         }
-        return redirect("/colaboradores");
+        $tipo = $request->tipo;
+        if (!$tipo) {
+            $tipo = "U";
+            if (intval(Pessoas::find($request->id)->supervisor)) $tipo = "S";
+            if (!intval(Pessoas::find($request->id)->id_empresa)) $tipo = "A";
+        }
+        return redirect("/colaboradores/pagina/".$tipo);
     }
 
     public function excluir(Request $request) {

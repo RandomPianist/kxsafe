@@ -129,7 +129,7 @@
                             </div>
                             <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
                             <ul class = "dropdown-toolbar-user">
-                                <li onclick = "pessoa = new Pessoa({{ Auth::user()->id_pessoa }})">
+                                <li onclick = "pessoa = new Pessoa(USUARIO)">
                                     <span class = "pb-2">Editar</span>
                                 </li>
                                 <li onclick = "document.getElementById('logout-form').submit()">
@@ -152,6 +152,7 @@
         </div>
         <script type = "text/javascript" language = "JavaScript">
             const URL = "{{ config('app.root_url') }}";
+            const USUARIO = {{ Auth::user()->id_pessoa }};
 
             function redirect(url, bNew_Tab) {
                 if (bNew_Tab) window.open(url, '_blank');
@@ -313,7 +314,7 @@
                                 erro = "Já existe um registro com esse " + data.dado;
                                 document.getElementById(data.dado == "CPF" ? "cpf" : "email").classList.add("invalido");
                             }
-                            if (!erro && !alterou) erro = "Altere pelo menos um campo para salvar";
+                            if (!erro && !alterou && !document.querySelector("#pessoasModal input[type=file]").value) erro = "Altere pelo menos um campo para salvar";
                             if (!erro) {
                                 _cpf.value = _cpf.value.replace(/\D/g, "");
                                 document.querySelector("#pessoasModal form").submit();
@@ -341,6 +342,7 @@
                                 Array.from(document.getElementsByClassName("pessoa-senha")).forEach((el) => {
                                     el.innerHTML = "Senha:";
                                 });
+                                foto_pessoa("#pessoasModal .user-pic", data.foto ? data.foto : "");
                             });
                         }, 0);
                     });
@@ -353,6 +355,7 @@
                             Array.from(document.getElementsByClassName("pessoa-senha")).forEach((el) => {
                                 el.innerHTML = "Senha: *";
                             });
+                            foto_pessoa("#pessoasModal .user-pic", "");
                             const tipo = document.getElementById("titulo-tela").innerHTML.charAt(0);
                             if (tipo == "A" || tipo == "U") {
                                 $.get(URL + "/setores/primeiro-admin", function(data) {
