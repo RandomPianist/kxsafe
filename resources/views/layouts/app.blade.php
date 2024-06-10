@@ -53,7 +53,9 @@
                                     <!-- <span>Colaboradores</span> -->
                                     <span>Colaboradores<img class="dropdown-icon" src="/kxsafe/img/sort-down.png"></span>
                                     <ul class="subdropdown-toolbar">
-                                        <li onclick="redirect('/kxsafe/colaboradores/pagina/A')">Administradores</li>
+                                        @if (!intval(App\Models\Pessoas::find(Auth::user()->id_pessoa)->id_empresa))
+                                            <li onclick="redirect('/kxsafe/colaboradores/pagina/A')">Administradores</li>
+                                        @endif
                                         <li onclick="redirect('/kxsafe/colaboradores/pagina/F')">Funcionários</li>
                                         <li onclick="redirect('/kxsafe/colaboradores/pagina/S')">Supervisores</li>
                                         <li onclick="redirect('/kxsafe/colaboradores/pagina/U')">Usuários</li>
