@@ -337,12 +337,9 @@ function autocomplete(_this) {
                 '&#39;': "'",
                 '&#x2F;': '/'
             };
-            function unescapeHtml(str) {
-                return String(str).replace(/&amp;|&lt;|&gt;|&quot|&#39;|&#x2F;/g, function (s) {
-                    return entityMap[s];
-                });
-            }
-            return unescapeHtml(texto);
+            return String(texto).replace(/&amp;|&lt;|&gt;|&quot|&#39;|&#x2F;/g, function (s) {
+                return entityMap[s];
+            });
         }
         element.parent().find(".autocomplete-line").each(function () {
             $(this).click(function () {
