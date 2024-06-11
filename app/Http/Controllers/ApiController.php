@@ -190,7 +190,9 @@ class ApiController extends Controller {
 
     public function gerenciar_estoque(Request $request) {
         $precoProd = floatval(DB::select("produtos")->where("id", $request->idProduto)->value("preco"));
-        if (isset($request->preco)) $precoProd = floatval($request->preco) > 0 ? floatval($request->preco) : floatval(DB::select("produtos")->where("id", $request->idProduto)->value("preco"));
+        if (isset($request->preco)) {
+            if (floatval($request->preco) > 0) $precoProd = floatval($request->preco);
+        }
         $log = new LogController;
         DB::statement("
             UPDATE maquinas_produtos SET
