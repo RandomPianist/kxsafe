@@ -148,54 +148,47 @@ class RelatoriosController extends Controller {
         $filtro = join(" AND ", $filtro);
         if (!$filtro) $filtro = "1";
         $lm = $request->lm == "S";
-        $resultado = collect(DB::select(DB::raw("
-            SELECT
-                /* GRUPO 1 */
-                valores.id AS id_maquina,
-                valores.descr AS maquina,
+        $resultado = collect(
+            DB::table("log")
+                ->select(
+                    // GRUPO 1
+                    "valores.id AS id_maquina",
+                    "valores.descr AS maquina",
 
-                /* GRUPO 2 */
-                produtos.id AS id_produto,
-                produtos.descr AS produto,
-                IFNULL(mp.preco, produtos.preco) AS preco,
+                    // GRUPO 2
+                    "produtos.id AS id_produto",
+                    "produtos.descr AS produto",
+                    DB::raw("IFNULL(mp.preco, produtos.preco) AS preco"),
 
-                /* DETALHES */
-                DATE_FORMAT(log.created_at, '%d/%m/%Y %H:%i') AS data,
-                estoque.es,
-                estoque.descr AS estoque_descr,
-                CASE
-                    WHEN (es = 'E') THEN qtd
-                    ELSE qtd * -1
-                END AS qtd,
-                IFNULL(pessoas.nome, CONCAT(
-                    'API',
-                    IFNULL(CONCAT(' - ', log.nome), '')
-                )) AS autor
-
-            FROM log
-
-            JOIN estoque
-                ON estoque.id = log.fk
-
-            JOIN maquinas_produtos AS mp
-                ON mp.id = estoque.id_mp
-
-            JOIN produtos
-                ON produtos.id = mp.id_produto
-
-            JOIN valores
-                ON valores.id = mp.id_maquina
-
-            LEFT JOIN pessoas
-                ON pessoas.id = log.id_pessoa
-
-            WHERE log.tabela = 'estoque'
-              AND ".$filtro."
-              AND produtos.lixeira = 0
-              AND valores.lixeira = 0
-
-            ORDER BY log.created_at
-        ")))->groupBy("id_maquina")->map(function($itens1) {
+                    // DETALHES
+                    DB::raw("DATE_FORMAT(log.created_at, '%d/%m/%Y %H:%i') AS data"),
+                    "estoque.es",
+                    "estoque.descr AS estoque_descr",
+                    DB::raw("
+                        CASE
+                            WHEN (es = 'E') THEN qtd
+                            ELSE qtd * -1
+                        END AS qtd
+                    "),
+                    DB::raw("
+                        IFNULL(pessoas.nome, CONCAT(
+                            'API',
+                            IFNULL(CONCAT(' - ', log.nome), '')
+                        )) AS autor
+                    ")
+                )
+                ->join("estoque", "estoque.id", "log.fk")
+                ->join("maquinas_produtos AS mp", "mp.id", "estoque.id_mp")
+                ->join("produtos", "produtos.id", "mp.id_produto")
+                ->join("valores", "valores.id", "mp.id_maquina")
+                ->leftjoin("pessoas", "pessoas.id", "log.id_pessoa")
+                ->whereRaw($filtro)
+                ->where("log.tabela", "estoque")
+                ->where("produtos.lixeira", 0)
+                ->where("valores.lixeira", 0)
+                ->orderby("log.id")
+                ->get()
+        )->groupBy("id_maquina")->map(function($itens1) {
             return [
                 "maquina" => [
                     "descr" => $itens1[0]->maquina,
@@ -259,36 +252,25 @@ class RelatoriosController extends Controller {
         $filtro = join(" AND ", $filtro);
         if (!$filtro) $filtro = "1";
         
-        $resultado = collect(DB::select(DB::raw("
-            SELECT
-                retiradas.id_pessoa,
-                pessoas.nome,
-                produtos.descr AS produto,
-                valores.descr AS maquina,
-                DATE_FORMAT(retiradas.created_at, '%d/%m/%Y') AS data,
-                IFNULL(CONCAT('Liberado por ', supervisor.nome, IFNULL(CONCAT(' - ', retiradas.observacao), '')), '') AS obs
-
-            FROM retiradas
-
-            JOIN produtos
-                ON produtos.id = retiradas.id_produto
-
-            JOIN pessoas
-                ON pessoas.id = retiradas.id_pessoa
-
-            JOIN comodatos
-                ON comodatos.id = retiradas.id_comodato
-
-            JOIN valores
-                ON valores.id = comodatos.id_maquina
-
-            LEFT JOIN pessoas AS supervisor
-                ON supervisor.id = retiradas.id_supervisor
-
-            WHERE ".$filtro."
-
-            ORDER BY retiradas.id
-        ")))->groupBy("id_pessoa")->map(function($itens) {
+        $resultado = collect(
+            DB::table("retiradas")
+                ->select(
+                    "retiradas.id_pessoa",
+                    "pessoas.nome",
+                    "produtos.descr AS produto",
+                    "valores.descr AS maquina",
+                    DB::raw("DATE_FORMAT(retiradas.created_at, '%d/%m/%Y') AS data"),
+                    DB::raw("IFNULL(CONCAT('Liberado por ', supervisor.nome, IFNULL(CONCAT(' - ', retiradas.observacao), '')), '') AS obs")
+                )
+                ->join("produtos", "produtos.id", "retiradas.id_produto")
+                ->join("pessoas", "pessoas.id", "retiradas.id_pessoa")
+                ->join("comodatos", "comodatos.id", "retiradas.id_comodato")
+                ->join("valores", "valores.id", "comodatos.id_maquina")
+                ->leftjoin("pessoas AS supervisor", "supervisor.id", "retiradas.id_supervisor")
+                ->whereRaw($filtro)
+                ->orderby("retiradas.id")
+                ->get()
+        )->groupBy("id_pessoa")->map(function($itens) {
             return [
                 "nome" => $itens[0]->nome,
                 "retiradas" => $itens->map(function($retirada) {

@@ -11,64 +11,64 @@ use App\Models\Valores;
 use App\Models\MaquinasProdutos;
 
 class ValoresController extends Controller {
-    private function busca($alias, $param) {
-        $query = "
-            SELECT
-                valores.id,
-                valores.seq,
-                valores.descr,
-                valores.alias,
-                CASE
-                    WHEN aux3.id_maquina IS NOT NULL THEN 'S'
-                    ELSE 'N'
-                END AS tem_mov,
-                CASE
-                    WHEN aux2.id IS NOT NULL THEN CONCAT(
-                        aux2.nome_fantasia,
-                        ' até ',
-                        aux1.fim_formatado
-                    ) ELSE '---'
-                END AS comodato
-
-            FROM valores
-
-            LEFT JOIN (
-                SELECT
-                    id_maquina,
-                    id_empresa,
-                    DATE_FORMAT(fim, '%d/%m/%Y') AS fim_formatado
-
-                FROM comodatos
-
-                WHERE CURDATE() >= inicio
-                  AND CURDATE() < fim
-            ) AS aux1 ON aux1.id_maquina = valores.id
-
-            LEFT JOIN (
-                SELECT
-                    id,
-                    id_matriz,
-                    nome_fantasia
-                FROM empresas
-                WHERE lixeira = 0
-            ) AS aux2 ON aux2.id = aux1.id_empresa
-
-            LEFT JOIN (
-                SELECT DISTINCTROW id_maquina
-                FROM maquinas_produtos AS mp
-                JOIN estoque
-                    ON estoque.id_mp = mp.id
-            ) AS aux3 ON aux3.id_maquina = valores.id
-
-            WHERE ".$param."
-              AND lixeira = 0
-              AND alias = '".$alias."'
-        ";
+    private function busca($alias, $where) {
         if ($alias == "maquinas") {
             $id_emp = intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa);
-            if ($id_emp) $query .= " AND ".$id_emp." IN (aux2.id, aux2.id_matriz)";
+            if ($id_emp) $where .= " AND ".$id_emp." IN (aux2.id, aux2.id_matriz)";
         }
-        return DB::select(DB::raw($query));
+        return DB::table("valores")
+                    ->select(
+                        "valores.id",
+                        "valores.seq",
+                        "valores.descr",
+                        "valores.alias",
+                        DB::raw("
+                            CASE
+                                WHEN aux3.id_maquina IS NOT NULL THEN 'S'
+                                ELSE 'N'
+                            END AS tem_mov
+                        "),
+                        DB::raw("
+                            CASE
+                                WHEN aux2.id IS NOT NULL THEN CONCAT(
+                                    aux2.nome_fantasia,
+                                    ' até ',
+                                    aux1.fim_formatado
+                                ) ELSE '---'
+                            END AS comodato
+                        ")
+                    )
+                    ->leftjoin(DB::raw("(
+                        SELECT
+                            id_maquina,
+                            id_empresa,
+                            DATE_FORMAT(fim, '%d/%m/%Y') AS fim_formatado
+
+                        FROM comodatos
+
+                        WHERE CURDATE() >= inicio
+                          AND CURDATE() < fim
+                    ) AS aux1"), "aux1.id_maquina", "valores.id")
+                    ->leftjoin(DB::raw("(
+                        SELECT
+                            id,
+                            id_matriz,
+                            nome_fantasia
+
+                        FROM empresas
+
+                        WHERE lixeira = 0
+                    ) AS aux2"), "aux2.id", "aux1.id_empresa")
+                    ->leftjoin(DB::raw("(
+                        SELECT DISTINCTROW id_maquina
+                        FROM maquinas_produtos AS mp
+                        JOIN estoque
+                            ON estoque.id_mp = mp.id
+                    ) AS aux3"), "aux3.id_maquina", "valores.id")
+                    ->whereRaw($where)
+                    ->where("alias", $alias)
+                    ->where("lixeira", 0)
+                    ->get();
     }
 
     public function ver($alias) {
@@ -113,55 +113,50 @@ class ValoresController extends Controller {
     public function aviso($alias, $id) {
         $aviso = "";
         if ($alias == "maquinas") {
-            $aviso = DB::select(DB::raw("
-                SELECT
-                    CASE
-                        WHEN (tab_comodatos.id_maquina IS NOT NULL) THEN CONCAT('está comodatada para ', tab_comodatos.empresa, ' até ', tab_comodatos.fim)
-                        WHEN (tab_estoque.saldo <> 0) THEN 'possui saldo diferente de zero'
-                        ELSE ''
-                    END AS aviso
-                
-                FROM valores
-                
-                LEFT JOIN (
-                    SELECT
-                        IFNULL(SUM(qtd), 0) AS saldo,
-                        mp.id_maquina
-                        
-                    FROM (
-                        SELECT
+            $aviso = DB::table("valores")
+                        ->selectRaw("
                             CASE
-                                WHEN (es = 'E') THEN qtd
-                                ELSE qtd * -1
-                            END AS qtd,
-                            id_mp
-                
-                        FROM estoque
-                    ) AS estq
+                                WHEN (tab_comodatos.id_maquina IS NOT NULL) THEN CONCAT('está comodatada para ', tab_comodatos.empresa, ' até ', tab_comodatos.fim)
+                                WHEN (tab_estoque.saldo <> 0) THEN 'possui saldo diferente de zero'
+                                ELSE ''
+                            END AS aviso
+                        ")
+                        ->leftjoin(DB::raw("(
+                            SELECT
+                                IFNULL(SUM(qtd), 0) AS saldo,
+                                mp.id_maquina
+                                
+                            FROM (
+                                SELECT
+                                    CASE
+                                        WHEN (es = 'E') THEN qtd
+                                        ELSE qtd * -1
+                                    END AS qtd,
+                                    id_mp
+                        
+                                FROM estoque
+                            ) AS estq
 
-                    JOIN maquinas_produtos AS mp
-                        ON mp.id = estq.id_mp
-                
-                    GROUP BY mp.id_maquina
-                ) AS tab_estoque ON tab_estoque.id_maquina = valores.id
-                
-                LEFT JOIN (
-                    SELECT
-                        id_maquina,
-                        empresas.nome_fantasia AS empresa,
-                        DATE_FORMAT(fim, '%d/%m/%Y') AS fim
-                    
-                    FROM comodatos
-                    
-                    JOIN empresas
-                        ON empresas.id = comodatos.id_empresa
-                    
-                    WHERE CURDATE() >= inicio
-                      AND CURDATE() < fim
-                ) AS tab_comodatos ON tab_comodatos.id_maquina = valores.id
-
-                WHERE valores.id = ".$id
-            ))[0]->aviso;
+                            JOIN maquinas_produtos AS mp
+                                ON mp.id = estq.id_mp
+                        
+                            GROUP BY mp.id_maquina
+                        ) AS tab_estoque", "tab_estoque.id_maquina", "valores.id"))
+                        ->leftjoin(DB::raw("(
+                            SELECT
+                                id_maquina,
+                                empresas.nome_fantasia AS empresa,
+                                DATE_FORMAT(fim, '%d/%m/%Y') AS fim
+                            
+                            FROM comodatos
+                            
+                            JOIN empresas
+                                ON empresas.id = comodatos.id_empresa
+                            
+                            WHERE CURDATE() >= inicio
+                              AND CURDATE() < fim
+                        ) AS tab_comodatos", "tab_comodatos.id_maquina", "valores.id"))
+                        ->value("aviso");
             $vinculo = $aviso != "";
         } else {
             $vinculo = sizeof(
@@ -189,11 +184,12 @@ class ValoresController extends Controller {
         $linha->descr = mb_strtoupper($request->descr);
         $linha->alias = $alias;
         if (!$request->id) {
-            $linha->seq = intval(DB::select(DB::raw("
-                SELECT IFNULL(MAX(seq), 0) AS ultimo
-                FROM valores
-                WHERE alias = '".$alias."'
-            "))[0]->ultimo) + 1;
+            $linha->seq = intval(
+                DB::table("valores")
+                    ->selectRaw("IFNULL(MAX(seq), 0) AS ultimo")
+                    ->where("alias", $alias)
+                    ->value("ultimo")
+            ) + 1;
         }
         $linha->save();
         if ($alias == "maquinas") {

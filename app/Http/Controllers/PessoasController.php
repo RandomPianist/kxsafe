@@ -13,58 +13,53 @@ use App\Http\Controllers\EmpresasController;
 use App\Models\Pessoas;
 
 class PessoasController extends Controller {
-    private function busca($param, $tipo) {
-        if (in_array($tipo, ["A", "U"])) {
-            $param .= " AND setores.cria_usuario = 1";
-            if ($tipo == "A") $param .= " AND pessoas.id_empresa = 0";
-        } else $param .= " AND setores.cria_usuario = 0 AND pessoas.supervisor = ".($tipo == "S" ? "1" : "0");
-        $query = "
-            SELECT
-                pessoas.id,
-                CONCAT(
-                    pessoas.nome,
-                    CASE
-                        WHEN pessoas.id = ".Auth::user()->id_pessoa." THEN ' (você)'
-                        ELSE ''
-                    END
-                ) AS nome,
-                IFNULL(setores.descr,          'A CLASSIFICAR') AS setor,
-                IFNULL(empresas.nome_fantasia, 'A CLASSIFICAR') AS empresa,
-                CASE
-                    WHEN ret.id_pessoa IS NULL THEN 0
-                    ELSE 1
-                END AS possui_retiradas
-            
-            FROM pessoas
-
-            LEFT JOIN setores
-                ON setores.id = pessoas.id_setor
-
-            LEFT JOIN empresas
-                ON empresas.id = pessoas.id_empresa
-
-            LEFT JOIN (
-                SELECT id_pessoa
-                FROM retiradas
-                GROUP BY id_pessoa
-            ) AS ret ON ret.id_pessoa = pessoas.id
-
-            WHERE ".$param."
-              AND pessoas.lixeira = 0
-        ";
+    private function busca($where, $tipo) {
         $id_emp = intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa);
-        if ($id_emp) $query .= " AND ".$id_emp." IN (empresas.id, empresas.id_matriz)";
-        return DB::select(DB::raw($query));
+        if ($id_emp) $where .= " AND ".$id_emp." IN (empresas.id, empresas.id_matriz)";
+        if (in_array($tipo, ["A", "U"])) {
+            $where .= " AND setores.cria_usuario = 1";
+            if ($tipo == "A") $where .= " AND pessoas.id_empresa = 0";
+        } else $where .= " AND setores.cria_usuario = 0 AND pessoas.supervisor = ".($tipo == "S" ? "1" : "0");
+        return DB::table("pessoas")
+                    ->select(
+                        "pessoas.id",
+                        DB::raw("
+                            CONCAT(
+                                pessoas.nome,
+                                CASE
+                                    WHEN pessoas.id = ".Auth::user()->id_pessoa." THEN ' (você)'
+                                    ELSE ''
+                                END
+                            ) AS nome
+                        "),
+                        DB::raw("IFNULL(setores.descr, 'A CLASSIFICAR') AS setor"),
+                        DB::raw("IFNULL(empresas.nome_fantasia, 'A CLASSIFICAR') AS empresa"),
+                        DB::raw("
+                            CASE
+                                WHEN ret.id_pessoa IS NULL THEN 0
+                                ELSE 1
+                            END AS possui_retiradas
+                        ")
+                    )->leftjoin("setores", "setores.id", "pessoas.id_setor")
+                    ->leftjoin("empresas", "empresas.id", "pessoas.id_empresa")
+                    ->leftjoin(DB::raw("(
+                        SELECT id_pessoa
+                        FROM retiradas
+                        GROUP BY id_pessoa
+                    ) AS ret"), "ret.id_pessoa", "pessoas.id")
+                    ->whereRaw($where)
+                    ->where("pessoas.lixeira", 0)
+                    ->get();
     }
 
     private function criar_usuario($id_pessoa, Request $request) {
         $log = new LogController;
         $senha = Hash::make($request->password);
         DB::statement("INSERT INTO users (name, email, password, id_pessoa) VALUES ('".trim($request->nome)."', '".trim($request->email)."', '".$senha."', ".$id_pessoa.")");
-        $log->inserir("C", "users", DB::select(DB::raw("
-            SELECT MAX(id) AS id
-            FROM users
-        "))[0]->id);
+        $log->inserir("C", "users", DB::table("users")
+                                        ->selectRaw("MAX(id) AS id")
+                                        ->value("id")
+        );
     }
 
     private function deletar_usuario($id_pessoa) {
@@ -171,34 +166,28 @@ class PessoasController extends Controller {
     }
 
     public function mostrar($id) {
-        return json_encode(DB::select(DB::raw("
-            SELECT
-                pessoas.id,
-                pessoas.cpf,
-                pessoas.id_setor,
-                pessoas.id_empresa,
-                pessoas.funcao,
-                pessoas.supervisor,
-                pessoas.foto,
-                DATE_FORMAT(pessoas.admissao, '%d/%m/%Y') AS admissao,
-                setores.descr AS setor,
-                empresas.nome_fantasia AS empresa,
-                IFNULL(users.name, pessoas.nome) AS nome,
-                users.email
-            
-            FROM pessoas
-
-            LEFT JOIN empresas
-                ON empresas.id = pessoas.id_empresa
-
-            LEFT JOIN setores
-                ON setores.id = pessoas.id_setor
-
-            LEFT JOIN users
-                ON users.id_pessoa = pessoas.id
-            
-            WHERE pessoas.id = ".$id
-        ))[0]);
+        return json_encode(
+            DB::table("pessoas")
+                ->select(
+                    "pessoas.id",
+                    "pessoas.cpf",
+                    "pessoas.id_setor",
+                    "pessoas.id_empresa",
+                    "pessoas.funcao",
+                    "pessoas.supervisor",
+                    "pessoas.foto",
+                    DB::raw("DATE_FORMAT(pessoas.admissao, '%d/%m/%Y') AS admissao"),
+                    "setores.descr AS setor",
+                    "empresas.nome_fantasia AS empresa",
+                    DB::raw("IFNULL(users.name, pessoas.nome) AS nome"),
+                    "users.email"
+                )
+                ->leftjoin("empresas", "empresas.id", "pessoas.id_empresa")
+                ->leftjoin("setores", "setores.id", "pessoas.id_setor")
+                ->leftjoin("users", "users.id_pessoa", "pessoas.id")
+                ->where("pessoas.id", $id)
+                ->first()
+        );
     }
 
     public function aviso($id) {

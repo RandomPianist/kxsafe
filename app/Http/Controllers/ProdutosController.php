@@ -10,23 +10,21 @@ use App\Models\Produtos;
 use App\Models\Atribuicoes;
 
 class ProdutosController extends Controller {
-    private function busca($param) {
-        return DB::select(DB::raw("
-            SELECT
-                produtos.*,
-                CASE
-                    WHEN valores.descr IS NULL OR valores.descr = '' THEN 'A CLASSIFICAR'
-                    ELSE valores.descr
-                END AS categoria
-
-            FROM produtos
-
-            LEFT JOIN valores
-                ON valores.id = produtos.id_categoria
-
-            WHERE ".$param."
-              AND produtos.lixeira = 0
-        "));
+    private function busca($where) {
+        return DB::table("produtos")
+                    ->select(
+                        DB::raw("produtos.*"),
+                        DB::raw("
+                            CASE
+                                WHEN valores.descr IS NULL OR valores.descr = '' THEN 'A CLASSIFICAR'
+                                ELSE valores.descr
+                            END AS categoria
+                        ")
+                    )
+                    ->leftjoin("valores", "valores.id", "produtos.id_categoria")
+                    ->whereRaw($where)
+                    ->where("produtos.lixeira", 0)
+                    ->get();
     }
 
     public function ver() {
@@ -69,23 +67,17 @@ class ProdutosController extends Controller {
     }
 
     public function mostrar($id) {
-        $consulta = DB::select(DB::raw("
-            SELECT
-                produtos.*,
-                IFNULL(valores.descr, 'A CLASSIFICAR') AS categoria
-            
-            FROM produtos
-
-            LEFT JOIN valores
-                ON valores.id = produtos.id_categoria
-
-            WHERE produtos.id = ".$id
-        ));
-        foreach($consulta as $linha) {
-            if ($linha->foto == null) $linha->foto = "";
-            else if (!stripos($linha->foto, "//")) $linha->foto = asset("storage/".$linha->foto);
-        }
-        return json_encode($consulta[0]);
+        $produto = DB::table("produtos")
+                        ->select(
+                            DB::raw("produtos.*"),
+                            DB::raw("IFNULL(valores.descr, 'A CLASSIFICAR') AS categoria")
+                        )
+                        ->leftjoin("valores", "valores.id", "produtos.id_categoria")
+                        ->where("produtos.id", $id)
+                        ->first();
+        if ($produto->foto == null) $produto->foto = "";
+        else if (!stripos($produto->foto, "//")) $produto->foto = asset("storage/".$produto->foto);
+        return json_encode($produto);
     }
 
     public function aviso($id) {
@@ -123,25 +115,24 @@ class ProdutosController extends Controller {
         $log = new LogController;
         $log->inserir("D", "produtos", $linha->id);
         $lista = array();
-        $consulta = DB::select(DB::raw("
-            SELECT id
-
-            FROM atribuicoes
-
-            WHERE (
-                produto_ou_referencia_valor IN (
-                    SELECT descr
-                    FROM produtos
-                    WHERE id = ".$request->id."
-                ) AND produto_ou_referencia_chave = 'produto'
-            ) OR (
-                produto_ou_referencia_valor IN (
-                    SELECT referencia
-                    FROM produtos
-                    WHERE id = ".$request->id."
-                ) AND produto_ou_referencia_chave = 'referencia'
-            )
-        "));
+        $consulta = DB::table("atribuicoes")
+                        ->select("id")
+                        ->whereRaw("
+                            (
+                                produto_ou_referencia_valor IN (
+                                    SELECT descr
+                                    FROM produtos
+                                    WHERE id = ".$request->id."
+                                ) AND produto_ou_referencia_chave = 'produto'
+                            ) OR (
+                                produto_ou_referencia_valor IN (
+                                    SELECT referencia
+                                    FROM produtos
+                                    WHERE id = ".$request->id."
+                                ) AND produto_ou_referencia_chave = 'referencia'
+                            )
+                        ")
+                        ->get();
         foreach ($consulta as $linha) {
             $modelo = Atribuicoes::find($linha->id);
             $modelo->lixeira = 1;

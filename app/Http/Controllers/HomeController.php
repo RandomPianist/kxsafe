@@ -13,64 +13,46 @@ class HomeController extends Controller {
         return redirect("/valores/categorias");
     }
 
-    public function autocomplete(Request $request) {
-        if ($request->column <> "referencia") {
-            return json_encode(
-                DB::table($request->table)
-                    ->select(
-                        "id",
-                        $request->column
-                    )
-                    ->where($request->column, "LIKE", $request->search."%")
-                    ->where(function($sql) use($request) {
-                        if ($request->filter) $sql->where($request->filter_col, $request->filter);
-                    })
-                    ->where(function($sql) use($request) {
-                        $id_emp = intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa);
-                        if ($id_emp) {
-                            switch($request->table) {
-                                case "empresas":
-                                    if (sizeof(
-                                        DB::table("empresas")
-                                            ->where("id_matriz", $id_emp)
-                                            ->where("lixeira", 0)
-                                            ->get()
-                                    ) > 0) {
-                                        $sql->where("id", $id_emp)
-                                            ->orWhere("id_matriz", $id_emp);
-                                    } else $sql->where("id", $id_emp);
-                                    break;
-                                case "setores":
-                                    $sql->where("cria_usuario", 0);
-                                    break;
-                            }
-                        }
-                    })
-                    ->where("lixeira", 0)
-                    ->orderby($request->column)
-                    ->take(30)
-                    ->get()
-            );
-        }
+    public function autocomplete(Request $request) {        
         $where = " AND ".$request->column." LIKE '".$request->search."%'";
-        if ($request->filter) $where .= " AND referencia NOT IN (
-            SELECT produto_ou_referencia_valor
-            FROM atribuicoes
-            WHERE pessoa_ou_setor_valor = ".$request->filter."
-              AND lixeira = 0
-        )";
-        return json_encode(DB::select(DB::raw("
-            SELECT
-                MIN(id) AS id,
-                referencia
-            
-            FROM produtos
 
-            WHERE lixeira = 0".$where."
+        $id_emp = intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa);
+        if ($id_emp) {
+            switch ($request->table) {
+                case "empresas":
+                    $where .= " AND (id = ".$id_emp;
+                    if (sizeof(
+                        DB::table("empresas")
+                            ->where("id_matriz", $id_emp)
+                            ->where("lixeira", 0)
+                            ->get()
+                    ) > 0) $where .= " OR id_matriz = ".$id_emp;
+                    $where .= ")";
+                    break;
+                case "setores":
+                    $where .= " AND cria_usuario = 0";
+                    break;
+            }
+        }
 
-            GROUP BY referencia
+        if ($request->filter) {
+            $where .= $request->column != "referencia" ? " AND ".$request->filter_col." = '".$request->filter."'" : " AND referencia NOT IN (
+                SELECT produto_ou_referencia_valor
+                FROM atribuicoes
+                WHERE pessoa_ou_setor_valor = ".$request->filter."
+                  AND lixeira = 0
+            )";
+        }
 
-            ORDER BY referencia
-        ")));
+        $query = "SELECT ";
+        if ($request->column == "referencia") $query .= "MIN(id) AS ";
+        $query .= "id, ".$request->column;
+        $query .= " FROM ".$request->table;
+        $query .= " WHERE lixeira = 0".$where;
+        if ($request->column == "referencia") $query .= " GROUP BY referencia";
+        $query .= " ORDER BY ".$request->column;
+        $query .= " LIMIT 30";
+        
+        return json_encode(DB::select(DB::raw($query)));
     }
 }

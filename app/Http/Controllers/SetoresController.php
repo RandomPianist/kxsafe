@@ -64,32 +64,28 @@ class SetoresController extends Controller {
     }
 
     public function pessoas($id) {
-        return DB::select(DB::raw("
-            SELECT
-                pessoas.id,
-                pessoas.nome
-
-            FROM pessoas
-
-            LEFT JOIN users
-                ON users.id_pessoa = pessoas.id
-
-            WHERE pessoas.id_setor = ".$id."
-              AND pessoas.lixeira = 0
-              AND users.id IS NULL
-        "));
+        return DB::table("pessoas")
+                    ->select(
+                        "pessoas.id",
+                        "pessoas.nome"
+                    )
+                    ->leftjoin("users", "users.id_pessoa", "pessoas.id")
+                    ->where("pessoas.id_setor", $id)
+                    ->where("pessoas.lixeira", 0)
+                    ->whereNull("users.id")
+                    ->get();
     }
 
     public function mostrar($id) {
         if (intval($id)) {
             return DB::table("setores")
-                ->select(
-                    "descr",
-                    "cria_usuario",
-                    "padrao"
-                )
-                ->where("id", $id)
-                ->first();
+                        ->select(
+                            "descr",
+                            "cria_usuario",
+                            "padrao"
+                        )
+                        ->where("id", $id)
+                        ->first();
         } else {
             $resultado = new \stdClass;
             $resultado->cria_usuario = 0;
@@ -149,10 +145,10 @@ class SetoresController extends Controller {
                     for ($i = 0; $i < sizeof($request->id_pessoa); $i++) {
                         $senha = Hash::make($request->password[$i]);
                         DB::statement("INSERT INTO users (name, email, password, id_pessoa) VALUES ('".trim($request->nome[$i])."', '".trim($request->email[$i])."', '".$senha."', ".$request->id_pessoa[$i].")");
-                        $log->inserir("C", "users", DB::select(DB::raw("
-                            SELECT MAX(id) AS id
-                            FROM users
-                        "))[0]->id);
+                        $log->inserir("C", "users", DB::table("users")
+                                                        ->selectRaw("MAX(id) AS id")
+                                                        ->value("id")
+                        );
                     }
                 }
             }

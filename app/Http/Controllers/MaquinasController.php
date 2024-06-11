@@ -55,26 +55,20 @@ class MaquinasController extends Controller {
 
         if (!$texto) {
             for ($i = 0; $i < sizeof($produtos_id); $i++) {
-                $consulta = DB::select(DB::raw("
-                    SELECT IFNULL(SUM(qtd), 0) AS saldo
-                        
-                    FROM (
-                        SELECT
-                            CASE
-                                WHEN (es = 'E') THEN qtd
-                                ELSE qtd * -1
-                            END AS qtd,
-                            id_mp
-                
-                        FROM estoque
-                    ) AS estq
+                $consulta = DB::table(DB::raw("(
+                    SELECT
+                        CASE
+                            WHEN (es = 'E') THEN qtd
+                            ELSE qtd * -1
+                        END AS qtd,
+                        id_mp
 
-                    JOIN maquinas_produtos AS mp
-                        ON mp.id = estq.id_mp
-
-                    WHERE mp.id_maquina = ".$request->id_maquina."
-                      AND mp.id_produto = ".$produtos_id[$i]
-                ));
+                    FROM estoque
+                ) AS estq"))->selectRaw("IFNULL(SUM(qtd), 0) AS saldo")
+                    ->join("maquinas_produtos AS mp", "mp.id", "estq.id_mp")
+                    ->where("mp.id_maquina", $request->id_maquina)
+                    ->where("mp.id_produto", $produtos_id[$i])
+                    ->get();
                 $erro = !sizeof($consulta);
                 if (!$erro) {
                     $valor = floatval($quantidades[$i]);
@@ -106,36 +100,37 @@ class MaquinasController extends Controller {
         if (!$resultado->texto) {
             $inicio = Carbon::createFromFormat('d/m/Y', $request->inicio)->format('Y-m-d');
             $fim = Carbon::createFromFormat('d/m/Y', $request->fim)->format('Y-m-d');
-            $consulta = DB::select(DB::raw("
-                SELECT
-                    CONCAT(
-                        valores.descr, ' ',
-                        CASE
-                            WHEN (CURDATE() > fim) THEN 'esteve'
-                            WHEN (CURDATE() >= inicio) THEN 'está'
-                            ELSE 'estará'
-                        END,
-                        ' comodatada entre ',
-                        DATE_FORMAT(inicio, '%d/%m/%Y'), ' e ', DATE_FORMAT(fim, '%d/%m/%Y')
-                    ) AS texto,
-                    CASE
-                        WHEN inicio >= '".$inicio."' THEN 'S'
-                        ELSE 'N'
-                    END AS invalida_inicio,
-                    CASE
-                        WHEN fim < '".$fim."' THEN 'S'
-                        ELSE 'N'
-                    END AS invalida_fim
-
-                FROM comodatos
-
-                JOIN valores
-                    ON valores.id = comodatos.id_maquina
-
-                WHERE (('".$inicio."' BETWEEN comodatos.inicio AND comodatos.fim) OR ('".$fim."' BETWEEN comodatos.inicio AND comodatos.fim))
-                  AND comodatos.inicio <> comodatos.fim
-                  AND id_maquina = ".$request->id_maquina
-            ));
+            $consulta = DB::table("comodatos")
+                            ->select(
+                                DB::raw("
+                                    CONCAT(
+                                        valores.descr, ' ',
+                                        CASE
+                                            WHEN (CURDATE() > fim) THEN 'esteve'
+                                            WHEN (CURDATE() >= inicio) THEN 'está'
+                                            ELSE 'estará'
+                                        END,
+                                        ' comodatada entre ',
+                                        DATE_FORMAT(inicio, '%d/%m/%Y'), ' e ', DATE_FORMAT(fim, '%d/%m/%Y')
+                                    ) AS texto
+                                "),
+                                DB::raw("
+                                    CASE
+                                        WHEN inicio >= '".$inicio."' THEN 'S'
+                                        ELSE 'N'
+                                    END AS invalida_inicio
+                                "),
+                                DB::raw("
+                                    CASE
+                                        WHEN fim < '".$fim."' THEN 'S'
+                                        ELSE 'N'
+                                    END AS invalida_fim
+                                ")
+                            )->join("valores", "valores.id", "comodato.id_maquina")
+                            ->whereRaw("(('".$inicio."' BETWEEN comodatos.inicio AND comodatos.fim) OR ('".$fim."' BETWEEN comodatos.inicio AND comodatos.fim))")
+                            ->where("comodatos.inicio", "<>", "comodatos.fim")
+                            ->where("id_maquina", $request->id_maquina)
+                            ->get();
             if (sizeof($consulta)) $resultado = $consulta[0];
         }
         return json_encode($resultado);

@@ -15,22 +15,22 @@ use App\Models\Atribuicoes;
 
 class ApiController extends Controller {
     public function empresas() {
-        return json_encode(DB::select(DB::raw("
-            SELECT
-                empresas.id,
-                CONCAT(
-                    empresas.nome_fantasia,
-                    IFNULL(CONCAT(' - ', matriz.nome_fantasia), '')
-                ) AS descr
-
-            FROM empresas
-
-            LEFT JOIN empresas AS matriz
-                ON matriz.id = empresas.id_matriz
-
-            WHERE empresas.lixeira = 0
-              AND matriz.lixeira = 0
-        ")));
+        return json_encode(
+            DB::table("empresas")
+                ->select(
+                    "empresas.id",
+                    DB::raw("
+                        CONCAT(
+                            empresas.nome_fantasia,
+                            IFNULL(CONCAT(' - ', matriz.nome_fantasia), '')
+                        ) AS descr
+                    ")
+                )
+                ->leftjoin("empresas AS matriz", "matriz.id", "empresas.id_matriz")
+                ->where("empresas.lixeira", 0)
+                ->where("matriz.lixeira", 0)
+                ->get()
+        );
     }
 
     public function maquinas(Request $request) {
@@ -63,42 +63,37 @@ class ApiController extends Controller {
     }
 
     public function produtos_por_maquina(Request $request) {
-        $consulta = DB::select(DB::raw("
-            SELECT
-                produtos.id,
-                produtos.descr,
-                IFNULL(mp.preco, 0) AS preco,
-                IFNULL(tab.saldo, 0) AS saldo,
-                IFNULL(mp.minimo, 0) AS minimo,
-                IFNULL(mp.maximo, 0) AS maximo
-
-            FROM maquinas_produtos AS mp
-            
-            LEFT JOIN (
-                SELECT
-                    IFNULL(SUM(qtd), 0) AS saldo,
-                    id_mp
-                    
-                FROM (
-                    SELECT
-                        CASE
-                            WHEN (es = 'E') THEN qtd
-                            ELSE qtd * -1
-                        END AS qtd,
-                        id_mp
-            
-                    FROM estoque
-                ) AS estq
-            
-                GROUP BY id_mp
-            ) AS tab ON tab.id_mp = mp.id
-
-            JOIN produtos
-                ON produtos.id = mp.id_produto
-
-            WHERE mp.id_maquina = ".$request->idMaquina."
-              AND produtos.lixeira = 0
-        "));
+        $consulta = DB::table("maquinas_produtos AS mp")
+                        ->select(
+                            "produtos.id",
+                            "produtos.descr",
+                            DB::raw("IFNULL(mp.preco, 0) AS preco"),
+                            DB::raw("IFNULL(tab.saldo, 0) AS saldo"),
+                            DB::raw("IFNULL(mp.minimo, 0) AS minimo"),
+                            DB::raw("IFNULL(mp.maximo, 0) AS maximo")
+                        )
+                        ->leftjoin(DB::raw("(
+                            SELECT
+                                IFNULL(SUM(qtd), 0) AS saldo,
+                                id_mp
+                                
+                            FROM (
+                                SELECT
+                                    CASE
+                                        WHEN (es = 'E') THEN qtd
+                                        ELSE qtd * -1
+                                    END AS qtd,
+                                    id_mp
+                        
+                                FROM estoque
+                            ) AS estq
+                        
+                            GROUP BY id_mp
+                        ) AS tab"), "tab.id_mp", "mp.id")
+                        ->join("produtos", "produtos.id", "mp.id_produto")
+                        ->where("mp.id_maquina", $request->idMaquina)
+                        ->where("produtos.lixeira", 0)
+                        ->get();
         foreach ($consulta as $linha) {
             $linha->preco = floatval($linha->preco);
             $linha->saldo = floatval($linha->saldo);
@@ -113,11 +108,12 @@ class ApiController extends Controller {
         $linha->descr = mb_strtoupper($request->descr);
         $linha->alias = "categorias";
         if (!$request->id) {
-            $linha->seq = intval(DB::select(DB::raw("
-                SELECT IFNULL(MAX(seq), 0) AS ultimo
-                FROM valores
-                WHERE alias = 'categorias'
-            "))[0]->ultimo) + 1;
+            $linha->seq = intval(
+                DB::table("valores")
+                    ->selectRaw("IFNULL(MAX(seq), 0) AS ultimo")
+                    ->where("alias", "categorias")
+                    ->value("ultimo")
+            ) + 1;
         }
         $linha->save();
         $log = new LogController;
@@ -151,25 +147,23 @@ class ApiController extends Controller {
         $modelo->save();
         $maquinas = new MaquinasController;
         $maquinas->mov_estoque($linha->id, true);
-        $consulta = DB::select(DB::raw("
-            SELECT
-                id,
-                descr,
-                preco,
-                validade,
-                IFNULL(ca, '') AS ca,
-                IFNULL(foto, '') AS foto,
-                lixeira,
-                referencia AS refer,
-                IFNULL(tamanho, '') AS tamanho,
-                id_categoria AS idCategoria,
-                cod_externo AS codExterno,
-                '123' AS usu
-
-            FROM produtos
-
-            WHERE id = ".$linha->id
-        ))[0];
+        $consulta = DB::table("produtos")
+                        ->select(
+                            "id",
+                            "descr",
+                            "preco",
+                            "validade",
+                            DB::raw("IFNULL(ca, '') AS ca"),
+                            DB::raw("IFNULL(foto, '') AS foto"),
+                            "lixeira",
+                            "referencia AS refer",
+                            DB::raw("IFNULL(tamanho, '') AS tamanho"),
+                            "id_categoria AS idCategoria",
+                            "cod_externo AS codExterno",
+                            "'123' AS usu"
+                        )
+                        ->where("id", $linha->id)
+                        ->first();
         $consulta->preco = floatval($consulta->preco);
         $consulta->lixeira = intval($consulta->lixeira);
         return json_encode($consulta);
@@ -237,59 +231,53 @@ class ApiController extends Controller {
     }
 
     public function produtosPorPessoa(Request $request) {
-        $consulta = DB::select(DB::raw("
-            SELECT
-                produtos.id,
-                produtos.referencia,
-                produtos.descr AS nome,
-                produtos.detalhes,
-                produtos.cod_externo AS codbar,
-                IFNULL(produtos.tamanho, '') AS tamanho,
-                IFNULL(produtos.foto, '') AS foto,
+        $consulta = DB::table("produtos")
+                        ->select(
+                            "produtos.id",
+                            "produtos.referencia",
+                            "produtos.descr AS nome",
+                            "produtos.detalhes",
+                            "produtos.cod_externo AS codbar",
+                            DB::raw("IFNULL(produtos.tamanho, '') AS tamanho"),
+                            DB::raw("IFNULL(produtos.foto, '') AS foto"),
+                            "atribuicoes.id AS id_atribuicao",
+                            DB::raw("(atribuicoes.qtd - IFNULL(ret.qtd, 0)) AS qtd"),
+                            DB::raw("IFNULL(ret.ultima_retirada, '') AS ultima_retirada"),
+                            DB::raw("DATE_FORMAT(IFNULL(ret.proxima_retirada, CURDATE()), '%d/%m/%Y') AS proxima_retirada")
+                        )->join("atribuicoes", "atribuicoes.id", DB::raw("(
+                            SELECT atribuicoes.id
+                            
+                            FROM atribuicoes
 
-                atribuicoes.id AS id_atribuicao,
-                (atribuicoes.qtd - IFNULL(ret.qtd, 0)) AS qtd,
-                IFNULL(ret.ultima_retirada, '') AS ultima_retirada,
-                DATE_FORMAT(IFNULL(ret.proxima_retirada, CURDATE()), '%d/%m/%Y') AS proxima_retirada
+                            JOIN pessoas
+                                ON (atribuicoes.pessoa_ou_setor_chave = 'pessoa' AND atribuicoes.pessoa_ou_setor_valor = pessoas.id)
+                                    OR (atribuicoes.pessoa_ou_setor_chave = 'setor' AND atribuicoes.pessoa_ou_setor_valor = pessoas.id_setor)
+                            
+                            WHERE (
+                                (produto_ou_referencia_chave = 'produto' AND produto_ou_referencia_valor = produtos.cod_externo)
+                            OR (produto_ou_referencia_chave = 'referencia' AND produto_ou_referencia_valor = produtos.referencia)
+                            ) AND pessoas.cpf = '".$request->cpf."'
+                              AND pessoas.lixeira = 0
+                              AND atribuicoes.lixeira = 0
 
-            FROM produtos
+                            ORDER BY pessoa_ou_setor_chave
 
-            JOIN atribuicoes ON atribuicoes.id = (
-                SELECT atribuicoes.id
-                
-                FROM atribuicoes
-
-                JOIN pessoas
-                    ON (atribuicoes.pessoa_ou_setor_chave = 'pessoa' AND atribuicoes.pessoa_ou_setor_valor = pessoas.id)
-                        OR (atribuicoes.pessoa_ou_setor_chave = 'setor' AND atribuicoes.pessoa_ou_setor_valor = pessoas.id_setor)
-                
-                WHERE (
-                    (produto_ou_referencia_chave = 'produto' AND produto_ou_referencia_valor = produtos.cod_externo)
-                   OR (produto_ou_referencia_chave = 'referencia' AND produto_ou_referencia_valor = produtos.referencia)
-                ) AND pessoas.cpf = '".$request->cpf."'
-                  AND pessoas.lixeira = 0
-                  AND atribuicoes.lixeira = 0
-
-                ORDER BY pessoa_ou_setor_chave
-
-                LIMIT 1
-            )
-
-            LEFT JOIN (
-                SELECT
-                    SUM(retiradas.qtd) AS qtd,
-                    id_atribuicao,
-                    DATE_FORMAT(MAX(retiradas.created_at), '%d/%m/%Y') AS ultima_retirada,
-                    DATE_ADD(MAX(retiradas.created_at), INTERVAL atribuicoes.validade DAY) AS proxima_retirada
-                FROM retiradas
-                JOIN atribuicoes
-                    ON atribuicoes.id = retiradas.id_atribuicao
-                WHERE DATE_ADD(DATE(retiradas.created_at), INTERVAL atribuicoes.validade DAY) >= CURDATE()
-                GROUP BY
-                    id_atribuicao,
-                    atribuicoes.validade
-            ) AS ret ON ret.id_atribuicao = atribuicoes.id
-        "));
+                            LIMIT 1
+                        )"))->leftjoin(DB::raw("(
+                            SELECT
+                                SUM(retiradas.qtd) AS qtd,
+                                id_atribuicao,
+                                DATE_FORMAT(MAX(retiradas.created_at), '%d/%m/%Y') AS ultima_retirada,
+                                DATE_ADD(MAX(retiradas.created_at), INTERVAL atribuicoes.validade DAY) AS proxima_retirada
+                            FROM retiradas
+                            JOIN atribuicoes
+                                ON atribuicoes.id = retiradas.id_atribuicao
+                            WHERE DATE_ADD(DATE(retiradas.created_at), INTERVAL atribuicoes.validade DAY) >= CURDATE()
+                            GROUP BY
+                                id_atribuicao,
+                                atribuicoes.validade
+                        ) AS ret"), "ret.id_atribuicao", "atribuicoes.id")
+                        ->get();
         $resultado = array();
         foreach ($consulta as $linha) {
             if ($linha->foto) {
@@ -354,14 +342,12 @@ class ApiController extends Controller {
                 $resultado->msg = "Máquina não comodatada para nenhuma empresa";
                 return json_encode($resultado);
             }
-            $ja_retirados = DB::select(DB::raw("
-                SELECT IFNULL(SUM(retiradas.qtd), 0) AS qtd
-                FROM retiradas
-                JOIN atribuicoes
-                    ON atribuicoes.id = retiradas.id_atribuicao
-                WHERE DATE_ADD(DATE(retiradas.created_at), INTERVAL atribuicoes.validade DAY) >= CURDATE()
-                  AND atribuicoes.id = ".$retirada["id_atribuicao"]
-            ));
+            $ja_retirados = DB::table("retiradas")
+                                ->selectRaw("IFNULL(SUM(retiradas.qtd), 0) AS qtd")
+                                ->join("atribuicoes", "atribuicoes.id", "retiradas.id_atribuicao")
+                                ->whereRaw("DATE_ADD(DATE(retiradas.created_at), INTERVAL atribuicoes.validade DAY) >= CURDATE()")
+                                ->where("atribuicoes.id", $retirada["id_atribuicao"])
+                                ->get();
             $ja_retirados = sizeof($ja_retirados) ? floatval($ja_retirados[0]->qtd) : 0;
             if (floatval($atribuicao->qtd) < (floatval($retirada["qtd"]) + $ja_retirados)) {
                 $resultado->code = 401;

@@ -11,70 +11,34 @@ class AtribuicoesController extends Controller {
     public function verMaximo(Request $request) {
         $resultado = new \stdClass;
 
-        $query = $request->tipo == "produto" ? "
-            SELECT IFNULL(SUM(qtd), 0) AS saldo
-                    
-            FROM (
-                SELECT
-                    CASE
-                        WHEN (es = 'E') THEN qtd
-                        ELSE qtd * -1
-                    END AS qtd,
-                    id_produto
-
-                FROM estoque
-
-                JOIN maquinas_produtos AS mp
-                    ON mp.id = estoque.id_mp
-            ) AS estq
-
-            WHERE id_produto = ".$request->id
-        : "
-            SELECT IFNULL(SUM(qtd), 0) AS saldo
-                        
-            FROM (
-                SELECT
-                    CASE
-                        WHEN (es = 'E') THEN qtd
-                        ELSE qtd * -1
-                    END AS qtd,
-                    referencia
-
-                FROM estoque
-
-                JOIN maquinas_produtos AS mp
-                    ON mp.id = estoque.id_mp
-
-                JOIN produtos
-                    ON produtos.id = mp.id_produto
-            ) AS estq
-
-            WHERE referencia IN (
-                SELECT referencia
-                FROM produtos
-                WHERE id = ".$request->id."
-            )
+        $subquery = "(
+            SELECT
+                CASE
+                    WHEN (es = 'E') THEN qtd
+                    ELSE qtd * -1
+                END AS qtd,
         ";
-        $resultado->maximo = DB::select(DB::raw($query))[0]->saldo;
+        $subquery .= $request->tipo == "produto" ? "id_produto" : "referencia";
+        $subquery .= " FROM estoque";
+        $subquery .= " JOIN maquinas_produtos AS mp ON mp.id = estoque.id";
+        if ($request->tipo == "referencia") $subquery .= " JOIN produtos ON produtos.id = mp.id_produto";
+        $subquery .= ") AS estq";
 
-        $query = $request->tipo == "produto" ? "
-            SELECT validade
-
+        $where = $request->tipo == "produto" ? "id_produto = ".$request->id : "referencia IN (
+            SELECT referencia
             FROM produtos
+            WHERE id = ".$request->id."
+        )";
 
-            WHERE id_produto = ".$request->id
-        : "
-            SELECT MAX(validade) AS validade
-                        
-            FROM produtos
-
-            WHERE referencia IN (
-                SELECT referencia
-                FROM produtos
-                WHERE id = ".$request->id."
-            )
-        ";
-        $resultado->validade = DB::select(DB::raw($query))[0]->validade;
+        $resultado->maximo = DB::table(DB::raw($subquery))
+                                    ->selectRaw("IFNULL(SUM(qtd), 0) AS saldo")
+                                    ->whereRaw($where)
+                                    ->value("saldo");
+        
+        $resultado->validade = DB::table("produtos")
+                                    ->selectRaw($request->tipo == "produto" ? "validade" : "MAX(validade) AS validade")
+                                    ->whereRaw(str_replace("id_produto", "id", $where))
+                                    ->value("validade");
 
         return json_encode($resultado);
     }
