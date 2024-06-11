@@ -86,19 +86,15 @@
         }
 
         function retirada_pessoa(id_pessoa) {
-            $.get(URL + "/colaboradores/mostrar/" + id_pessoa, function(data) {
-                if (typeof data == "string") data = $.parseJSON(data);
-                let req = {};
-                ["inicio", "fim"].forEach((chave) => {
-                    req[chave] = "";
-                });
-                req.pessoa = data.nome;
-                req.id_pessoa = id_pessoa;
-                let link = document.createElement("a");
-                link.href = URL + "/relatorios/retiradas?" + $.param(req);
-                link.target = "_blank";
-                link.click();
+            let req = {};
+            ["inicio", "fim"].forEach((chave) => {
+                req[chave] = "";
             });
+            req.id_pessoa = id_pessoa;
+            let link = document.createElement("a");
+            link.href = URL + "/relatorios/retiradas?" + $.param(req);
+            link.target = "_blank";
+            link.click();
         }
     </script>
 

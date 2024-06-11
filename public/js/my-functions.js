@@ -521,8 +521,6 @@ function RelatorioItens() {
         let el_maquina = document.getElementById("rel-maquina2");
         if (el_inicio.value.length && el_fim.value.length) erro = validar_datas(el_inicio, el_fim, false);
         $.get(URL + "/relatorios/extrato/consultar", {
-            produto : el_produto.value,
-            maquina : el_maquina.value,
             id_produto : document.getElementById("rel-id_produto").value,
             id_maquina : document.getElementById("rel-id_maquina2").value,
         }, function(data) {
@@ -561,7 +559,6 @@ function RelatorioRetiradas() {
         let el_pessoa = document.getElementById("rel-pessoa");
         if (el_inicio.value.length && el_fim.value.length) erro = validar_datas(el_inicio, el_fim, false);
         $.get(URL + "/relatorios/retiradas/consultar", {
-            pessoa : el_pessoa.value,
             id_pessoa : document.getElementById("rel-id_pessoa").value
         }, function(data) {
             if (data) {

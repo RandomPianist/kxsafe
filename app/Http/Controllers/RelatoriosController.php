@@ -138,11 +138,17 @@ class RelatoriosController extends Controller {
         }
         if ($periodo) array_push($criterios, $periodo);
         if ($request->id_maquina) {
-            array_push($criterios, "Máquina: ".$request->maquina);
+            $maquina = DB::table("valores")
+                            ->where("id", $request->id_maquina)
+                            ->value("descr");
+            array_push($criterios, "Máquina: ".$maquina);
             array_push($filtro, "mp.id_maquina = ".$request->id_maquina);
         }
         if ($request->id_produto) {
-            array_push($criterios, "Produto: ".$request->produto);
+            $produto = DB::table("produtos")
+                            ->where("id", $request->id_produto)
+                            ->value("descr");
+            array_push($criterios, "Produto: ".$produto);
             array_push($filtro, "mp.id_produto = ".$request->id_produto);
         }
         $filtro = join(" AND ", $filtro);
@@ -246,7 +252,10 @@ class RelatoriosController extends Controller {
         }
         if ($periodo) array_push($criterios, $periodo);
         if ($request->id_pessoa) {
-            array_push($criterios, "Colaborador: ".$request->pessoa);
+            $pessoa = DB::table("pessoas")
+                            ->where("id", $request->id_pessoa)
+                            ->value("nome");
+            array_push($criterios, "Colaborador: ".$pessoa);
             array_push($filtro, "retiradas.id_pessoa = ".$request->id_pessoa);
         }
         $filtro = join(" AND ", $filtro);

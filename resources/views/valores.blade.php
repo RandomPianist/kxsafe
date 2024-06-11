@@ -121,19 +121,16 @@
         }
 
         function extrato_maquina(id_maquina) {
-            $.get(URL + "/valores/maquinas/mostrar/" + id_maquina, function(descr) {
-                let req = {};
-                ["inicio", "fim", "produto", "id_produto"].forEach((chave) => {
-                    req[chave] = "";
-                });
-                req.lm = "S";
-                req.maquina = descr;
-                req.id_maquina = id_maquina;
-                let link = document.createElement("a");
-                link.href = URL + "/relatorios/extrato?" + $.param(req);
-                link.target = "_blank";
-                link.click();
+            let req = {};
+            ["inicio", "fim", "id_produto"].forEach((chave) => {
+                req[chave] = "";
             });
+            req.lm = "S";
+            req.id_maquina = id_maquina;
+            let link = document.createElement("a");
+            link.href = URL + "/relatorios/extrato?" + $.param(req);
+            link.target = "_blank";
+            link.click();
         }
     </script>
     @if ($alias == "maquinas")
