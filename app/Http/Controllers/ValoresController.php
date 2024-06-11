@@ -87,7 +87,7 @@ class ValoresController extends Controller {
 
     public function listar($alias, Request $request) {
         $filtro = trim($request->filtro);
-        if (strlen($filtro)) {
+        if ($filtro) {
             $busca = $this->busca($alias, "descr LIKE '".$filtro."%'");
             if (sizeof($busca) < 3) $busca = $this->busca($alias, "descr LIKE '%".$filtro."%'");
             if (sizeof($busca) < 3) $busca = $this->busca($alias, "(descr LIKE '%".implode("%' AND descr LIKE '%", explode(" ", str_replace("  ", " ", $filtro)))."%')");

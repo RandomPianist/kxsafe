@@ -90,7 +90,7 @@ class RelatoriosController extends Controller {
 
     public function bilateral(Request $request) {
         if ($request->rel_grupo == "empresas-por-maquina") return $this->empresas_por_maquina($request);
-        else return $this->maquinas_por_empresa($request);
+        return $this->maquinas_por_empresa($request);
     }
 
     public function bilateral_consultar(Request $request) {

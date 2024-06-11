@@ -493,10 +493,11 @@ function RelatorioBilateral(_grupo) {
         });
     }
 
+    let titulo = "Empresas por máquina";
     if (grupo == "maquinas-por-empresa") {
         that.inverter();
-        var titulo = "Máquinas por empresa";
-    } else var titulo = "Empresas por máquina";
+        titulo = "Máquinas por empresa";
+    }
     document.getElementById("relatorioBilateralModalLabel").innerHTML = titulo;
     
     limpar_invalido();
@@ -579,12 +580,9 @@ function RelatorioRetiradas() {
 
 function limitar(el) {
     let texto = el.value.toString();
-    if (!texto.length) el.value = 1;
-    else if (texto.length > 11) el.value = "".padStart(11, "9");
-    else if (parseInt(texto) < 1) el.value = 1;
-    if (el.id == "quantidade" && location.href.indexOf("colaboradores") > -1) {
-        if (parseInt(texto) > limite_maximo) el.value = limite_maximo;
-    }
+    if (el.id == "quantidade" && location.href.indexOf("colaboradores") > -1 && parseInt(texto) > limite_maximo) el.value = limite_maximo;
+    if (!texto.length || parseInt(texto) < 1) el.value = 1;
+    if (texto.length > 11) el.value = "".padStart(11, "9");
 }
 
 function numerico(el) {

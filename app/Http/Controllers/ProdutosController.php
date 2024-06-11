@@ -35,7 +35,7 @@ class ProdutosController extends Controller {
 
     public function listar(Request $request) {
         $filtro = trim($request->filtro);
-        if (strlen($filtro)) {
+        if ($filtro) {
             $busca = $this->busca("produtos.descr LIKE '".$filtro."%'");
             if (sizeof($busca) < 3) $busca = $this->busca("produtos.descr LIKE '%".$filtro."%'");
             if (sizeof($busca) < 3) $busca = $this->busca("(produtos.descr LIKE '%".implode("%' AND produtos.descr LIKE '%", explode(" ", str_replace("  ", " ", $filtro)))."%')");

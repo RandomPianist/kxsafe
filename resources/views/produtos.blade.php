@@ -155,10 +155,9 @@
                         document.getElementById("cod_externo").disabled = true;
                     });
                     modal("produtosModal", id, function() {
-                        if (data.foto) {
-                            el_img.src = data.foto;
-                            el_img.parentElement.classList.remove("d-none");
-                        } else el_img.parentElement.classList.add("d-none");
+                        el_img.src = data.foto;
+                        el_img.parentElement.classList.remove("d-none");
+                        if (!data.foto) el_img.parentElement.classList.add("d-none");
                     });
                 });
             } else {
