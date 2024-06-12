@@ -133,17 +133,17 @@ class EmpresasController extends Controller {
 
     public function listarSetores($id) {
         return json_encode(
-            DB::table("empresas_setores")
+            DB::table("empresas_setores AS es")
                 ->select(
-                    "empresas_setores.id",
+                    "es.id",
                     "setores.descr"
                 )
-                ->join("setores", "setores.id", "empresas_setores.id_setor")
-                ->join("empresas", "empresas.id", "empresas_setores.id_empresa")
+                ->join("setores", "setores.id", "es.id_setor")
+                ->join("empresas", "empresas.id", "es.id_empresa")
                 ->where("setores.lixeira", 0)
                 ->where("empresas.lixeira", 0)
-                ->where("empresas_setores.lixeira", 0)
-                ->where("empresas_setores.id_empresa", $id)
+                ->where("es.lixeira", 0)
+                ->where("es.id_empresa", $id)
                 ->get()
         );
     }
