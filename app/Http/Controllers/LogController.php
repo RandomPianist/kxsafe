@@ -19,39 +19,31 @@ class LogController extends Controller {
     }
 
     public function consultar($arr_tabelas, $alias = "", $where = "") {
-        $tabelas = "'".join("' OR '", $arr_tabelas)."'";
-        $query = "
-            SELECT
-                IFNULL(pessoas.nome, CONCAT(
-                    'API',
-                    IFNULL(CONCAT(' - ', log.nome), '')
-                )) AS nome,
-                DATE_FORMAT(log.created_at, '%d/%m/%Y às %H:%i') AS data
-            
-            FROM log
-
-            LEFT JOIN pessoas
-                ON log.id_pessoa = pessoas.id
-        ";
-        if (in_array("pessoas", $arr_tabelas)) {
-            $query .= "
-                LEFT JOIN pessoas AS aux
-                    ON aux.id = log.fk
-
-                LEFT JOIN setores
-                    ON setores.id = aux.id_setor
-            ";
-        }
-        $query .= $alias ? "
-            JOIN valores
-                ON valores.id = log.fk
-
-            WHERE alias = '".$alias."'
-        " : "
-            WHERE tabela IN (".$tabelas.")
-        ";
-        $query .= $where." ORDER BY log.id DESC";
-        $consulta = DB::select(DB::raw($query));
+        $consulta = DB::table("log")
+                        ->select(
+                            DB::raw("
+                                IFNULL(pessoas.nome, CONCAT(
+                                    'API',
+                                    IFNULL(CONCAT(' - ', log.nome), '')
+                                )) AS nome
+                            "),
+                            DB::raw("DATE_FORMAT(log.created_at, '%d/%m/%Y às %H:%i') AS data")
+                        )
+                        ->leftjoin("pessoas", "pessoas.id", "log.id_pessoa")
+                        ->leftjoin("pessoas AS aux", "aux.id", "log.fk")
+                        ->leftjoin("setores", "setores.id", "aux.id_setor")
+                        ->leftjoin("valores", "valores.id", "log.fk")
+                        ->where(function($sql) use($arr_tabelas, $alias, $where) {
+                            if (in_array("pessoas", $arr_tabelas)) {
+                                $sql->whereNotNull("aux.id")
+                                    ->whereNotNull("setores.id");
+                            }
+                            if ($alias) $sql->where("alias", $alias);
+                            else $sql->whereIn("tabela", $arr_tabelas);
+                            if ($where) $sql->whereRaw($where);
+                        })
+                        ->orderby("log.id")
+                        ->get();
         return !intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa) ? sizeof($consulta) ? "Última atualização feita por ".$consulta[0]->nome." em ".$consulta[0]->data : "Nenhuma atualização feita" : "";
     }
 }
