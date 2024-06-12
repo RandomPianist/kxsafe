@@ -12,10 +12,6 @@ use App\Models\MaquinasProdutos;
 
 class ValoresController extends Controller {
     private function busca($alias, $where) {
-        if ($alias == "maquinas") {
-            $id_emp = intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa);
-            if ($id_emp) $where .= " AND ".$id_emp." IN (aux2.id, aux2.id_matriz)";
-        }
         return DB::table("valores")
                     ->select(
                         "valores.id",
@@ -62,6 +58,12 @@ class ValoresController extends Controller {
                             ->selectRaw("DISTINCTROW id_maquina")
                             ->join("estoque", "estoque.id_mp", "mp.id"),
                     "aux3", "aux3.id_maquina", "valores.id")
+                    ->where(function($sql) use ($alias) {
+                        if ($alias == "maquinas") {
+                            $id_emp = intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa);
+                            if ($id_emp) $sql->whereRaw($id_emp." IN (aux2.id, aux2.id_matriz)");
+                        }
+                    })
                     ->whereRaw($where)
                     ->where("alias", $alias)
                     ->where("lixeira", 0)
