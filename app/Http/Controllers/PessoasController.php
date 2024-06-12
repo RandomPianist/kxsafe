@@ -14,12 +14,6 @@ use App\Models\Pessoas;
 
 class PessoasController extends Controller {
     private function busca($where, $tipo) {
-        $id_emp = intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa);
-        if ($id_emp) $where .= " AND ".$id_emp." IN (empresas.id, empresas.id_matriz)";
-        if (in_array($tipo, ["A", "U"])) {
-            $where .= " AND setores.cria_usuario = 1";
-            if ($tipo == "A") $where .= " AND pessoas.id_empresa = 0";
-        } else $where .= " AND setores.cria_usuario = 0 AND pessoas.supervisor = ".($tipo == "S" ? "1" : "0");
         return DB::table("pessoas")
                     ->select(
                         "pessoas.id",
@@ -48,6 +42,17 @@ class PessoasController extends Controller {
                             ->select("id_pessoa")
                             ->groupby("id_pessoa"),
                     "ret", "ret.id_pessoa", "pessoas.id")
+                    ->where(function($sql) use($tipo) {
+                        $id_emp = intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa);
+                        if ($id_emp) $sql->whereRaw($id_emp." IN (empresas.id, empresas.id_matriz)");
+                        if (in_array($tipo, ["A", "U"])) {
+                            $sql->where("setores.cria_usuario", 1);
+                            if ($tipo == "A") $sql->where("pessoas.id_empresa", 0);
+                        } else {
+                            $sql->where("setores.cria_usuario", 0)
+                                ->where("pessoas.supervisor", ($tipo == "S" ? 1 : 0));
+                        }
+                    })
                     ->whereRaw($where)
                     ->where("pessoas.lixeira", 0)
                     ->get();
