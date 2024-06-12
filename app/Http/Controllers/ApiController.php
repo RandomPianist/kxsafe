@@ -34,32 +34,25 @@ class ApiController extends Controller {
     }
 
     public function maquinas(Request $request) {
-        $query = "
+        return DB::table(DB::raw("(
             SELECT
-                tab.id,
-                tab.descr
-            
-            FROM (
-                SELECT
-                    id,
-                    descr
-                FROM valores
-                WHERE alias = 'maquinas'
-                  AND lixeira = 0
-            ) AS tab
-        ";
-        if (isset($request->idEmp)) {
-            $query .= "
-                JOIN (
-                    SELECT id_maquina
-                    FROM comodatos
-                    WHERE id_empresa = ".$request->idEmp."
-                      AND CURDATE() >= inicio
-                      AND CURDATE() < fim
-                ) AS aux ON aux.id_maquina = tab.id
-            ";
-        }
-        return DB::select(DB::raw($query));
+                id,
+                descr
+            FROM valores
+            WHERE alias = 'maquinas'
+                AND lixeira = 0
+        ) AS tab"))->selectRaw("tab.*")->leftjoinSub(
+            DB::table("comodatos")
+                ->select("id_maquina")
+                ->where(function($sql) use($request) {
+                    if (isset($request->idEmp)) $sql->where("id_empresa", $request->idEmp);
+                })
+                ->whereRaw("CURDATE() >= inicio")
+                ->whereRaw("CURDATE() < fim"),
+        "aux", "aux.id_maquina", "tab.id")
+        ->where(function($sql) use($request) {
+            if (isset($request->idEmp)) $sql->whereNotNull("aux.id_maquina");
+        })->get();
     }
 
     public function produtos_por_maquina(Request $request) {
@@ -79,7 +72,7 @@ class ApiController extends Controller {
                                     ELSE qtd * -1
                                 END AS qtd,
                                 id_mp
-                    
+                            
                             FROM estoque
                         ) AS estq"))->select(
                             DB::raw("IFNULL(SUM(qtd), 0) AS saldo"),
