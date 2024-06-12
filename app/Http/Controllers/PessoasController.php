@@ -40,13 +40,14 @@ class PessoasController extends Controller {
                                 ELSE 1
                             END AS possui_retiradas
                         ")
-                    )->leftjoin("setores", "setores.id", "pessoas.id_setor")
+                    )
+                    ->leftjoin("setores", "setores.id", "pessoas.id_setor")
                     ->leftjoin("empresas", "empresas.id", "pessoas.id_empresa")
-                    ->leftjoin(DB::raw("(
-                        SELECT id_pessoa
-                        FROM retiradas
-                        GROUP BY id_pessoa
-                    ) AS ret"), "ret.id_pessoa", "pessoas.id")
+                    ->leftjoinSub(
+                        DB::table("retiradas")
+                            ->select("id_pessoa")
+                            ->groupby("id_pessoa"),
+                    "ret", "ret.id_pessoa", "pessoas.id")
                     ->whereRaw($where)
                     ->where("pessoas.lixeira", 0)
                     ->get();

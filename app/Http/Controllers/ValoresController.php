@@ -38,33 +38,30 @@ class ValoresController extends Controller {
                             END AS comodato
                         ")
                     )
-                    ->leftjoin(DB::raw("(
-                        SELECT
-                            id_maquina,
-                            id_empresa,
-                            DATE_FORMAT(fim, '%d/%m/%Y') AS fim_formatado
-
-                        FROM comodatos
-
-                        WHERE CURDATE() >= inicio
-                          AND CURDATE() < fim
-                    ) AS aux1"), "aux1.id_maquina", "valores.id")
-                    ->leftjoin(DB::raw("(
-                        SELECT
-                            id,
-                            id_matriz,
-                            nome_fantasia
-
-                        FROM empresas
-
-                        WHERE lixeira = 0
-                    ) AS aux2"), "aux2.id", "aux1.id_empresa")
-                    ->leftjoin(DB::raw("(
-                        SELECT DISTINCTROW id_maquina
-                        FROM maquinas_produtos AS mp
-                        JOIN estoque
-                            ON estoque.id_mp = mp.id
-                    ) AS aux3"), "aux3.id_maquina", "valores.id")
+                    ->leftjoinSub(
+                        DB::table("comodatos")
+                            ->select(
+                                "id_maquina",
+                                "id_empresa",
+                                DB::raw("DATE_FORMAT(fim, '%d/%m/%Y') AS fim_formatado")
+                            )
+                            ->whereRaw("CURDATE() >= inicio")
+                            ->whereRaw("CURDATE() < fim"),
+                    "aux1", "aux1.id_maquina", "valores.id")
+                    ->leftjoinSub(
+                        DB::table("empresas")
+                            ->select(
+                                "id",
+                                "id_matriz",
+                                "nome_fantasia"
+                            )
+                            ->where("lixeira", 0),
+                    "aux2", "aux2.id", "aux1.id_empresa")
+                    ->leftjoinSub(
+                        DB::table("maquinas_produtos AS mp")
+                            ->selectRaw("DISTINCTROW id_maquina")
+                            ->join("estoque", "estoque.id_mp", "mp.id"),
+                    "aux3", "aux3.id_maquina", "valores.id")
                     ->whereRaw($where)
                     ->where("alias", $alias)
                     ->where("lixeira", 0)
@@ -121,12 +118,8 @@ class ValoresController extends Controller {
                                 ELSE ''
                             END AS aviso
                         ")
-                        ->leftjoin(DB::raw("(
-                            SELECT
-                                IFNULL(SUM(qtd), 0) AS saldo,
-                                mp.id_maquina
-                                
-                            FROM (
+                        ->leftjoinSub(
+                            DB::table(DB::raw("(
                                 SELECT
                                     CASE
                                         WHEN (es = 'E') THEN qtd
@@ -135,27 +128,25 @@ class ValoresController extends Controller {
                                     id_mp
                         
                                 FROM estoque
-                            ) AS estq
-
-                            JOIN maquinas_produtos AS mp
-                                ON mp.id = estq.id_mp
-                        
-                            GROUP BY mp.id_maquina
-                        ) AS tab_estoque", "tab_estoque.id_maquina", "valores.id"))
-                        ->leftjoin(DB::raw("(
-                            SELECT
-                                id_maquina,
-                                empresas.nome_fantasia AS empresa,
-                                DATE_FORMAT(fim, '%d/%m/%Y') AS fim
-                            
-                            FROM comodatos
-                            
-                            JOIN empresas
-                                ON empresas.id = comodatos.id_empresa
-                            
-                            WHERE CURDATE() >= inicio
-                              AND CURDATE() < fim
-                        ) AS tab_comodatos", "tab_comodatos.id_maquina", "valores.id"))
+                            ) AS estq"))
+                            ->select(
+                                DB::raw("IFNULL(SUM(qtd), 0) AS saldo"),
+                                "mp.id_maquina"
+                            )
+                            ->join("maquinas_produtos AS mp", "mp.id", "estq.id_mp")
+                            ->groupby("id_maquina"),
+                        "tab_estoque", "tab_estoque.id_maquina", "valores.id")
+                        ->leftjoinSub(
+                            DB::table("comodatos")
+                                ->select(
+                                    "id_maquina",
+                                    "empresas.nome_fantasia AS empresa",
+                                    DB::raw("DATE_FORMAT(fim, '%d/%m/%Y') AS fim")
+                                )
+                                ->join("empresas", "empresas.id", "comodatos.id_empresa")
+                                ->whereRaw("CURDATE() >= inicio")
+                                ->whereRaw("CURDATE() < fim"),
+                        "tab_comodatos", "tab_comodatos.id_maquina", "valores.id")
                         ->value("aviso");
             $vinculo = $aviso != "";
         } else {

@@ -72,24 +72,19 @@ class ApiController extends Controller {
                             DB::raw("IFNULL(mp.minimo, 0) AS minimo"),
                             DB::raw("IFNULL(mp.maximo, 0) AS maximo")
                         )
-                        ->leftjoin(DB::raw("(
+                        ->leftjoinSub(DB::table(DB::raw("(
                             SELECT
-                                IFNULL(SUM(qtd), 0) AS saldo,
+                                CASE
+                                    WHEN (es = 'E') THEN qtd
+                                    ELSE qtd * -1
+                                END AS qtd,
                                 id_mp
-                                
-                            FROM (
-                                SELECT
-                                    CASE
-                                        WHEN (es = 'E') THEN qtd
-                                        ELSE qtd * -1
-                                    END AS qtd,
-                                    id_mp
-                        
-                                FROM estoque
-                            ) AS estq
-                        
-                            GROUP BY id_mp
-                        ) AS tab"), "tab.id_mp", "mp.id")
+                    
+                            FROM estoque
+                        ) AS estq"))->select(
+                            DB::raw("IFNULL(SUM(qtd), 0) AS saldo"),
+                            "id_mp"
+                        )->groupBy("id_mp"), "tab", "tab.id_mp", "mp.id")
                         ->join("produtos", "produtos.id", "mp.id_produto")
                         ->where("mp.id_maquina", $request->idMaquina)
                         ->where("produtos.lixeira", 0)
@@ -265,20 +260,21 @@ class ApiController extends Controller {
                             ORDER BY pessoa_ou_setor_chave
 
                             LIMIT 1
-                        )"))->leftjoin(DB::raw("(
-                            SELECT
-                                SUM(retiradas.qtd) AS qtd,
-                                id_atribuicao,
-                                DATE_FORMAT(MAX(retiradas.created_at), '%d/%m/%Y') AS ultima_retirada,
-                                DATE_ADD(MAX(retiradas.created_at), INTERVAL atribuicoes.validade DAY) AS proxima_retirada
-                            FROM retiradas
-                            JOIN atribuicoes
-                                ON atribuicoes.id = retiradas.id_atribuicao
-                            WHERE DATE_ADD(DATE(retiradas.created_at), INTERVAL atribuicoes.validade DAY) >= CURDATE()
-                            GROUP BY
-                                id_atribuicao,
-                                atribuicoes.validade
-                        ) AS ret"), "ret.id_atribuicao", "atribuicoes.id")
+                        )"))->leftjoinSub(
+                            DB::table("retiradas")
+                                ->select(
+                                    DB::raw("SUM(retiradas.qtd) AS qtd"),
+                                    "id_atribuicao",
+                                    DB::raw("DATE_FORMAT(MAX(retiradas.created_at), '%d/%m/%Y') AS ultima_retirada"),
+                                    DB::raw("DATE_ADD(MAX(retiradas.created_at), INTERVAL atribuicoes.validade DAY) AS proxima_retirada")
+                                )
+                                ->join("atribuicoes", "atribuicoes.id", "retiradas.id_atribuicao")
+                                ->whereRaw("DATE_ADD(DATE(retiradas.created_at), INTERVAL atribuicoes.validade DAY) >= CURDATE()")
+                                ->groupby(
+                                    "id_atribuicao",
+                                    "atribuicoes.validade"
+                                ),
+                        "ret", "ret.id_atribuicao", "atribuicoes.id")
                         ->get();
         $resultado = array();
         foreach ($consulta as $linha) {
