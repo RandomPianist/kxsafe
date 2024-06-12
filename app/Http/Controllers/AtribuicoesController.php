@@ -87,34 +87,22 @@ class AtribuicoesController extends Controller {
     }
 
     public function mostrar(Request $request) {
-        return json_encode(
-            $request->tipo == "produto" ?
-                DB::table("atribuicoes")
-                    ->select(
-                        "atribuicoes.id",
-                        "produtos.descr AS produto_ou_referencia_valor",
-                        "atribuicoes.qtd",
-                        "atribuicoes.validade"
-                    )
-                    ->join("produtos", "produtos.cod_externo", "atribuicoes.produto_ou_referencia_valor")
-                    ->where("pessoa_ou_setor_valor", $request->id)
-                    ->where("produto_ou_referencia_chave", $request->tipo)
-                    ->where("pessoa_ou_setor_chave", $request->tipo2)
-                    ->where("atribuicoes.lixeira", 0)
-                    ->get()
-            :
-                DB::table("atribuicoes")
-                    ->select(
-                        "id",
-                        "produto_ou_referencia_valor",
-                        "qtd",
-                        "validade"
-                    )
-                    ->where("pessoa_ou_setor_valor", $request->id)
-                    ->where("produto_ou_referencia_chave", $request->tipo)
-                    ->where("pessoa_ou_setor_chave", $request->tipo2)
-                    ->where("lixeira", 0)
-                    ->get()
-        );
+        $query = "SELECT atribuicoes.id, ";
+        if ($request->tipo == "produto") $query .= "produtos.descr AS ";
+        $query .= "produto_ou_referencia_valor, ";
+        $query .= "
+                atribuicoes.qtd,
+                atribuicoes.validade
+
+            FROM atribuicoes
+        ";
+        if ($request->tipo == "produto") $query .= " JOIN produtos ON produtos.cod_externo = produto_ou_referencia_valor ";
+        $query .= "WHERE
+                pessoa_ou_setor_valor = ".$request->id."
+            AND produto_ou_referencia_chave = '".$request->tipo."'
+            AND pessoa_ou_setor_chave = '".$request->tipo2."'
+            AND atribuicoes.lixeira = 0
+        ";
+        return json_encode(DB::select(DB::raw($query)));
     }
 }
