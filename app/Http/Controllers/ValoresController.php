@@ -149,6 +149,7 @@ class ValoresController extends Controller {
                                 ->whereRaw("CURDATE() >= inicio")
                                 ->whereRaw("CURDATE() < fim"),
                         "tab_comodatos", "tab_comodatos.id_maquina", "valores.id")
+                        ->where("valores.id", $id)
                         ->value("aviso");
             $vinculo = $aviso != "";
         } else {
