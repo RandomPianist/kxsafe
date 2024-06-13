@@ -169,18 +169,18 @@ class MaquinasController extends Controller {
     public function mov_estoque($id_produto, $api) {
         $log = new LogController;
         $maquinas = DB::table("valores")
-                        ->select("id")
                         ->where("alias", "maquinas")
-                        ->get();
+                        ->pluck("id")
+                        ->toArray();
         foreach ($maquinas as $maquina) {
             if (!sizeof(
                 DB::table("maquinas_produtos")
                     ->where("id_produto", $id_produto)
-                    ->where("id_maquina", $maquina->id)
+                    ->where("id_maquina", $maquina)
                     ->get()
             )) {
                 $gestor = new MaquinasProdutos;
-                $gestor->id_maquina = $maquina->id;
+                $gestor->id_maquina = $maquina;
                 $gestor->id_produto = $id_produto;
                 $gestor->save();
                 $log->inserir("C", "maquinas_produtos", $gestor->id, $api);

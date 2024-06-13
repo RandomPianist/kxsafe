@@ -108,13 +108,13 @@ class EmpresasController extends Controller {
         $log->inserir($request->id ? "E" : "C", "empresas", $linha->id);
         if (!$request->id) {
             $consulta = DB::table("setores")
-                            ->select("id")
                             ->where("padrao", 1)
-                            ->get();
+                            ->pluck("id")
+                            ->toArray();
             foreach ($consulta as $setor) {
                 $modelo = new EmpresasSetores;
                 $modelo->id_empresa = $linha->id;
-                $modelo->id_setor = $setor->id;
+                $modelo->id_setor = $setor;
                 $modelo->save();
                 $log = new LogController;
                 $log->inserir("C", "empresas_setores", $modelo->id);

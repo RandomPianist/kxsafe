@@ -118,11 +118,11 @@ class ProdutosController extends Controller {
         $consulta = DB::table("atribuicoes")
                         ->select("id")
                         ->where(function($sql) {
-                            $sql->whereIn("produto_ou_referencia_valor", DB::table("produtos")->select("cod_externo")->where("id", $request->id))
+                            $sql->whereIn("produto_ou_referencia_valor", DB::table("produtos")->where("id", $request->id)->pluck("cod_externo")->toArray())
                                 ->where("produto_ou_referencia_chave", "produto");
                         })
                         ->orWhere(function($sql) {
-                            $sql->whereIn("produto_ou_referencia_valor", DB::table("produtos")->select("referencia")->where("id", $request->id))
+                            $sql->whereIn("produto_ou_referencia_valor", DB::table("produtos")->where("id", $request->id)->pluck("referencia")->toArray())
                                 ->where("produto_ou_referencia_chave", "referencia");
                         })
                         ->get();

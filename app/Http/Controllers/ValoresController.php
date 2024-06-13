@@ -188,18 +188,18 @@ class ValoresController extends Controller {
         $linha->save();
         if ($alias == "maquinas") {
             $produtos = DB::table("produtos")
-                            ->select("id")
-                            ->get();
+                            ->pluck("id")
+                            ->toArray();
             foreach ($produtos as $produto) {
                 if (!sizeof(
                     DB::table("maquinas_produtos")
-                        ->where("id_produto", $produto->id)
+                        ->where("id_produto", $produto)
                         ->where("id_maquina", $linha->id)
                         ->get()
                 )) {
                     $gestor = new MaquinasProdutos;
                     $gestor->id_maquina = $linha->id;
-                    $gestor->id_produto = $produto->id;
+                    $gestor->id_produto = $produto;
                     $gestor->save();
                     $log->inserir("C", "maquinas_produtos", $gestor->id);
                 }

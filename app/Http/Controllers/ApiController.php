@@ -191,12 +191,12 @@ class ApiController extends Controller {
               AND id_maquina = ".$request->idMaquina
         );
         $consulta = DB::table("maquinas_produtos")
-                    ->select("id")
                     ->where("id_produto", $request->idProduto)
                     ->where("id_maquina", $request->idMaquina)
-                    ->get();
-        foreach ($consulta as $linha) {
-            $modelo = $log->inserir("E", "maquinas_produtos", $linha->id, true);
+                    ->pluck("id")
+                    ->toArray();
+        foreach ($consulta as $id) {
+            $modelo = $log->inserir("E", "maquinas_produtos", $id, true);
             if (isset($request->usu)) $modelo->nome = $request->usu;
             $modelo->save();
         }

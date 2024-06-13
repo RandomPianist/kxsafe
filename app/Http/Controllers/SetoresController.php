@@ -120,13 +120,13 @@ class SetoresController extends Controller {
                 if ($adm_ant) {
                     $lista = array();
                     $consulta = DB::table("users")
-                                    ->select("users.id")
                                     ->join("pessoas", "pessoas.id", "users.id_pessoa")
                                     ->where("id_setor", $request->id)
-                                    ->get();
+                                    ->pluck("users.id")
+                                    ->toArray();
                     foreach($consulta as $usuario) {
-                        array_push($lista, $usuario->id);
-                        $log->inserir("D", "users", $usuario->id);
+                        array_push($lista, $usuario);
+                        $log->inserir("D", "users", $usuario);
                     }
                     $lista = join(",", $lista);
                     if ($lista) {
@@ -159,12 +159,12 @@ class SetoresController extends Controller {
         $log->inserir($request->id ? "E" : "C", "setores", $linha->id);
         if ($linha->padrao) {
             $consulta = DB::table("empresas")
-                            ->select("id")
-                            ->get();
+                            ->pluck("id")
+                            ->toArray();
             foreach ($consulta as $empresa) {
                 if (!sizeof(
                     DB::table("empresas_setores")
-                        ->where("id_empresa", $empresa->id)
+                        ->where("id_empresa", $empresa)
                         ->where("id_setor", $linha->id)
                         ->get()
                 )) {
