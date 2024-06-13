@@ -117,21 +117,14 @@ class ProdutosController extends Controller {
         $lista = array();
         $consulta = DB::table("atribuicoes")
                         ->select("id")
-                        ->whereRaw("
-                            (
-                                produto_ou_referencia_valor IN (
-                                    SELECT descr
-                                    FROM produtos
-                                    WHERE id = ".$request->id."
-                                ) AND produto_ou_referencia_chave = 'produto'
-                            ) OR (
-                                produto_ou_referencia_valor IN (
-                                    SELECT referencia
-                                    FROM produtos
-                                    WHERE id = ".$request->id."
-                                ) AND produto_ou_referencia_chave = 'referencia'
-                            )
-                        ")
+                        ->where(function($sql) {
+                            $sql->whereIn("produto_ou_referencia_valor", DB::table("produtos")->select("cod_externo")->where("id", $request->id))
+                                ->where("produto_ou_referencia_chave", "produto");
+                        })
+                        ->orWhere(function($sql) {
+                            $sql->whereIn("produto_ou_referencia_valor", DB::table("produtos")->select("referencia")->where("id", $request->id))
+                                ->where("produto_ou_referencia_chave", "referencia");
+                        })
                         ->get();
         foreach ($consulta as $linha) {
             $modelo = Atribuicoes::find($linha->id);
