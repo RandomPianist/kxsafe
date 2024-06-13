@@ -32,17 +32,27 @@ class LogController extends Controller {
                         ->leftjoin("pessoas", "pessoas.id", "log.id_pessoa")
                         ->leftjoin("pessoas AS aux", "aux.id", "log.fk")
                         ->leftjoin("setores", "setores.id", "aux.id_setor")
+                        ->leftjoin("atribuicoes", function($join) {
+                            $join->on(function($sql) {
+                                $sql->on("atribuicoes.pessoa_ou_setor_valor", "aux.id")
+                                    ->whereRaw("atribuicoes.pessoa_ou_setor_chave = 'pessoa'");
+                            })->orOn(function($sql) {
+                                $sql->on("atribuicoes.pessoa_ou_setor_valor", "setores.id")
+                                    ->whereRaw("atribuicoes.pessoa_ou_setor_chave = 'setor'");
+                            });
+                        })
                         ->leftjoin("valores", "valores.id", "log.fk")
                         ->where(function($sql) use($arr_tabelas, $alias, $where) {
                             if (in_array("pessoas", $arr_tabelas)) {
                                 $sql->whereNotNull("aux.id")
                                     ->whereNotNull("setores.id");
+                                array_push($arr_tabelas, "atribuicoes");
                             }
                             if ($alias) $sql->where("alias", $alias);
-                            else $sql->whereIn("tabela", $arr_tabelas);
+                            else $sql->whereRaw("tabela IN ('".join("', '", $arr_tabelas)."')");
                             if ($where) $sql->whereRaw($where);
                         })
-                        ->orderby("log.id")
+                        ->orderby("log.id", "desc")
                         ->get();
         return !intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa) ? sizeof($consulta) ? "Última atualização feita por ".$consulta[0]->nome." em ".$consulta[0]->data : "Nenhuma atualização feita" : "";
     }
