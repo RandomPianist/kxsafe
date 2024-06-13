@@ -122,37 +122,7 @@ class RelatoriosController extends Controller {
     }
 
     public function extrato(Request $request) {
-        $filtro = array();
         $criterios = array();
-        $periodo = "";
-        if ($request->inicio || $request->fim) $periodo = "Período";
-        if ($request->inicio) {
-            $inicio = Carbon::createFromFormat('d/m/Y', $request->inicio)->format('Y-m-d');
-            array_push($filtro, "DATE(log.created_at) >= '".$inicio."'");
-            $periodo .= " de ".$request->inicio;
-        }
-        if ($request->fim) {
-            $fim = Carbon::createFromFormat('d/m/Y', $request->fim)->format('Y-m-d');
-            array_push($filtro, "DATE(log.created_at) <= '".$fim."'");
-            $periodo .= " até ".$request->fim;
-        }
-        if ($periodo) array_push($criterios, $periodo);
-        if ($request->id_maquina) {
-            $maquina = DB::table("valores")
-                            ->where("id", $request->id_maquina)
-                            ->value("descr");
-            array_push($criterios, "Máquina: ".$maquina);
-            array_push($filtro, "mp.id_maquina = ".$request->id_maquina);
-        }
-        if ($request->id_produto) {
-            $produto = DB::table("produtos")
-                            ->where("id", $request->id_produto)
-                            ->value("descr");
-            array_push($criterios, "Produto: ".$produto);
-            array_push($filtro, "mp.id_produto = ".$request->id_produto);
-        }
-        $filtro = join(" AND ", $filtro);
-        if (!$filtro) $filtro = "1";
         $lm = $request->lm == "S";
         $resultado = collect(
             DB::table("log")
@@ -188,7 +158,36 @@ class RelatoriosController extends Controller {
                 ->join("produtos", "produtos.id", "mp.id_produto")
                 ->join("valores", "valores.id", "mp.id_maquina")
                 ->leftjoin("pessoas", "pessoas.id", "log.id_pessoa")
-                ->whereRaw($filtro)
+                ->where(function($sql) use($request, &$criterios) {
+                    if ($request->inicio || $request->fim) {
+                        $periodo = "Período";
+                        if ($request->inicio) {
+                            $inicio = Carbon::createFromFormat('d/m/Y', $request->inicio)->format('Y-m-d');
+                            $sql->whereRaw("DATE(log.created_at) >= '".$inicio."'");
+                            $periodo .= " de ".$request->inicio;
+                        }
+                        if ($request->fim) {
+                            $fim = Carbon::createFromFormat('d/m/Y', $request->fim)->format('Y-m-d');
+                            $sql->whereRaw("DATE(log.created_at) <= '".$fim."'");
+                            $periodo .= " até ".$request->fim;
+                        }
+                        array_push($criterios, $periodo);
+                    }
+                    if ($request->id_maquina) {
+                        $maquina = DB::table("valores")
+                                        ->where("id", $request->id_maquina)
+                                        ->value("descr");
+                        array_push($criterios, "Máquina: ".$maquina);
+                        $sql->where("mp.id_maquina", $request->id_maquina);
+                    }
+                    if ($request->id_produto) {
+                        $produto = DB::table("produtos")
+                                        ->where("id", $request->id_produto)
+                                        ->value("descr");
+                        array_push($criterios, "Produto: ".$produto);
+                        $sql->where("mp.id_produto", $request->id_produto);
+                    }
+                })
                 ->where("log.tabela", "estoque")
                 ->where("produtos.lixeira", 0)
                 ->where("valores.lixeira", 0)
@@ -236,31 +235,7 @@ class RelatoriosController extends Controller {
     }
 
     public function retiradas(Request $request) {
-        $filtro = array();
-        $criterios = array();
-        $periodo = "";
-        if ($request->inicio || $request->fim) $periodo = "Período";
-        if ($request->inicio) {
-            $inicio = Carbon::createFromFormat('d/m/Y', $request->inicio)->format('Y-m-d');
-            array_push($filtro, "DATE(retiradas.created_at) >= '".$inicio."'");
-            $periodo .= " de ".$request->inicio;
-        }
-        if ($request->fim) {
-            $fim = Carbon::createFromFormat('d/m/Y', $request->fim)->format('Y-m-d');
-            array_push($filtro, "DATE(retiradas.created_at) <= '".$fim."'");
-            $periodo .= " até ".$request->fim;
-        }
-        if ($periodo) array_push($criterios, $periodo);
-        if ($request->id_pessoa) {
-            $pessoa = DB::table("pessoas")
-                            ->where("id", $request->id_pessoa)
-                            ->value("nome");
-            array_push($criterios, "Colaborador: ".$pessoa);
-            array_push($filtro, "retiradas.id_pessoa = ".$request->id_pessoa);
-        }
-        $filtro = join(" AND ", $filtro);
-        if (!$filtro) $filtro = "1";
-        
+        $criterios = array();        
         $resultado = collect(
             DB::table("retiradas")
                 ->select(
@@ -276,7 +251,29 @@ class RelatoriosController extends Controller {
                 ->join("comodatos", "comodatos.id", "retiradas.id_comodato")
                 ->join("valores", "valores.id", "comodatos.id_maquina")
                 ->leftjoin("pessoas AS supervisor", "supervisor.id", "retiradas.id_supervisor")
-                ->whereRaw($filtro)
+                ->where(function($sql) use($request, &$criterios) {
+                    if ($request->inicio || $request->fim) {
+                        $periodo = "Período";
+                        if ($request->inicio) {
+                            $inicio = Carbon::createFromFormat('d/m/Y', $request->inicio)->format('Y-m-d');
+                            $sql->whereRaw("DATE(retiradas.created_at) >= '".$inicio."'");
+                            $periodo .= " de ".$request->inicio;
+                        }
+                        if ($request->fim) {
+                            $fim = Carbon::createFromFormat('d/m/Y', $request->fim)->format('Y-m-d');
+                            $sql->whereRaw("DATE(retiradas.created_at) <= '".$fim."'");
+                            $periodo .= " até ".$request->fim;
+                        }
+                        array_push($criterios, $periodo);
+                    }
+                    if ($request->id_pessoa) {
+                        $pessoa = DB::table("pessoas")
+                                        ->where("id", $request->id_pessoa)
+                                        ->value("nome");
+                        array_push($criterios, "Colaborador: ".$pessoa);
+                        $sql->where("retiradas.id_pessoa", $request->id_pessoa);
+                    }
+                })
                 ->orderby("retiradas.id")
                 ->get()
         )->groupBy("id_pessoa")->map(function($itens) {
