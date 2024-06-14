@@ -109,8 +109,7 @@ class EmpresasController extends Controller {
         if (!$request->id) {
             $consulta = DB::table("setores")
                             ->where("padrao", 1)
-                            ->pluck("id")
-                            ->toArray();
+                            ->pluck("id");
             foreach ($consulta as $setor) {
                 $modelo = new EmpresasSetores;
                 $modelo->id_empresa = $linha->id;

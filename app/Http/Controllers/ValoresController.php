@@ -188,8 +188,7 @@ class ValoresController extends Controller {
         $linha->save();
         if ($alias == "maquinas") {
             $produtos = DB::table("produtos")
-                            ->pluck("id")
-                            ->toArray();
+                            ->pluck("id");
             foreach ($produtos as $produto) {
                 if (!sizeof(
                     DB::table("maquinas_produtos")

@@ -124,8 +124,7 @@ class ProdutosController extends Controller {
                             $sql->whereIn("produto_ou_referencia_valor", DB::table("produtos")->where("id", $request->id)->pluck("referencia")->toArray())
                                 ->where("produto_ou_referencia_chave", "referencia");
                         })
-                        ->pluck("id")
-                        ->toArray();
+                        ->pluck("id");
         foreach ($consulta as $atb) {
             $modelo = Atribuicoes::find($atb);
             $modelo->lixeira = 1;

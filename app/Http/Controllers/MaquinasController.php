@@ -170,8 +170,7 @@ class MaquinasController extends Controller {
         $log = new LogController;
         $maquinas = DB::table("valores")
                         ->where("alias", "maquinas")
-                        ->pluck("id")
-                        ->toArray();
+                        ->pluck("id");
         foreach ($maquinas as $maquina) {
             if (!sizeof(
                 DB::table("maquinas_produtos")

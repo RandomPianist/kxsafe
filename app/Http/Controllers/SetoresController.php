@@ -122,8 +122,7 @@ class SetoresController extends Controller {
                     $consulta = DB::table("users")
                                     ->join("pessoas", "pessoas.id", "users.id_pessoa")
                                     ->where("id_setor", $request->id)
-                                    ->pluck("users.id")
-                                    ->toArray();
+                                    ->pluck("users.id");
                     foreach($consulta as $usuario) {
                         array_push($lista, $usuario);
                         $log->inserir("D", "users", $usuario);
@@ -159,8 +158,7 @@ class SetoresController extends Controller {
         $log->inserir($request->id ? "E" : "C", "setores", $linha->id);
         if ($linha->padrao) {
             $consulta = DB::table("empresas")
-                            ->pluck("id")
-                            ->toArray();
+                            ->pluck("id");
             foreach ($consulta as $empresa) {
                 if (!sizeof(
                     DB::table("empresas_setores")
