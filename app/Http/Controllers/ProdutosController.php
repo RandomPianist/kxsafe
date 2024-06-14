@@ -116,22 +116,22 @@ class ProdutosController extends Controller {
         $log->inserir("D", "produtos", $linha->id);
         $lista = array();
         $consulta = DB::table("atribuicoes")
-                        ->select("id")
-                        ->where(function($sql) {
+                        ->where(function($sql) use ($request) {
                             $sql->whereIn("produto_ou_referencia_valor", DB::table("produtos")->where("id", $request->id)->pluck("cod_externo")->toArray())
                                 ->where("produto_ou_referencia_chave", "produto");
                         })
-                        ->orWhere(function($sql) {
+                        ->orWhere(function($sql) use ($request) {
                             $sql->whereIn("produto_ou_referencia_valor", DB::table("produtos")->where("id", $request->id)->pluck("referencia")->toArray())
                                 ->where("produto_ou_referencia_chave", "referencia");
                         })
-                        ->get();
-        foreach ($consulta as $linha) {
-            $modelo = Atribuicoes::find($linha->id);
+                        ->pluck("id")
+                        ->toArray();
+        foreach ($consulta as $atb) {
+            $modelo = Atribuicoes::find($atb);
             $modelo->lixeira = 1;
             $modelo->save();
             $log = new LogController;
-            $log->inserir("D", "atribuicoes", $linha->id);
+            $log->inserir("D", "atribuicoes", $atb);
         }
     }
 }
