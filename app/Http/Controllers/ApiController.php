@@ -148,7 +148,7 @@ class ApiController extends Controller {
                             DB::raw("IFNULL(tamanho, '') AS tamanho"),
                             "id_categoria AS idCategoria",
                             "cod_externo AS codExterno",
-                            "'123' AS usu"
+                            DB::raw("'123' AS usu")
                         )
                         ->where("id", $linha->id)
                         ->first();
