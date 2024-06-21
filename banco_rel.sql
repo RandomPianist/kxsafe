@@ -159,6 +159,9 @@ CREATE TABLE atribuicoes (
 	FOREIGN KEY (produto_ou_referencia_valor) REFERENCES produtos(referencia)
 );
 
+ALTER TABLE produtos ADD UNIQUE cod_externo (cod_externo(8));
+ALTER TABLE produtos ADD UNIQUE referencia (referencia(64), tamanho(32));
+
 CREATE TABLE retiradas (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	qtd NUMERIC(10,5),
