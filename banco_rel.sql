@@ -100,6 +100,9 @@ CREATE TABLE produtos (
 	FOREIGN KEY (id_categoria) REFERENCES valores(id)
 );
 
+ALTER TABLE produtos ADD UNIQUE cod_externo (cod_externo(8));
+ALTER TABLE produtos ADD UNIQUE referencia (referencia(64), tamanho(32));
+
 CREATE TABLE maquinas_produtos (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	descr VARCHAR(16),
@@ -159,9 +162,6 @@ CREATE TABLE atribuicoes (
 	FOREIGN KEY (produto_ou_referencia_valor) REFERENCES produtos(referencia)
 );
 
-ALTER TABLE produtos ADD UNIQUE cod_externo (cod_externo(8));
-ALTER TABLE produtos ADD UNIQUE referencia (referencia(64), tamanho(32));
-
 CREATE TABLE retiradas (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	qtd NUMERIC(10,5),
@@ -190,11 +190,17 @@ CREATE TABLE log (
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	FOREIGN KEY (id_pessoa) REFERENCES pessoas(id),
-	FOREIGN KEY (fk) REFERENCES valores(id),
-	FOREIGN KEY (fk) REFERENCES pessoas(id),
-	FOREIGN KEY (fk) REFERENCES users(id),
+	FOREIGN KEY (fk) REFERENCES atribuicoes(id),
+	FOREIGN KEY (fk) REFERENCES comodatos(id),
 	FOREIGN KEY (fk) REFERENCES empresas(id),
-	FOREIGN KEY (fk) REFERENCES produtos(id),
+	FOREIGN KEY (fk) REFERENCES empresas_setores(id),
 	FOREIGN KEY (fk) REFERENCES estoque(id),
-	FOREIGN KEY (fk) REFERENCES comodatos(id)
+	FOREIGN KEY (fk) REFERENCES log(id),
+	FOREIGN KEY (fk) REFERENCES maquinas_produtos(id),
+	FOREIGN KEY (fk) REFERENCES pessoas(id),
+	FOREIGN KEY (fk) REFERENCES produtos(id),
+	FOREIGN KEY (fk) REFERENCES retiradas(id),
+	FOREIGN KEY (fk) REFERENCES setores(id),
+	FOREIGN KEY (fk) REFERENCES users(id),
+	FOREIGN KEY (fk) REFERENCES valores(id)
 );
