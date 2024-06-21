@@ -195,7 +195,6 @@ CREATE TABLE log (
 	FOREIGN KEY (fk) REFERENCES empresas(id),
 	FOREIGN KEY (fk) REFERENCES empresas_setores(id),
 	FOREIGN KEY (fk) REFERENCES estoque(id),
-	FOREIGN KEY (fk) REFERENCES log(id),
 	FOREIGN KEY (fk) REFERENCES maquinas_produtos(id),
 	FOREIGN KEY (fk) REFERENCES pessoas(id),
 	FOREIGN KEY (fk) REFERENCES produtos(id),
