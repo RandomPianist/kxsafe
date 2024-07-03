@@ -29,6 +29,13 @@ class HomeController extends Controller {
                     ) > 0) $where .= " OR id_matriz = ".$id_emp;
                     $where .= ")";
                     break;
+                case "pessoas":
+                    $where .= " AND (id_empresa = ".$id_emp." OR id_empresa IN (
+                        SELECT id_matriz
+                        FROM empresas
+                        WHERE id = ".$id_emp."
+                    ))";
+                    break;
                 case "setores":
                     $where .= " AND cria_usuario = 0";
                     break;

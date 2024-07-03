@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use DB;
+use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Models\Pessoas;
 use App\Http\Controllers\EmpresasController;
 
 class RelatoriosController extends Controller {
@@ -251,6 +253,7 @@ class RelatoriosController extends Controller {
                 ->join("comodatos", "comodatos.id", "retiradas.id_comodato")
                 ->join("valores", "valores.id", "comodatos.id_maquina")
                 ->leftjoin("pessoas AS supervisor", "supervisor.id", "retiradas.id_supervisor")
+                ->leftjoin("empresas", "empresas.id", "pessoas.id_empresa")
                 ->where(function($sql) use($request, &$criterios) {
                     if ($request->inicio || $request->fim) {
                         $periodo = "Período";
@@ -266,12 +269,18 @@ class RelatoriosController extends Controller {
                         }
                         array_push($criterios, $periodo);
                     }
+                    $id_emp = intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa);
                     if ($request->id_pessoa) {
                         $pessoa = DB::table("pessoas")
                                         ->where("id", $request->id_pessoa)
                                         ->value("nome");
                         array_push($criterios, "Colaborador: ".$pessoa);
                         $sql->where("retiradas.id_pessoa", $request->id_pessoa);
+                    } else if ($id_emp) {
+                        $sql->where(function($query) use($id_emp) {
+                            $query->where("pessoas.id_empresa", $id_emp)
+                                ->orWhere("empresas.id_matriz", $id_emp);
+                        });
                     }
                 })
                 ->orderby("retiradas.id")

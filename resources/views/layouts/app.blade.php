@@ -87,11 +87,13 @@
                                 <i class = "my-icon fa-light fa-layer-group"></i>
                                 <span>Setores</span>
                             </a>
-                            <a href = "#">
-                                <i class = "my-icon fa-light fa-file-chart-line"></i>
-                                <span>Relatórios</span>
-                                <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
-                                <ul class = "dropdown-toolbar">
+                        @endif
+                        <a href = "#">
+                            <i class = "my-icon fa-light fa-file-chart-line"></i>
+                            <span>Relatórios</span>
+                            <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
+                            <ul class = "dropdown-toolbar">
+                                @if (!intval(App\Models\Pessoas::find(Auth::user()->id_pessoa)->id_empresa))
                                     <li onclick = "window.open('/kxsafe/relatorios/comodatos', '_blank')">
                                         <span>Locação</span>
                                     </li>
@@ -104,12 +106,12 @@
                                     <li onclick = "relatorio = new RelatorioBilateral('maquinas-por-empresa')">
                                         <span>Máquinas por empresa</span>
                                     </li>
-                                    <li onclick = "relatorio = new RelatorioRetiradas()">
-                                        <span>Retiradas</span>
-                                    </li>
-                                </ul>
-                            </a>
-                        @endif
+                                @endif
+                                <li onclick = "relatorio = new RelatorioRetiradas()">
+                                    <span>Retiradas</span>
+                                </li>
+                            </ul>
+                        </a>
                     </div>
                     <div class = "d-flex mx-3">
                         <div class = "user-card d-flex my-auto">
