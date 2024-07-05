@@ -105,4 +105,15 @@ class AtribuicoesController extends Controller {
         ";
         return json_encode(DB::select(DB::raw($query)));
     }
+
+    public function podeRetirar($id, $qtd) {
+        $atribuicao = Atribuicoes::find($id);
+        $ja_retirados = DB::table("retiradas")
+                            ->selectRaw("IFNULL(SUM(retiradas.qtd), 0) AS qtd")
+                            ->join("atribuicoes", "atribuicoes.id", "retiradas.id_atribuicao")
+                            ->whereRaw("DATE_ADD(retiradas.data, INTERVAL atribuicoes.validade DAY) >= CURDATE()")
+                            ->where("atribuicoes.id", $id)
+                            ->get();
+        return floatval($atribuicao->qtd) < (floatval($qtd) + (sizeof($ja_retirados) ? floatval($ja_retirados[0]->qtd) : 0));
+    }
 }

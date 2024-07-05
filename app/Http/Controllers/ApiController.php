@@ -7,6 +7,7 @@ use Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\MaquinasController;
+use App\Http\Controllers\AtribuicoesController;
 use App\Models\Valores;
 use App\Models\Produtos;
 use App\Models\Estoque;
@@ -257,11 +258,11 @@ class ApiController extends Controller {
                                 ->select(
                                     DB::raw("SUM(retiradas.qtd) AS qtd"),
                                     "id_atribuicao",
-                                    DB::raw("DATE_FORMAT(MAX(retiradas.created_at), '%d/%m/%Y') AS ultima_retirada"),
-                                    DB::raw("DATE_ADD(MAX(retiradas.created_at), INTERVAL atribuicoes.validade DAY) AS proxima_retirada")
+                                    DB::raw("DATE_FORMAT(MAX(retiradas.data), '%d/%m/%Y') AS ultima_retirada"),
+                                    DB::raw("DATE_ADD(MAX(retiradas.data), INTERVAL atribuicoes.validade DAY) AS proxima_retirada")
                                 )
                                 ->join("atribuicoes", "atribuicoes.id", "retiradas.id_atribuicao")
-                                ->whereRaw("DATE_ADD(DATE(retiradas.created_at), INTERVAL atribuicoes.validade DAY) >= CURDATE()")
+                                ->whereRaw("DATE_ADD(retiradas.data, INTERVAL atribuicoes.validade DAY) >= CURDATE()")
                                 ->groupby(
                                     "id_atribuicao",
                                     "atribuicoes.validade"
@@ -332,14 +333,8 @@ class ApiController extends Controller {
                 $resultado->msg = "Máquina não comodatada para nenhuma empresa";
                 return json_encode($resultado);
             }
-            $ja_retirados = DB::table("retiradas")
-                                ->selectRaw("IFNULL(SUM(retiradas.qtd), 0) AS qtd")
-                                ->join("atribuicoes", "atribuicoes.id", "retiradas.id_atribuicao")
-                                ->whereRaw("DATE_ADD(DATE(retiradas.created_at), INTERVAL atribuicoes.validade DAY) >= CURDATE()")
-                                ->where("atribuicoes.id", $retirada["id_atribuicao"])
-                                ->get();
-            $ja_retirados = sizeof($ja_retirados) ? floatval($ja_retirados[0]->qtd) : 0;
-            if (floatval($atribuicao->qtd) < (floatval($retirada["qtd"]) + $ja_retirados)) {
+            $atb_controller = new AtribuicoesController;
+            if ($atb_controller->podeRetirar($retirada["id_atribuicao"], $retirada["qtd"])) {
                 $resultado->code = 401;
                 $resultado->msg = "Essa quantidade de produtos não é permitida para essa pessoa";
                 return json_encode($resultado);
@@ -350,6 +345,7 @@ class ApiController extends Controller {
             $linha->id_produto = $retirada["id_produto"];
             $linha->id_comodato = $comodato[0]->id;
             $linha->qtd = $retirada["qtd"];
+            $linha->data = date("Y-m-d");
             $linha->save();
             $modelo = $log->inserir("C", "retiradas", $linha->id, true);
             $modelo->nome = "APP";
@@ -411,6 +407,7 @@ class ApiController extends Controller {
             $linha->id_produto = $retirada["id_produto"];
             $linha->id_comodato = $comodato[0]->id;
             $linha->qtd = $retirada["qtd"];
+            $linha->data = date("Y-m-d");
             $linha->save();
             $modelo = $log->inserir("C", "retiradas", $linha->id, true);
             $modelo->nome = "APP";

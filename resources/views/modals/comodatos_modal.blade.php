@@ -1,10 +1,10 @@
 
 <!-- Modal -->
-<div class = "modal fade" id = "comodatoModal" aria-labelledby = "comodatoModalLabel" aria-hidden = "true">
+<div class = "modal fade" id = "comodatosModal" aria-labelledby = "comodatosModalLabel" aria-hidden = "true">
     <div class = "modal-dialog modal-lg" role = "document">
         <div class = "modal-content">
             <div class = "modal-header">
-                <h6 class = "modal-title header-color" id = "comodatoModalLabel"></h6>
+                <h6 class = "modal-title header-color" id = "comodatosModalLabel"></h6>
                 <button type = "button" class = "close" data-dismiss = "modal" aria-label = "Close">
                     <span aria-hidden = "true">&times;</span>
                 </button>
@@ -58,12 +58,12 @@
 <script type = "text/javascript" language = "JavaScript">
     function comodatar(id) {
         $.get(URL + "/valores/{{ $alias }}/mostrar/" + id, function(descr) {
-            document.getElementById("comodatoModalLabel").innerHTML = "Locando " + descr;
+            document.getElementById("comodatosModalLabel").innerHTML = "Locando " + descr;
             Array.from(document.getElementsByClassName("id_maquina")).forEach((el) => {
                 el.value = id;
             });
             document.getElementById("comodato-inicio").value = hoje();
-            modal2("comodatoModal", ["comodato-fim", "comodato-empresa", "comodato-id_empresa"]);
+            modal2("comodatosModal", ["comodato-fim", "comodato-empresa", "comodato-id_empresa"]);
         });
     }
 
@@ -109,7 +109,7 @@
                 } else el_empresa.classList.add("invalido");
                 erro = data.texto;
             }
-            if (!erro) document.querySelector("#comodatoModal form").submit();
+            if (!erro) document.querySelector("#comodatosModal form").submit();
             else s_alert(erro);
         });
     }

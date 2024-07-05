@@ -253,5 +253,5 @@
     </script>
 
     @include("modals.setores_modal")
-    @include("modals.atribuicao_modal")
+    @include("modals.atribuicoes_modal")
 @endsection

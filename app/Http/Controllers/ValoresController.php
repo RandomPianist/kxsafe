@@ -79,7 +79,7 @@ class ValoresController extends Controller {
             }
         }
         $log = new LogController;
-        $ultima_atualizacao = $log->consultar(["valores"], $alias);
+        $ultima_atualizacao = $log->consultar("valores", $alias);
         $titulo = $alias == "maquinas" ? "Máquinas" : "Categorias";
         return view("valores", compact("alias", "titulo", "ultima_atualizacao", "comodato"));
     }

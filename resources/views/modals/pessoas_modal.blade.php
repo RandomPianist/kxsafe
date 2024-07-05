@@ -70,7 +70,7 @@
                         <div class = "row">
                             <div class = "col-6">
                                 <label for = "cpf" class = "custom-label-form">CPF: *</label>
-                                <input id = "cpf" name = "cpf" class = "form-control" autocomplete = "off" type = "text" onkeyup = "pessoa.formatar_cpf(this)" />
+                                <input id = "cpf" name = "cpf" class = "form-control" autocomplete = "off" type = "text" onkeyup = "formatar_cpf(this)" />
                             </div>
                             <div class = "col-5 pr-0 form-search-2">
                                 <label for = "setor" class = "custom-label-form">Setor: *</label>

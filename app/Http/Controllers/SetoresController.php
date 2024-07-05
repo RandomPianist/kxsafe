@@ -24,7 +24,7 @@ class SetoresController extends Controller {
 
     public function ver() {
         $log = new LogController;
-        $ultima_atualizacao = $log->consultar(["setores"]);
+        $ultima_atualizacao = $log->consultar("setores");
         return view("setores", compact("ultima_atualizacao"));
     }
 

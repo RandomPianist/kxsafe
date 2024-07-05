@@ -46,19 +46,19 @@
                             <span>Corporativo</span>
                             <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
                             <ul class = "dropdown-toolbar">
-                                <li onclick = "redirect('/kxsafe/empresas')">
+                                <li onclick = "redirect('/kxsafe-consulta/empresas')">
                                     <span>Empresas</span>
                                 </li>
                                 <li>
                                     <!-- <span>Colaboradores</span> -->
-                                    <span>Colaboradores<img class="dropdown-icon" src="/kxsafe/img/sort-down.png"></span>
+                                    <span>Colaboradores<img class="dropdown-icon" src="/kxsafe-consulta/img/sort-down.png"></span>
                                     <ul class="subdropdown-toolbar">
                                         @if (!intval(App\Models\Pessoas::find(Auth::user()->id_pessoa)->id_empresa))
-                                            <li onclick="redirect('/kxsafe/colaboradores/pagina/A')">Administradores</li>
+                                            <li onclick="redirect('/kxsafe-consulta/colaboradores/pagina/A')">Administradores</li>
                                         @endif
-                                        <li onclick="redirect('/kxsafe/colaboradores/pagina/F')">Funcionários</li>
-                                        <li onclick="redirect('/kxsafe/colaboradores/pagina/S')">Supervisores</li>
-                                        <li onclick="redirect('/kxsafe/colaboradores/pagina/U')">Usuários</li>
+                                        <li onclick="redirect('/kxsafe-consulta/colaboradores/pagina/F')">Funcionários</li>
+                                        <li onclick="redirect('/kxsafe-consulta/colaboradores/pagina/S')">Supervisores</li>
+                                        <li onclick="redirect('/kxsafe-consulta/colaboradores/pagina/U')">Usuários</li>
                                     </ul>
                                 </li>
                             </ul>
@@ -69,10 +69,10 @@
                                 <span>Itens</span>
                                 <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
                                 <ul class = "dropdown-toolbar">
-                                    <li onclick = "redirect('/kxsafe/valores/categorias')">
+                                    <li onclick = "redirect('/kxsafe-consulta/valores/categorias')">
                                         <span>Categorias</span>
                                     </li>
-                                    <li onclick = "redirect('/kxsafe/produtos')">
+                                    <li onclick = "redirect('/kxsafe-consulta/produtos')">
                                         <span>Produtos</span>
                                     </li>
                                 </ul>
@@ -94,7 +94,7 @@
                             <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
                             <ul class = "dropdown-toolbar">
                                 @if (!intval(App\Models\Pessoas::find(Auth::user()->id_pessoa)->id_empresa))
-                                    <li onclick = "window.open('/kxsafe/relatorios/comodatos', '_blank')">
+                                    <li onclick = "window.open('/kxsafe-consulta/relatorios/comodatos', '_blank')">
                                         <span>Locação</span>
                                     </li>
                                     <li onclick = "relatorio = new RelatorioBilateral('empresas-por-maquina')">
@@ -180,20 +180,6 @@
             function Pessoa(id) {
                 let that = this;
 
-                this.formatar_cpf = function(el) {
-                    el.classList.remove("invalido");
-                    let cpf = el.value;
-                    let num = cpf.replace(/[^\d]/g, '');
-                    let len = num.length;
-                    if (len <= 6) cpf = num.replace(/(\d{3})(\d{1,3})/g, '$1.$2');
-                    else if (len <= 9) cpf = num.replace(/(\d{3})(\d{3})(\d{1,3})/g, '$1.$2.$3');
-                    else {
-                        cpf = num.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/g, "$1.$2.$3-$4");
-                        cpf = cpf.substring(0, 14);
-                    }
-                    el.value = cpf;
-                }
-
                 this.toggle_user = function(setor) {
                     $.get(URL + "/setores/mostrar/" + setor, function(data) {
                         if (typeof data == "string") data = $.parseJSON(data);
@@ -230,23 +216,6 @@
                             if (!/^[a-zA-Z0-9-]+$/.test(parteDoDominio)) valido = false;
                         })
                         return valido;
-                    }
-
-                    let validar_cpf = function(__cpf) {
-                        __cpf = __cpf.replace(/\D/g, "");
-                        if (__cpf == "00000000000") return false;
-                        if (__cpf.length != 11) return false;
-                        let soma = 0;
-                        for (let i = 1; i <= 9; i++) soma = soma + (parseInt(__cpf.substring(i - 1, i)) * (11 - i));
-                        let resto = (soma * 10) % 11;
-                        if ((resto == 10) || (resto == 11)) resto = 0;
-                        if (resto != parseInt(__cpf.substring(9, 10))) return false;
-                        soma = 0;
-                        for (i = 1; i <= 10; i++) soma = soma + (parseInt(__cpf.substring(i - 1, i)) * (12 - i));
-                        resto = (soma * 10) % 11;
-                        if ((resto == 10) || (resto == 11)) resto = 0;
-                        if (resto != parseInt(__cpf.substring(10, 11))) return false;
-                        return true;
                     }
 
                     limpar_invalido();

@@ -171,6 +171,7 @@ CREATE TABLE retiradas (
 	id_supervisor INT,
 	id_produto INT,
 	observacao TEXT,
+	data DATE,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 	FOREIGN KEY (id_atribuicao) REFERENCES atribuicoes(id),

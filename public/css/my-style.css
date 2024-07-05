@@ -466,7 +466,9 @@ main {
     padding: 0 5px
 }
 
-.btn-table-action > .my-icon:hover, .texto-tabela:hover, .texto-tabela:hover i {
+.btn-table-action > .my-icon:hover,
+.texto-tabela:hover, .texto-tabela:hover i,
+#table-atribuicoes .my-icon:hover {
     color: #B4A204
 }
 

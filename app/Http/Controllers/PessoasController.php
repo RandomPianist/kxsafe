@@ -114,12 +114,12 @@ class PessoasController extends Controller {
                 break;
         }
         $log = new LogController;
-        $where = "setores.cria_usuario = 0 AND aux.supervisor = ".($tipo == "S" ? "1" : "0");
+        $where = "setores1.cria_usuario = 0 AND aux1.supervisor = ".($tipo == "S" ? "1" : "0");
         if (in_array($tipo, ["A", "U"])) {
-            $where = "setores.cria_usuario = 1";
-            if ($tipo == "A") $where .= " AND aux.id_empresa = 0";
+            $where = "setores1.cria_usuario = 1";
+            if ($tipo == "A") $where .= " AND aux1.id_empresa = 0";
         }
-        $ultima_atualizacao = $log->consultar(["pessoas"], "", $where);
+        $ultima_atualizacao = $log->consultar("pessoas", $where);
         return view("pessoas", compact("ultima_atualizacao", "titulo", "tipo"));
     }
 

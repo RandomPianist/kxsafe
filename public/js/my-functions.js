@@ -614,6 +614,7 @@ function mostrar_atribuicoes() {
                     "<td class = 'text-right'>" + atribuicao.qtd + "</td>" +
                     "<td class = 'text-right'>" + atribuicao.validade + "</td>" +
                     "<td class = 'text-center'>" +
+                        (location.href.indexOf("colaboradores") > -1 ? "<i class = 'my-icon far fa-hand-holding-box' title = 'Retirar' onclick = 'retirar(" + atribuicao.id + ")'></i>" : "") +
                         "<i class = 'my-icon far fa-trash-alt' title = 'Excluir' onclick = 'excluir_atribuicao(" + atribuicao.id + ")'></i>" +
                     "</td>" +
                 "</tr>";
@@ -626,14 +627,14 @@ function mostrar_atribuicoes() {
 }
 
 function atribuicao(grade, id) {
-    modal("atribuicaoModal", 0, function() {
+    modal("atribuicoesModal", 0, function() {
         pessoa_atribuindo = id;
         $.get(URL + "/" + (location.href.indexOf("colaboradores") > -1 ? "colaboradores" : "setores") + "/mostrar/" + id, function(data) {
             if (typeof data == "string") data = $.parseJSON(data);
             let div_produto = document.getElementById("div-produto").classList;
             let div_referencia = document.getElementById("div-referencia").classList;
             let nome = location.href.indexOf("colaboradores") > -1 ? data.nome.toUpperCase() : data.descr.toUpperCase();
-            document.getElementById("atribuicaoModalLabel").innerHTML = nome + " - Atribuindo " + (grade ? "grades" : "produtos");
+            document.getElementById("atribuicoesModalLabel").innerHTML = nome + " - Atribuindo " + (grade ? "grades" : "produtos");
             if (grade) {
                 document.getElementById("referencia").dataset.filter = id;
                 div_produto.add("d-none");
@@ -710,4 +711,35 @@ function foto_pessoa(seletor, caminho) {
         el.style.backgroundSize = "100% 100%";
         el.firstElementChild.classList.add("d-none");
     }
+}
+
+function formatar_cpf(el) {
+    el.classList.remove("invalido");
+    let cpf = el.value;
+    let num = cpf.replace(/[^\d]/g, '');
+    let len = num.length;
+    if (len <= 6) cpf = num.replace(/(\d{3})(\d{1,3})/g, '$1.$2');
+    else if (len <= 9) cpf = num.replace(/(\d{3})(\d{3})(\d{1,3})/g, '$1.$2.$3');
+    else {
+        cpf = num.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/g, "$1.$2.$3-$4");
+        cpf = cpf.substring(0, 14);
+    }
+    el.value = cpf;
+}
+
+function validar_cpf(__cpf) {
+    __cpf = __cpf.replace(/\D/g, "");
+    if (__cpf == "00000000000") return false;
+    if (__cpf.length != 11) return false;
+    let soma = 0;
+    for (let i = 1; i <= 9; i++) soma = soma + (parseInt(__cpf.substring(i - 1, i)) * (11 - i));
+    let resto = (soma * 10) % 11;
+    if ((resto == 10) || (resto == 11)) resto = 0;
+    if (resto != parseInt(__cpf.substring(9, 10))) return false;
+    soma = 0;
+    for (i = 1; i <= 10; i++) soma = soma + (parseInt(__cpf.substring(i - 1, i)) * (12 - i));
+    resto = (soma * 10) % 11;
+    if ((resto == 10) || (resto == 11)) resto = 0;
+    if (resto != parseInt(__cpf.substring(10, 11))) return false;
+    return true;
 }

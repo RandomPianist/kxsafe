@@ -244,27 +244,38 @@ class RelatoriosController extends Controller {
                     "retiradas.id_pessoa",
                     "pessoas.nome",
                     "produtos.descr AS produto",
+                    DB::raw("CASE
+                        WHEN valores.descr IS NOT NULL THEN valores.descr
+                        ELSE CONCAT('Sistema - ', ret_sis.nome)
+                    END AS maquina"),
                     "valores.descr AS maquina",
-                    DB::raw("DATE_FORMAT(retiradas.created_at, '%d/%m/%Y') AS data"),
+                    DB::raw("DATE_FORMAT(retiradas.data, '%d/%m/%Y') AS data"),
                     DB::raw("IFNULL(CONCAT('Liberado por ', supervisor.nome, IFNULL(CONCAT(' - ', retiradas.observacao), '')), '') AS obs")
                 )
                 ->join("produtos", "produtos.id", "retiradas.id_produto")
                 ->join("pessoas", "pessoas.id", "retiradas.id_pessoa")
-                ->join("comodatos", "comodatos.id", "retiradas.id_comodato")
-                ->join("valores", "valores.id", "comodatos.id_maquina")
+                ->leftjoin("comodatos", "comodatos.id", "retiradas.id_comodato")
+                ->leftjoin("valores", "valores.id", "comodatos.id_maquina")
                 ->leftjoin("pessoas AS supervisor", "supervisor.id", "retiradas.id_supervisor")
                 ->leftjoin("empresas", "empresas.id", "pessoas.id_empresa")
+                ->leftjoin("log", function($join) {
+                    $join->on(function($sql) {
+                        $sql->on("log.fk", "retiradas.id")
+                            ->where("log.tabela", "retiradas");
+                    });
+                })
+                ->leftjoin("pessoas AS ret_sis", "ret_sis.id", "log.id_pessoa")
                 ->where(function($sql) use($request, &$criterios) {
                     if ($request->inicio || $request->fim) {
                         $periodo = "Período";
                         if ($request->inicio) {
                             $inicio = Carbon::createFromFormat('d/m/Y', $request->inicio)->format('Y-m-d');
-                            $sql->whereRaw("DATE(retiradas.created_at) >= '".$inicio."'");
+                            $sql->whereDate("retiradas.data", ">=", $inicio);
                             $periodo .= " de ".$request->inicio;
                         }
                         if ($request->fim) {
                             $fim = Carbon::createFromFormat('d/m/Y', $request->fim)->format('Y-m-d');
-                            $sql->whereRaw("DATE(retiradas.created_at) <= '".$fim."'");
+                            $sql->whereDate("retiradas.data", "<=", $fim);
                             $periodo .= " até ".$request->fim;
                         }
                         array_push($criterios, $periodo);

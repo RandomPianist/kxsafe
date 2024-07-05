@@ -135,7 +135,7 @@
     </script>
     @if ($alias == "maquinas")
         @include("modals.estoque_modal")
-        @include("modals.comodato_modal")
+        @include("modals.comodatos_modal")
     @endif
     @include("modals.valores_modal")
 @endsection

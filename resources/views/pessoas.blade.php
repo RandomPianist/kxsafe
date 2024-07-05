@@ -98,5 +98,7 @@
         }
     </script>
 
-    @include("modals.atribuicao_modal")
+    @include("modals.atribuicoes_modal")
+    @include("modals.retiradas_modal")
+    @include("modals.supervisor_modal")
 @endsection
