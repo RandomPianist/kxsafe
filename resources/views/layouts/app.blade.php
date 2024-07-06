@@ -230,12 +230,12 @@
                     $.get(URL + "/setores/mostrar/" + id_setor, function(data) {
                         if (typeof data == "string") data = $.parseJSON(data);
                         if (parseInt(data.cria_usuario)) {
-                            if (!_email.value.length) {
+                            if (!_email.value) {
                                 erro = "Preencha o campo";
                                 _email.classList.add("invalido");
                             }
                         }
-                        if (!_cpf.value.length) {
+                        if (!_cpf.value) {
                             if (!erro) erro = "Preencha o campo";
                             else erro = "Preencha os campos";
                             _cpf.classList.add("invalido");
@@ -252,10 +252,10 @@
                                 _email.classList.add("invalido");
                             }
                             if (
-                                document.getElementById("password").value.length ||
+                                document.getElementById("password").value ||
                                 _email.value.toLowerCase() != anteriores.email.toLowerCase()
                             ) alterou = true;
-                        } else if (document.getElementById("senha").value.length) alterou = true;
+                        } else if (document.getElementById("senha").value) alterou = true;
                         if (!erro && !validar_cpf(_cpf.value)/* && _cpf.value.trim()*/) {
                             erro = "CPF inválido";
                             _cpf.classList.add("invalido");
@@ -264,10 +264,7 @@
                         
                         aux = document.getElementById("admissao").value;
                         if (aux) {
-                            aux = aux.split("/");
-                            const hj = new Date();
-                            const admissao = new Date(aux[2], aux[1] - 1, aux[0]);
-                            if (!erro && admissao > hj) erro = "A admissão não pode ser no futuro";
+                            if (!erro && eFuturo(aux)) erro = "A admissão não pode ser no futuro";
                         }
 
                         $.get(URL + "/colaboradores/consultar/", {

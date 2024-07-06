@@ -334,7 +334,7 @@ class ApiController extends Controller {
                 return json_encode($resultado);
             }
             $atb_controller = new AtribuicoesController;
-            if ($atb_controller->podeRetirar($retirada["id_atribuicao"], $retirada["qtd"])) {
+            if (!$atb_controller->podeRetirar($retirada["id_atribuicao"], $retirada["qtd"])) {
                 $resultado->code = 401;
                 $resultado->msg = "Essa quantidade de produtos não é permitida para essa pessoa";
                 return json_encode($resultado);

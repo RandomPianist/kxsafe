@@ -191,7 +191,7 @@
             let erro = "";
 
             let _cnpj = document.getElementById("cnpj");
-            if (!_cnpj.value.length) {
+            if (!_cnpj.value) {
                 erro = "Preencha o campo";
                 _cnpj.classList.add("invalido");
             }

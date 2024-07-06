@@ -85,7 +85,7 @@
             let invalida_descricao = false;
             let erro = "";
             let el = document.getElementById("descr");
-            if (!el.value.length) {
+            if (!el.value) {
                 erro = "Preencha o campo";
                 invalida_descricao = true;
             }

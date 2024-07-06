@@ -2,8 +2,8 @@ CREATE DATABASE kxsafe;
 USE kxsafe;
 
 CREATE TABLE valores (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  seq INT,
+  	id INT AUTO_INCREMENT PRIMARY KEY,
+  	seq INT,
 	descr VARCHAR(32),
 	alias VARCHAR(16),
 	lixeira TINYINT DEFAULT 0,

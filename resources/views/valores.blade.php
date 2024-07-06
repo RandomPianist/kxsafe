@@ -95,7 +95,7 @@
             limpar_invalido();
             let erro = "";
             let el = document.getElementById("descr");
-            if (!el.value.length) erro = "Preencha o campo";
+            if (!el.value) erro = "Preencha o campo";
             if (!erro && el.value.toUpperCase().trim() == anteriores.descr.toUpperCase().trim()) erro = "Não há alterações para salvar";
             $.get(URL + "/valores/{{ $alias }}/consultar/", {
                 descr : el.value.toUpperCase().trim()

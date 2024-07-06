@@ -226,7 +226,7 @@ window.onload = function() {
 function contar_char(el, max) {
     el.classList.remove("invalido");
     el.value = el.value.substring(0, max);
-    el.nextElementSibling.innerHTML = el.value.length + "/" + max;
+    el.nextElementSibling.innerHTML = el.value + "/" + max;
 }
 
 function modal(nome, id, callback) {
@@ -407,7 +407,7 @@ function verifica_vazios(arr, _erro) {
     let _alterou = false;
     arr.forEach((id) => {
         let el = document.getElementById(id);
-        let erro_ou_vazio = !el.value.length;
+        let erro_ou_vazio = !el.value;
         if (!erro_ou_vazio && id.indexOf("qtd-") > -1) erro_ou_vazio = !parseInt(el.value);
         if (erro_ou_vazio) {
             if (!_erro) _erro = "Preencha o campo";
@@ -447,6 +447,13 @@ function validar_datas(el_inicio, el_fim, comodato) {
         el_fim.classList.add("invalido");
     }
     return erro;
+}
+
+function eFuturo(data) {
+    data = data.split("/");
+    const hj = new Date();
+    const comp = new Date(data[2], data[1] - 1, data[0]);
+    return comp > hj;
 }
 
 function RelatorioBilateral(_grupo) {
@@ -517,7 +524,7 @@ function RelatorioItens() {
         let erro = "";
         let el_produto = document.getElementById("rel-produto");
         let el_maquina = document.getElementById("rel-maquina2");
-        if (el_inicio.value.length && el_fim.value.length) erro = validar_datas(el_inicio, el_fim, false);
+        if (el_inicio.value && el_fim.value) erro = validar_datas(el_inicio, el_fim, false);
         $.get(URL + "/relatorios/extrato/consultar", {
             id_produto : document.getElementById("rel-id_produto").value,
             id_maquina : document.getElementById("rel-id_maquina2").value,
@@ -555,7 +562,7 @@ function RelatorioRetiradas() {
         limpar_invalido();
         let erro = "";
         let el_pessoa = document.getElementById("rel-pessoa");
-        if (el_inicio.value.length && el_fim.value.length) erro = validar_datas(el_inicio, el_fim, false);
+        if (el_inicio.value && el_fim.value) erro = validar_datas(el_inicio, el_fim, false);
         $.get(URL + "/relatorios/retiradas/consultar", {
             id_pessoa : document.getElementById("rel-id_pessoa").value
         }, function(data) {

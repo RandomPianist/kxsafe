@@ -133,18 +133,4 @@ class ProdutosController extends Controller {
             $log->inserir("D", "atribuicoes", $atb);
         }
     }
-
-    public function grade($referencia) {
-        return json_encode(
-            DB::table("produtos")
-                ->select(
-                    "id",
-                    "descr",
-                    "tamanho"
-                )
-                ->where("lixeira", 0)
-                ->where("referencia", $referencia)
-                ->get()
-        );
-    }
 }

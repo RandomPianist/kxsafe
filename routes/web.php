@@ -75,22 +75,23 @@ Route::middleware("auth")->group(function () {
     });
 
     Route::group(["prefix" => "produtos"], function() {
-        Route::get ("/",                   [ProdutosController::class, "ver"]);
-        Route::get ("/listar",             [ProdutosController::class, "listar"]);
-        Route::get ("/consultar",          [ProdutosController::class, "consultar"]);
-        Route::get ("/mostrar/{id}",       [ProdutosController::class, "mostrar"]);
-        Route::get ("/aviso/{id}",         [ProdutosController::class, "aviso"]);
-        Route::get ("/grade/{referencia}", [ProdutosController::class, "grade"]);
-        Route::post("/salvar",             [ProdutosController::class, "salvar"]);
-        Route::post("/excluir",            [ProdutosController::class, "excluir"]);
+        Route::get ("/",             [ProdutosController::class, "ver"]);
+        Route::get ("/listar",       [ProdutosController::class, "listar"]);
+        Route::get ("/consultar",    [ProdutosController::class, "consultar"]);
+        Route::get ("/mostrar/{id}", [ProdutosController::class, "mostrar"]);
+        Route::get ("/aviso/{id}",   [ProdutosController::class, "aviso"]);
+        Route::post("/salvar",       [ProdutosController::class, "salvar"]);
+        Route::post("/excluir",      [ProdutosController::class, "excluir"]);
     });
 
     Route::group(["prefix" => "atribuicoes"], function() {
-        Route::get ("/ver-maximo",        [AtribuicoesController::class, "verMaximo"]);
-        Route::get ("/mostrar",           [AtribuicoesController::class, "mostrar"]);
-        Route::get ("/pode-retirar/{id}", [AtribuicoesController::class, "podeRetirar"]);
-        Route::post("/salvar",            [AtribuicoesController::class, "salvar"]);
-        Route::post("/excluir",           [AtribuicoesController::class, "excluir"]);
+        Route::get ("/ver-maximo",              [AtribuicoesController::class, "verMaximo"]);
+        Route::get ("/mostrar",                 [AtribuicoesController::class, "mostrar"]);
+        Route::get ("/pode-retirar/{id}/{qtd}", [AtribuicoesController::class, "podeRetirar"]);
+        Route::get ("/produtos/{id}",           [AtribuicoesController::class, "produtos"]);
+        Route::post("/salvar",                  [AtribuicoesController::class, "salvar"]);
+        Route::post("/excluir",                 [AtribuicoesController::class, "excluir"]);
+        Route::post("/retirar",                 [AtribuicoesController::class, "retirar"]);
     });
 
     Route::group(["prefix" => "maquinas"], function() {

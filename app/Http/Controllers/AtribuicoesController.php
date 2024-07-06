@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use DB;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\LogController;
 use App\Models\Atribuicoes;
+use App\Models\Retiradas;
 
 class AtribuicoesController extends Controller {
     public function verMaximo(Request $request) {
@@ -114,6 +116,51 @@ class AtribuicoesController extends Controller {
                             ->whereRaw("DATE_ADD(retiradas.data, INTERVAL atribuicoes.validade DAY) >= CURDATE()")
                             ->where("atribuicoes.id", $id)
                             ->get();
-        return floatval($atribuicao->qtd) < (floatval($qtd) + (sizeof($ja_retirados) ? floatval($ja_retirados[0]->qtd) : 0));
+        if (floatval($atribuicao->qtd) < (floatval($qtd) + (sizeof($ja_retirados) ? floatval($ja_retirados[0]->qtd) : 0))) return 0;
+        return 1;
+    }
+
+    public function produtos($id) {
+        return json_encode(
+            DB::table("produtos")
+                ->select(
+                    "produtos.id",
+                    DB::raw("CASE
+                        WHEN produto_ou_referencia_chave = 'referencia' THEN CONCAT(produtos.descr, ' ', tamanho)
+                        ELSE produtos.descr
+                    END AS descr"),
+                    DB::raw("CASE
+                        WHEN produto_ou_referencia_chave = 'referencia' THEN produtos.referencia
+                        ELSE produtos.descr
+                    END AS titulo")
+                )
+                ->join("atribuicoes", function($join) {
+                    $join->on(function($sql) {
+                        $sql->on("atribuicoes.produto_ou_referencia_valor", "produtos.cod_externo")
+                            ->where("atribuicoes.produto_ou_referencia_chave", "produto");
+                    })->orOn(function($sql) {
+                        $sql->on("atribuicoes.produto_ou_referencia_valor", "produtos.referencia")
+                            ->where("atribuicoes.produto_ou_referencia_chave", "referencia");
+                    });
+                })
+                ->where("atribuicoes.id", $id)
+                ->where("produtos.lixeira", 0)
+                ->get()
+        );
+    }
+
+    public function retirar(Request $request) {
+        $linha = new Retiradas;
+        $atribuicao = Atribuicoes::find($request->atribuicao);
+        $linha->id_pessoa = $atribuicao->pessoa_ou_setor_valor;
+        if (intval($request->supervisor)) $linha->id_supervisor = $request->supervisor;
+        $linha->id_atribuicao = $request->atribuicao;
+        $linha->id_produto = $request->produto;
+        $linha->id_comodato = 0;
+        $linha->qtd = $request->quantidade;
+        $linha->data = Carbon::createFromFormat('d/m/Y', $request->data)->format('Y-m-d');
+        $linha->save();
+        $log = new LogController;
+        $log->inserir("C", "retiradas", $linha->id, false);
     }
 }
