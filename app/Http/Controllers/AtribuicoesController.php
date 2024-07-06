@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use DB;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Http\Controllers\LogController;
 use App\Models\Atribuicoes;
-use App\Models\Retiradas;
 
-class AtribuicoesController extends Controller {
+class AtribuicoesController extends ControllerKX {
     public function verMaximo(Request $request) {
         $resultado = new \stdClass;
 
@@ -75,8 +72,7 @@ class AtribuicoesController extends Controller {
         $linha->qtd = $request->qtd;
         $linha->validade = $request->validade;
         $linha->save();
-        $log = new LogController;
-        $log->inserir("C", "atribuicoes", $linha->id);
+        $this->log_inserir("C", "atribuicoes", $linha->id);
         return 201;
     }
 
@@ -84,8 +80,7 @@ class AtribuicoesController extends Controller {
         $linha = Atribuicoes::find($request->id);
         $linha->lixeira = 1;
         $linha->save();
-        $log = new LogController;
-        $log->inserir("D", "atribuicoes", $linha->id);
+        $this->log_inserir("D", "atribuicoes", $linha->id);
     }
 
     public function mostrar(Request $request) {
@@ -106,18 +101,6 @@ class AtribuicoesController extends Controller {
             AND atribuicoes.lixeira = 0
         ";
         return json_encode(DB::select(DB::raw($query)));
-    }
-
-    public function podeRetirar($id, $qtd) {
-        $atribuicao = Atribuicoes::find($id);
-        $ja_retirados = DB::table("retiradas")
-                            ->selectRaw("IFNULL(SUM(retiradas.qtd), 0) AS qtd")
-                            ->join("atribuicoes", "atribuicoes.id", "retiradas.id_atribuicao")
-                            ->whereRaw("DATE_ADD(retiradas.data, INTERVAL atribuicoes.validade DAY) >= CURDATE()")
-                            ->where("atribuicoes.id", $id)
-                            ->get();
-        if (floatval($atribuicao->qtd) < (floatval($qtd) + (sizeof($ja_retirados) ? floatval($ja_retirados[0]->qtd) : 0))) return 0;
-        return 1;
     }
 
     public function produtos($id) {
@@ -147,20 +130,5 @@ class AtribuicoesController extends Controller {
                 ->where("produtos.lixeira", 0)
                 ->get()
         );
-    }
-
-    public function retirar(Request $request) {
-        $linha = new Retiradas;
-        $atribuicao = Atribuicoes::find($request->atribuicao);
-        $linha->id_pessoa = $atribuicao->pessoa_ou_setor_valor;
-        if (intval($request->supervisor)) $linha->id_supervisor = $request->supervisor;
-        $linha->id_atribuicao = $request->atribuicao;
-        $linha->id_produto = $request->produto;
-        $linha->id_comodato = 0;
-        $linha->qtd = $request->quantidade;
-        $linha->data = Carbon::createFromFormat('d/m/Y', $request->data)->format('Y-m-d');
-        $linha->save();
-        $log = new LogController;
-        $log->inserir("C", "retiradas", $linha->id, false);
     }
 }

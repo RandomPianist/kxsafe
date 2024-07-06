@@ -7,9 +7,8 @@ use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Pessoas;
-use App\Http\Controllers\EmpresasController;
 
-class RelatoriosController extends Controller {
+class RelatoriosController extends ControllerKX {
     private function consultar_maquina(Request $request) {
         return (!sizeof(
             DB::table("valores")
@@ -97,13 +96,12 @@ class RelatoriosController extends Controller {
 
     public function bilateral_consultar(Request $request) {
         $erro = "";
-        $emp_controller = new EmpresasController;
         if ($request->prioridade == "empresas") {
-            if ($emp_controller->consultar_solo($request) && trim($request->empresa)) $erro = "empresa";
+            if ($this->consultar_empresa($request) && trim($request->empresa)) $erro = "empresa";
             if (!$erro && $this->consultar_maquina($request) && trim($request->maquina)) $erro = "maquina";
         } else {
             if ($this->consultar_maquina($request) && trim($request->maquina)) $erro = "maquina";
-            if (!$erro && $emp_controller->consultar_solo($request) && trim($request->empresa)) $erro = "empresa";
+            if (!$erro && $this->consultar_empresa($request) && trim($request->empresa)) $erro = "empresa";
         }
         return $erro;
     }

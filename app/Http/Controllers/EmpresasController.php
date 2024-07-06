@@ -5,12 +5,11 @@ namespace App\Http\Controllers;
 use DB;
 use Auth;
 use Illuminate\Http\Request;
-use App\Http\Controllers\LogController;
 use App\Models\EmpresasSetores;
 use App\Models\Empresas;
 use App\Models\Pessoas;
 
-class EmpresasController extends Controller {
+class EmpresasController extends ControllerKX {
     private function busca($param) {
         $id_emp = Pessoas::find(Auth::user()->id_pessoa)->id_empresa;
         return DB::table("empresas")
@@ -32,8 +31,7 @@ class EmpresasController extends Controller {
     }
 
     public function ver() {
-        $log = new LogController;
-        $ultima_atualizacao = $log->consultar("empresas");
+        $ultima_atualizacao = $this->log_consultar("empresas");
         $pode_criar_matriz = !intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa);
         return view("empresas", compact("ultima_atualizacao", "pode_criar_matriz"));
     }
@@ -55,16 +53,6 @@ class EmpresasController extends Controller {
                 ->get()
         )) return "1";
         return "0";
-    }
-
-    public function consultar_solo(Request $request) {
-        return (!sizeof(
-            DB::table("empresas")
-                ->where("id", $request->id_empresa)
-                ->where("nome_fantasia", $request->empresa)
-                ->where("lixeira", 0)
-                ->get()
-        ));
     }
 
     public function mostrar($id) {
@@ -104,8 +92,7 @@ class EmpresasController extends Controller {
         $linha->cnpj = $request->cnpj;
         $linha->id_matriz = $request->id_matriz ? $request->id_matriz : 0;
         $linha->save();
-        $log = new LogController;
-        $log->inserir($request->id ? "E" : "C", "empresas", $linha->id);
+        $this->log_inserir($request->id ? "E" : "C", "empresas", $linha->id);
         if (!$request->id) {
             $consulta = DB::table("setores")
                             ->where("padrao", 1)
@@ -115,8 +102,7 @@ class EmpresasController extends Controller {
                 $modelo->id_empresa = $linha->id;
                 $modelo->id_setor = $setor;
                 $modelo->save();
-                $log = new LogController;
-                $log->inserir("C", "empresas_setores", $modelo->id);
+                $this->log_inserir("C", "empresas_setores", $modelo->id);
             }
         }
         return redirect("/empresas");
@@ -126,8 +112,7 @@ class EmpresasController extends Controller {
         $linha = Empresas::find($request->id);
         $linha->lixeira = 1;
         $linha->save();
-        $log = new LogController;
-        $log->inserir("D", "empresas", $linha->id);
+        $this->log_inserir("D", "empresas", $linha->id);
     }
 
     public function listarSetores($id) {
@@ -166,8 +151,7 @@ class EmpresasController extends Controller {
         $linha->id_empresa = $request->id_empresa;
         $linha->id_setor = $request->id_setor;
         $linha->save();
-        $log = new LogController;
-        $log->inserir("C", "empresas_setores", $linha->id);
+        $this->log_inserir("C", "empresas_setores", $linha->id);
         return 201;
     }
 
@@ -175,7 +159,6 @@ class EmpresasController extends Controller {
         $linha = EmpresasSetores::find($request->id);
         $linha->lixeira = 1;
         $linha->save();
-        $log = new LogController;
-        $log->inserir("D", "empresas_setores", $linha->id);
+        $this->log_inserir("D", "empresas_setores", $linha->id);
     }
 }

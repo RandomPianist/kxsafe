@@ -5,13 +5,11 @@ namespace App\Http\Controllers;
 use DB;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Http\Controllers\LogController;
-use App\Http\Controllers\EmpresasController;
 use App\Models\Comodatos;
 use App\Models\Estoque;
 use App\Models\MaquinasProdutos;
 
-class MaquinasController extends Controller {
+class MaquinasController extends ControllerKX {
     public function estoque(Request $request) {
         for ($i = 0; $i < sizeof($request->id_produto); $i++) {
             $linha = new Estoque;
@@ -23,8 +21,7 @@ class MaquinasController extends Controller {
                                 ->where("id_maquina", $request->id_maquina)
                                 ->value("id");
             $linha->save();
-            $log = new LogController;
-            $log->inserir("C", "estoque", $linha->id);
+            $this->log_inserir("C", "estoque", $linha->id);
         }
         return redirect("/valores/maquinas");
     }
@@ -93,10 +90,9 @@ class MaquinasController extends Controller {
     }
 
     public function consultar_comodato(Request $request) {
-        $emp_controller = new EmpresasController;
         $resultado = new \stdClass;
         $resultado->texto = "";
-        if ($emp_controller->consultar_solo($request)) $resultado->texto = "Empresa não encontrada";
+        if ($this->empresa_consultar($request)) $resultado->texto = "Empresa não encontrada";
         if (!$resultado->texto) {
             $inicio = Carbon::createFromFormat('d/m/Y', $request->inicio)->format('Y-m-d');
             $fim = Carbon::createFromFormat('d/m/Y', $request->fim)->format('Y-m-d');
@@ -147,8 +143,7 @@ class MaquinasController extends Controller {
         $linha->fim = $fim;
         $linha->fim_orig = $fim;
         $linha->save();
-        $log = new LogController;
-        $log->inserir("C", "comodatos", $linha->id);
+        $this->log_inserir("C", "comodatos", $linha->id);
         return redirect("/valores/maquinas");
     }
 
@@ -161,29 +156,7 @@ class MaquinasController extends Controller {
         );
         $modelo->fim = date('Y-m-d');
         $modelo->save();
-        $log = new LogController;
-        $log->inserir("E", "comodatos", $modelo->id);
+        $this->log_inserir("E", "comodatos", $modelo->id);
         return redirect("/valores/maquinas");
-    }
-
-    public function mov_estoque($id_produto, $api) {
-        $log = new LogController;
-        $maquinas = DB::table("valores")
-                        ->where("alias", "maquinas")
-                        ->pluck("id");
-        foreach ($maquinas as $maquina) {
-            if (!sizeof(
-                DB::table("maquinas_produtos")
-                    ->where("id_produto", $id_produto)
-                    ->where("id_maquina", $maquina)
-                    ->get()
-            )) {
-                $gestor = new MaquinasProdutos;
-                $gestor->id_maquina = $maquina;
-                $gestor->id_produto = $id_produto;
-                $gestor->save();
-                $log->inserir("C", "maquinas_produtos", $gestor->id, $api);
-            }
-        }
     }
 }

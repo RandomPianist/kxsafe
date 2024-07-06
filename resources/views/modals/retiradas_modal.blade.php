@@ -103,7 +103,10 @@
                 else if (eFuturo(data_ret.value)) erro = "A retirada não pode ser no futuro";
                 
                 if (!erro) {
-                    $.get(URL + "/atribuicoes/pode-retirar/" + id + "/" + document.getElementById("quantidade2").value, function(ok) {
+                    $.get(URL + "/retiradas/consultar", {
+                        atribuicao : id,
+                        qtd : document.getElementById("quantidade2").value
+                    }, function(ok) {
                         if (!parseInt(ok)) modal2("supervisorModal", ["cpf2", "senha2"]);
                         else retirarMain(id);
                     });
@@ -140,7 +143,7 @@
         }
 
         if (!erro) {
-            $.post(URL + "/api/app/validar-spv", {
+            $.post(URL + "/colaboradores/supervisor", {
                 _token : $("meta[name='csrf-token']").attr("content"),
                 cpf : _cpf.value.replace(/\D/g, ""),
                 senha : _senha.value
@@ -153,7 +156,7 @@
 
     function retirarMain(id, _supervisor) {
         if (_supervisor === undefined) _supervisor = 0;
-        $.post(URL + "/atribuicoes/retirar", {
+        $.post(URL + "/retiradas/salvar", {
             _token : $("meta[name='csrf-token']").attr("content"),
             supervisor : _supervisor,
             atribuicao : id,

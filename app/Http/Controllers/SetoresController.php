@@ -5,12 +5,11 @@ namespace App\Http\Controllers;
 use DB;
 use Auth;
 use Illuminate\Http\Request;
-use App\Http\Controllers\LogController;
 use App\Models\EmpresasSetores;
 use App\Models\Pessoas;
 use App\Models\Setores;
 
-class SetoresController extends Controller {
+class SetoresController extends ControllerKX {
     private function busca($param) {
         return DB::table("setores")
                 ->select(
@@ -23,8 +22,7 @@ class SetoresController extends Controller {
     }
 
     public function ver() {
-        $log = new LogController;
-        $ultima_atualizacao = $log->consultar("setores");
+        $ultima_atualizacao = $this->log_consultar("setores");
         return view("setores", compact("ultima_atualizacao"));
     }
 
@@ -77,19 +75,7 @@ class SetoresController extends Controller {
     }
 
     public function mostrar($id) {
-        if (intval($id)) {
-            return DB::table("setores")
-                        ->select(
-                            "descr",
-                            "cria_usuario",
-                            "padrao"
-                        )
-                        ->where("id", $id)
-                        ->first();
-        }
-        $resultado = new \stdClass;
-        $resultado->cria_usuario = 0;
-        return json_encode($resultado);
+        return json_encode($this->setor_mostrar($id));
     }
 
     public function aviso($id) {
@@ -111,7 +97,6 @@ class SetoresController extends Controller {
     }
 
     public function salvar(Request $request) {
-        $log = new LogController;
         $cria_usuario = $request->cria_usuario == "S" ? 1 : 0;
         $linha = Setores::firstOrNew(["id" => $request->id]);
         if ($request->id) {
@@ -125,7 +110,7 @@ class SetoresController extends Controller {
                                     ->pluck("users.id");
                     foreach($consulta as $usuario) {
                         array_push($lista, $usuario);
-                        $log->inserir("D", "users", $usuario);
+                        $this->log_inserir("D", "users", $usuario);
                     }
                     $lista = join(",", $lista);
                     if ($lista) {
@@ -134,7 +119,7 @@ class SetoresController extends Controller {
                                 $modelo = Pessoas::find($request->id_pessoa[$i]);
                                 $modelo->senha = $request->password[$i];
                                 $modelo->save();
-                                $log->inserir("E", "pessoas", $modelo->id);
+                                $this->log_inserir("E", "pessoas", $modelo->id);
                             }
                         }
                         DB::statement("DELETE FROM users WHERE id IN (".$lista.")");
@@ -143,9 +128,9 @@ class SetoresController extends Controller {
                     for ($i = 0; $i < sizeof($request->id_pessoa); $i++) {
                         $senha = Hash::make($request->password[$i]);
                         DB::statement("INSERT INTO users (name, email, password, id_pessoa) VALUES ('".trim($request->nome[$i])."', '".trim($request->email[$i])."', '".$senha."', ".$request->id_pessoa[$i].")");
-                        $log->inserir("C", "users", DB::table("users")
-                                                        ->selectRaw("MAX(id) AS id")
-                                                        ->value("id")
+                        $this->log_inserir("C", "users", DB::table("users")
+                                                            ->selectRaw("MAX(id) AS id")
+                                                            ->value("id")
                         );
                     }
                 }
@@ -155,7 +140,7 @@ class SetoresController extends Controller {
         $linha->cria_usuario = $cria_usuario;
         $linha->padrao = $request->setor_padrao;
         $linha->save();
-        $log->inserir($request->id ? "E" : "C", "setores", $linha->id);
+        $this->log_inserir($request->id ? "E" : "C", "setores", $linha->id);
         if ($linha->padrao) {
             $consulta = DB::table("empresas")
                             ->pluck("id");
@@ -170,8 +155,7 @@ class SetoresController extends Controller {
                     $modelo->id_empresa = $empresa->id;
                     $modelo->id_setor = $linha->id;
                     $modelo->save();
-                    $log = new LogController;
-                    $log->inserir("C", "empresas_setores", $modelo->id);
+                    $this->log_inserir("C", "empresas_setores", $modelo->id);
                 }
             }
         }
@@ -182,8 +166,7 @@ class SetoresController extends Controller {
         $linha = Setores::find($request->id);
         $linha->lixeira = 1;
         $linha->save();
-        $log = new LogController;
-        $log->inserir("D", "setores", $linha->id);
+        $this->log_inserir("D", "setores", $linha->id);
     }
 
     public function primeiroAdmin() {

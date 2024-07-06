@@ -5,16 +5,13 @@ namespace App\Http\Controllers;
 use DB;
 use Auth;
 use Illuminate\Http\Request;
-use App\Http\Controllers\LogController;
-use App\Http\Controllers\MaquinasController;
-use App\Http\Controllers\AtribuicoesController;
 use App\Models\Valores;
 use App\Models\Produtos;
 use App\Models\Estoque;
 use App\Models\Retiradas;
 use App\Models\Atribuicoes;
 
-class ApiController extends Controller {
+class ApiController extends ControllerKX {
     public function empresas() {
         return json_encode(
             DB::table("empresas")
@@ -105,8 +102,7 @@ class ApiController extends Controller {
             ) + 1;
         }
         $linha->save();
-        $log = new LogController;
-        $modelo = $log->inserir($request->id ? "E" : "C", "valores", $linha->id, true);
+        $modelo = $this->log_inserir($request->id ? "E" : "C", "valores", $linha->id, true);
         if (isset($request->usu)) $modelo->nome = $request->usu;
         $modelo->save();
         $resultado = new \stdClass;
@@ -128,14 +124,12 @@ class ApiController extends Controller {
         if (isset($request->refer)) $linha->referencia = $request->refer;
         if (isset($request->tamanho)) $linha->tamanho = $request->tamanho;
         $linha->save();
-        $log = new LogController;
         $letra_log = $request->id ? "E" : "C";
         if (intval($request->lixeira)) $letra_log = "D";
-        $modelo = $log->inserir($letra_log, "produtos", $linha->id, true);
+        $modelo = $this->log_inserir($letra_log, "produtos", $linha->id, true);
         if (isset($request->usu)) $modelo->nome = $request->usu;
         $modelo->save();
-        $maquinas = new MaquinasController;
-        $maquinas->mov_estoque($linha->id, true);
+        $this->mov_estoque($linha->id, true);
         $consulta = DB::table("produtos")
                         ->select(
                             "id",
@@ -169,8 +163,7 @@ class ApiController extends Controller {
                                 ->where("id_maquina", $request->idMaquina)
                                 ->value("id");
             $linha->save();
-            $log = new LogController;
-            $modelo = $log->inserir("C", "estoque", $linha->id, true);
+            $modelo = $this->log_inserir("C", "estoque", $linha->id, true);
             if (isset($request->usu)) $modelo->nome = $request->usu;
             $modelo->save();
         }
@@ -182,7 +175,6 @@ class ApiController extends Controller {
         if (isset($request->preco)) {
             if (floatval($request->preco) > 0) $precoProd = floatval($request->preco);
         }
-        $log = new LogController;
         DB::statement("
             UPDATE maquinas_produtos SET
                 minimo = ".$request->minimo.",
@@ -196,7 +188,7 @@ class ApiController extends Controller {
                     ->where("id_maquina", $request->idMaquina)
                     ->pluck("id");
         foreach ($consulta as $id) {
-            $modelo = $log->inserir("E", "maquinas_produtos", $id, true);
+            $modelo = $this->log_inserir("E", "maquinas_produtos", $id, true);
             if (isset($request->usu)) $modelo->nome = $request->usu;
             $modelo->save();
         }
@@ -302,7 +294,6 @@ class ApiController extends Controller {
     }
 
     public function retirar(Request $request) {
-        $log = new LogController;
         $resultado = new \stdClass;
         $cont = 0;
         while (isset($request[$cont]["id_atribuicao"])) {
@@ -333,23 +324,19 @@ class ApiController extends Controller {
                 $resultado->msg = "Máquina não comodatada para nenhuma empresa";
                 return json_encode($resultado);
             }
-            $atb_controller = new AtribuicoesController;
-            if (!$atb_controller->podeRetirar($retirada["id_atribuicao"], $retirada["qtd"])) {
+            if (!$this->retirada_consultar($retirada["id_atribuicao"], $retirada["qtd"])) {
                 $resultado->code = 401;
                 $resultado->msg = "Essa quantidade de produtos não é permitida para essa pessoa";
                 return json_encode($resultado);
             }
-            $linha = new Retiradas;
-            $linha->id_pessoa = $retirada["id_pessoa"];
-            $linha->id_atribuicao = $retirada["id_atribuicao"];
-            $linha->id_produto = $retirada["id_produto"];
-            $linha->id_comodato = $comodato[0]->id;
-            $linha->qtd = $retirada["qtd"];
-            $linha->data = date("Y-m-d");
-            $linha->save();
-            $modelo = $log->inserir("C", "retiradas", $linha->id, true);
-            $modelo->nome = "APP";
-            $modelo->save();
+            $this->retirada_salvar(array(
+                "id_pessoa" => $retirada["id_pessoa"],
+                "id_produto" => $retirada["id_produto"],
+                "id_atribuicao" => $retirada["id_atribuicao"],
+                "id_comodato" => $comodato[0]->id,
+                "qtd" => $retirada["qtd"],
+                "data" => date("Y-m-d")
+            ));
             $cont++;
         }
         $resultado->code = 201;
@@ -358,17 +345,10 @@ class ApiController extends Controller {
     }
 
     public function validarSpv(Request $request) {
-        $consulta = DB::table("pessoas")
-                        ->where("cpf", $request->cpf)
-                        ->where("senha", $request->senha)
-                        ->where("supervisor", 1)
-                        ->where("lixeira", 0)
-                        ->get();
-        return sizeof($consulta) ? $consulta[0]->id : 0;
+        return $this->supervisor_consultar($request);
     }
 
     public function retirarComSupervisao(Request $request) {
-        $log = new LogController;
         $resultado = new \stdClass;
         $cont = 0;
         while (isset($request[$cont]["id_atribuicao"])) {
@@ -399,19 +379,16 @@ class ApiController extends Controller {
                 $resultado->msg = "Máquina não comodatada para nenhuma empresa";
                 return json_encode($resultado);
             }
-            $linha = new Retiradas;
-            $linha->id_pessoa = $retirada["id_pessoa"];
-            $linha->id_supervisor = $retirada["id_supervisor"];
-            $linha->observacao = $retirada["obs"];
-            $linha->id_atribuicao = $retirada["id_atribuicao"];
-            $linha->id_produto = $retirada["id_produto"];
-            $linha->id_comodato = $comodato[0]->id;
-            $linha->qtd = $retirada["qtd"];
-            $linha->data = date("Y-m-d");
-            $linha->save();
-            $modelo = $log->inserir("C", "retiradas", $linha->id, true);
-            $modelo->nome = "APP";
-            $modelo->save();
+            $this->retirada_salvar(array(
+                "id_pessoa" => $retirada["id_pessoa"],
+                "id_produto" => $retirada["id_produto"],
+                "id_atribuicao" => $retirada["id_atribuicao"],
+                "id_comodato" => $comodato[0]->id,
+                "qtd" => $retirada["qtd"],
+                "data" => date("Y-m-d"),
+                "id_supervisor" => $retirada["id_supervisor"],
+                "obs" => $retirada["obs"]
+            ));
             $cont++;
         }
         $resultado->code = 201;

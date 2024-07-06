@@ -4,12 +4,10 @@ namespace App\Http\Controllers;
 
 use DB;
 use Illuminate\Http\Request;
-use App\Http\Controllers\LogController;
-use App\Http\Controllers\MaquinasController;
 use App\Models\Produtos;
 use App\Models\Atribuicoes;
 
-class ProdutosController extends Controller {
+class ProdutosController extends ControllerKX {
     private function busca($where) {
         return DB::table("produtos")
                     ->select(
@@ -28,8 +26,7 @@ class ProdutosController extends Controller {
     }
 
     public function ver() {
-        $log = new LogController;
-        $ultima_atualizacao = $log->consultar("produtos");
+        $ultima_atualizacao = $this->log_consultar("produtos");
         return view("produtos", compact("ultima_atualizacao"));
     }
 
@@ -89,7 +86,6 @@ class ProdutosController extends Controller {
     }
 
     public function salvar(Request $request) {
-        $log = new LogController;
         $linha = Produtos::firstOrNew(["id" => $request->id]);
         $linha->descr = mb_strtoupper($request->descr);
         $linha->preco = $request->preco;
@@ -102,9 +98,8 @@ class ProdutosController extends Controller {
         $linha->detalhes = $request->detalhes;
         if ($request->file("foto")) $linha->foto = $request->file("foto")->store("uploads", "public");
         $linha->save();
-        $log->inserir($request->id ? "E" : "C", "produtos", $linha->id);
-        $maquinas = new MaquinasController;
-        $maquinas->mov_estoque($linha->id, false);
+        $this->log_inserir($request->id ? "E" : "C", "produtos", $linha->id);
+        $this->mov_estoque($linha->id, false);
         return redirect("/produtos");
     }
 
@@ -112,8 +107,7 @@ class ProdutosController extends Controller {
         $linha = Produtos::find($request->id);
         $linha->lixeira = 1;
         $linha->save();
-        $log = new LogController;
-        $log->inserir("D", "produtos", $linha->id);
+        $this->log_inserir("D", "produtos", $linha->id);
         $lista = array();
         $consulta = DB::table("atribuicoes")
                         ->where(function($sql) use ($request) {
@@ -129,8 +123,7 @@ class ProdutosController extends Controller {
             $modelo = Atribuicoes::find($atb);
             $modelo->lixeira = 1;
             $modelo->save();
-            $log = new LogController;
-            $log->inserir("D", "atribuicoes", $atb);
+            $this->log_inserir("D", "atribuicoes", $atb);
         }
     }
 }

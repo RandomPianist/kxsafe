@@ -5,12 +5,11 @@ namespace App\Http\Controllers;
 use DB;
 use Auth;
 use Illuminate\Http\Request;
-use App\Http\Controllers\LogController;
 use App\Models\Pessoas;
 use App\Models\Valores;
 use App\Models\MaquinasProdutos;
 
-class ValoresController extends Controller {
+class ValoresController extends ControllerKX {
     private function busca($alias, $where) {
         return DB::table("valores")
                     ->select(
@@ -78,8 +77,7 @@ class ValoresController extends Controller {
                 if ($linha->comodato != "---") $comodato = true;
             }
         }
-        $log = new LogController;
-        $ultima_atualizacao = $log->consultar("valores", $alias);
+        $ultima_atualizacao = $this->log_consultar("valores", $alias);
         $titulo = $alias == "maquinas" ? "Máquinas" : "Categorias";
         return view("valores", compact("alias", "titulo", "ultima_atualizacao", "comodato"));
     }
@@ -173,7 +171,6 @@ class ValoresController extends Controller {
     }
 
     public function salvar($alias, Request $request) {
-        $log = new LogController;
         $linha = Valores::firstOrNew(["id" => $request->id]);
         $linha->descr = mb_strtoupper($request->descr);
         $linha->alias = $alias;
@@ -200,11 +197,11 @@ class ValoresController extends Controller {
                     $gestor->id_maquina = $linha->id;
                     $gestor->id_produto = $produto;
                     $gestor->save();
-                    $log->inserir("C", "maquinas_produtos", $gestor->id);
+                    $this->log_inserir("C", "maquinas_produtos", $gestor->id);
                 }
             }
         }
-        $log->inserir($request->id ? "E" : "C", "valores", $linha->id);
+        $this->log_inserir($request->id ? "E" : "C", "valores", $linha->id);
         return redirect("/valores/$alias");
     }
 
@@ -217,7 +214,6 @@ class ValoresController extends Controller {
             SET id_categoria = NULL
             WHERE id_categoria = ".$request->id
         );
-        $log = new LogController;
-        $log->inserir("D", "valores", $linha->id);
+        $this->log_inserir("D", "valores", $linha->id);
     }
 }

@@ -7,12 +7,9 @@ use Auth;
 use Hash;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Http\Controllers\LogController;
-use App\Http\Controllers\SetoresController;
-use App\Http\Controllers\EmpresasController;
 use App\Models\Pessoas;
 
-class PessoasController extends Controller {
+class PessoasController extends ControllerKX {
     private function busca($where, $tipo) {
         return DB::table("pessoas")
                     ->select(
@@ -59,26 +56,23 @@ class PessoasController extends Controller {
     }
 
     private function criar_usuario($id_pessoa, Request $request) {
-        $log = new LogController;
         $senha = Hash::make($request->password);
         DB::statement("INSERT INTO users (name, email, password, id_pessoa) VALUES ('".trim($request->nome)."', '".trim($request->email)."', '".$senha."', ".$id_pessoa.")");
-        $log->inserir("C", "users", DB::table("users")
-                                        ->selectRaw("MAX(id) AS id")
-                                        ->value("id")
+        $this->log_inserir("C", "users", DB::table("users")
+                                            ->selectRaw("MAX(id) AS id")
+                                            ->value("id")
         );
     }
 
     private function deletar_usuario($id_pessoa) {
-        $log = new LogController;
         $fk = DB::table("users")
                 ->where("id_pessoa", $id_pessoa)
                 ->value("id");
         DB::statement("DELETE FROM users WHERE id_pessoa = ".$id_pessoa);
-        $log->inserir("D", "users", $fk);
+        $this->log_inserir("D", "users", $fk);
     }
 
     private function salvar_main($modelo, Request $request) {
-        $log = new LogController;
         $modelo->nome = mb_strtoupper($request->nome);
         $modelo->cpf = $request->cpf;
         $modelo->funcao = mb_strtoupper($request->funcao);
@@ -89,13 +83,12 @@ class PessoasController extends Controller {
         $modelo->supervisor = $request->supervisor;
         if ($request->file("foto")) $modelo->foto = $request->file("foto")->store("uploads", "public");
         $modelo->save();
-        $log->inserir($request->id ? "E" : "C", "pessoas", $modelo->id);
+        $this->log_inserir($request->id ? "E" : "C", "pessoas", $modelo->id);
         return $modelo;
     }
 
     private function cria_usuario($id) {
-        $setor = new SetoresController;
-        return intval($setor->mostrar($id)->cria_usuario);
+        return intval($this->setor_mostar($id)->cria_usuario);
     }
 
     public function ver($tipo) {
@@ -113,13 +106,12 @@ class PessoasController extends Controller {
                 $titulo = "Usuários";
                 break;
         }
-        $log = new LogController;
         $where = "setores1.cria_usuario = 0 AND aux1.supervisor = ".($tipo == "S" ? "1" : "0");
         if (in_array($tipo, ["A", "U"])) {
             $where = "setores1.cria_usuario = 1";
             if ($tipo == "A") $where .= " AND aux1.id_empresa = 0";
         }
-        $ultima_atualizacao = $log->consultar("pessoas", $where);
+        $ultima_atualizacao = $this->log_consultar("pessoas", $where);
         $consulta = DB::table("atribuicoes")
                         ->selectRaw("MAX(qtd) AS qtd")
                         ->get();
@@ -138,7 +130,6 @@ class PessoasController extends Controller {
     }
 
     public function consultar(Request $request) {
-        $emp_controller = new EmpresasController;
         $resultado = new \stdClass;
         if (!sizeof(
             DB::table("setores")
@@ -148,7 +139,7 @@ class PessoasController extends Controller {
         )) {
             $resultado->tipo = "invalido";
             $resultado->dado = "Setor";
-        } else if ($emp_controller->consultar_solo($request)) {
+        } else if ($this->empresa_consultar($request)) {
             $resultado->tipo = "invalido";
             $resultado->dado = "Empresa";
         } else if (sizeof(
@@ -214,7 +205,6 @@ class PessoasController extends Controller {
     }
 
     public function salvar(Request $request) {
-        $log = new LogController;
         if ($request->id) {
             $setor_ant = Pessoas::find($request->id)->id_setor;
             if ($setor_ant != $request->id_setor) {
@@ -236,9 +226,9 @@ class PessoasController extends Controller {
                         email = '".trim($request->email)."'
                     WHERE id_pessoa = ".$request->id
                 );
-                $log->inserir("E", "users", DB::table("users")
-                                                ->where("id_pessoa", $request->id)
-                                                ->value("id")             
+                $this->log_inserir("E", "users", DB::table("users")
+                                                    ->where("id_pessoa", $request->id)
+                                                    ->value("id")
                 );
             }
             $modelo = Pessoas::find($request->id);
@@ -261,8 +251,11 @@ class PessoasController extends Controller {
         $linha = Pessoas::find($request->id);
         $linha->lixeira = 1;
         $linha->save();
-        $log = new LogController;
-        $log->inserir("D", "pessoas", $linha->id);
+        $this->log_inserir("D", "pessoas", $linha->id);
         if ($this->cria_usuario($linha->id_setor)) $this->deletar_usuario($linha->id);
+    }
+
+    public function supervisor(Request $request) {
+        return $this->supervisor_consultar($request);
     }
 }
