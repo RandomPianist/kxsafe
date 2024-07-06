@@ -226,7 +226,7 @@ window.onload = function() {
 function contar_char(el, max) {
     el.classList.remove("invalido");
     el.value = el.value.substring(0, max);
-    el.nextElementSibling.innerHTML = el.value + "/" + max;
+    el.nextElementSibling.innerHTML = el.value.length + "/" + max;
 }
 
 function modal(nome, id, callback) {
