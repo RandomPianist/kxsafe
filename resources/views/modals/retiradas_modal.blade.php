@@ -164,7 +164,7 @@
             $("#supervisorModal").modal("hide");
             $("#retiradasModal").modal("hide");
             Swal.fire({
-                icon : "warning",
+                icon : "success",
                 title : "Sucesso",
                 confirmButtonColor : "rgb(31, 41, 55)"
             });
