@@ -160,6 +160,14 @@
             produto : document.getElementById("variacao").value.replace("prod-", ""),
             data : document.getElementById("data-ret").value,
             quantidade : document.getElementById("quantidade2").value
+        }, function() {
+            $("#supervisorModal").modal("hide");
+            $("#retiradasModal").modal("hide");
+            Swal.fire({
+                icon : "warning",
+                title : "Sucesso",
+                confirmButtonColor : "rgb(31, 41, 55)"
+            });
         });
     }
 </script>
