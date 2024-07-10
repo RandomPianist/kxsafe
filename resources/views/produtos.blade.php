@@ -121,23 +121,28 @@
             }
             if (preco.value.trim() != dinheiro(anteriores.preco.toString())) alterou = true;
             $.get(URL + "/produtos/consultar/", {
+                id : document.getElementById("id").value,
                 cod_externo : document.getElementById("cod_externo").value,
                 categoria : document.getElementById("categoria").value,
                 id_categoria : document.getElementById("id_categoria").value,
+                referencia : document.getElementById("referencia").value
             }, function(data) {
-                if (typeof data == "string") data = $.parseJSON(data);
-                if (!erro && data.tipo == "invalido") {
-                    erro = data.dado + " não encontrada";
-                    document.getElementById(data.dado.toLowerCase()).classList.add("invalido");
+                if (!erro && data == "invalido") {
+                    erro = "Categoria não encontrada";
+                    document.getElementById("categoria").classList.add("invalido");
                 }
-                if (!erro && data.tipo == "duplicado" && !parseInt(document.getElementById("id").value)) {
+                if (!erro && data == "duplicado") {
                     erro = "Já existe um registro com esse código";
                     document.getElementById("cod_externo").classList.add("invalido");
                 }
                 if (!erro && !alterou && !document.querySelector("#produtosModal input[type=file]").value) erro = "Altere pelo menos um campo para salvar";
                 if (!erro) {
-                    preco.value = parseInt(preco.value.replace(/\D/g, "")) / 100;
-                    document.querySelector("#produtosModal form").submit();
+                    const fn = function() {
+                        preco.value = parseInt(preco.value.replace(/\D/g, "")) / 100;
+                        document.querySelector("#produtosModal form").submit();
+                    }
+                    if (data == "aviso") s_confirm("Prosseguir apagará atribuições.<br>Deseja continuar?", fn);
+                    else fn();
                 } else s_alert(erro);
             });
         }

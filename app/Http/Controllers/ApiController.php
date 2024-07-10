@@ -113,6 +113,9 @@ class ApiController extends ControllerKX {
 
     public function produtos(Request $request) {
         $linha = Produtos::firstOrNew(["id" => $request->id]);
+        $nome = "NULL";
+        if (isset($request->usu)) $nome = $request->usu;
+        $this->atribuicao_atualiza_ref($request->id, $linha->referencia, $request->refer, $nome, true);
         $linha->descr = mb_strtoupper($request->descr);
         $linha->preco = $request->preco;
         $linha->validade = $request->validade;
@@ -175,23 +178,17 @@ class ApiController extends ControllerKX {
         if (isset($request->preco)) {
             if (floatval($request->preco) > 0) $precoProd = floatval($request->preco);
         }
+        $nome = "NULL";
+        $where = "id_produto = ".$request->idProduto." AND id_maquina = ".$request->idMaquina;
         DB::statement("
             UPDATE maquinas_produtos SET
                 minimo = ".$request->minimo.",
                 maximo = ".$request->maximo.",
                 preco = ".$precoProd."
-            WHERE id_produto = ".$request->idProduto."
-              AND id_maquina = ".$request->idMaquina
+            WHERE ".$where
         );
-        $consulta = DB::table("maquinas_produtos")
-                    ->where("id_produto", $request->idProduto)
-                    ->where("id_maquina", $request->idMaquina)
-                    ->pluck("id");
-        foreach ($consulta as $id) {
-            $modelo = $this->log_inserir("E", "maquinas_produtos", $id, true);
-            if (isset($request->usu)) $modelo->nome = $request->usu;
-            $modelo->save();
-        }
+        if (isset($request->usu)) $nome = $request->usu;
+        $this->log_inserir2("E", "maquinas_produtos", $where, $nome, true);
     }
 
     public function validarApp(Request $request) {
@@ -223,6 +220,7 @@ class ApiController extends ControllerKX {
                             DB::raw("IFNULL(produtos.tamanho, '') AS tamanho"),
                             DB::raw("IFNULL(produtos.foto, '') AS foto"),
                             "atribuicoes.id AS id_atribuicao",
+                            "atribuicoes.obrigatorio",
                             DB::raw("(atribuicoes.qtd - IFNULL(ret.qtd, 0)) AS qtd"),
                             DB::raw("IFNULL(ret.ultima_retirada, '') AS ultima_retirada"),
                             DB::raw("DATE_FORMAT(IFNULL(ret.proxima_retirada, CURDATE()), '%d/%m/%Y') AS proxima_retirada")
@@ -279,6 +277,7 @@ class ApiController extends ControllerKX {
                 "detalhes" => $itens[0]->detalhes,
                 "ultima_retirada" => $itens[0]->ultima_retirada,
                 "proxima_retirada" => $itens[0]->proxima_retirada,
+                "obrigatorio" => $itens[0]->obrigatorio,
                 "tamanhos" => $itens->map(function($tamanho) use($request) {
                     return [
                         "id" => $tamanho->id,

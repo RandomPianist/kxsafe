@@ -15,6 +15,7 @@ class RetiradasController extends ControllerKX {
         $json = array(
             "id_pessoa" => Atribuicoes::find($request->atribuicao)->pessoa_ou_setor_valor,
             "id_atribuicao" => $request->atribuicao,
+            "id_produto" => $request->produto,
             "id_comodato" => 0,
             "qtd" => $request->quantidade,
             "data" => Carbon::createFromFormat('d/m/Y', $request->data)->format('Y-m-d')

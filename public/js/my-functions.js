@@ -251,22 +251,26 @@ function modal2(nome, limpar) {
 }
 
 function excluirMain(_id, prefixo, aviso, callback) {
+    s_confirm(aviso, function() {
+        $.post(URL + prefixo + "/excluir", {
+            _token : $("meta[name='csrf-token']").attr("content"),
+            id : _id
+        }, function() {
+            callback();
+        });
+    });
+}
+
+function s_confirm(texto, funcao) {
     Swal.fire({
         title: "Aviso",
-        html : aviso,
+        html : texto,
         showDenyButton : true,
         confirmButtonText : "NÃO",
         confirmButtonColor : "rgb(31, 41, 55)",
         denyButtonText : "SIM"
     }).then((result) => {
-        if (result.isDenied) {
-            $.post(URL + prefixo + "/excluir", {
-                _token : $("meta[name='csrf-token']").attr("content"),
-                id : _id
-            }, function() {
-                callback();
-            });
-        }
+        if (result.isDenied) funcao();
     });
 }
 
@@ -609,6 +613,7 @@ function mostrar_atribuicoes() {
             resultado += "<thead>" +
                 "<tr>" +
                     "<th>" + (gradeGlobal ? "Referência" : "Produto") + "</th>" +
+                    "<th>Obrigatório?</th>" +
                     "<th class = 'text-right'>Qtde.</th>" +
                     "<th class = 'text-right'>Validade</th>" +
                     "<th>&nbsp;</th>" +
@@ -618,6 +623,7 @@ function mostrar_atribuicoes() {
             data.forEach((atribuicao) => {
                 resultado += "<tr>" +
                     "<td>" + atribuicao.produto_ou_referencia_valor + "</td>" +
+                    "<td>" + atribuicao.obrigatorio + "</td>" +
                     "<td class = 'text-right'>" + atribuicao.qtd + "</td>" +
                     "<td class = 'text-right'>" + atribuicao.validade + "</td>" +
                     "<td class = 'text-center'>" +
@@ -650,6 +656,7 @@ function atribuicao(grade, id) {
                 div_produto.remove("d-none");
                 div_referencia.add("d-none");
             }
+            document.getElementById("obrigatorio").value = "opt-0";
             gradeGlobal = grade;
             mostrar_atribuicoes();
         });
@@ -679,7 +686,8 @@ function atribuir() {
         produto_ou_referencia_chave : campo,
         produto_ou_referencia_valor : document.getElementById(campo).value,
         validade : document.getElementById("validade").value,
-        qtd : document.getElementById("quantidade").value
+        qtd : document.getElementById("quantidade").value,
+        obrigatorio : document.getElementById("obrigatorio").value.replace("opt-", "")
     }, function(ret) {
         ret = parseInt(ret);
         switch(ret) {

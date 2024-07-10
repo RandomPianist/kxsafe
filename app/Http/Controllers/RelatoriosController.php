@@ -246,7 +246,6 @@ class RelatoriosController extends ControllerKX {
                         WHEN valores.descr IS NOT NULL THEN valores.descr
                         ELSE CONCAT('Sistema - ', ret_sis.nome)
                     END AS maquina"),
-                    "valores.descr AS maquina",
                     DB::raw("DATE_FORMAT(retiradas.data, '%d/%m/%Y') AS data"),
                     DB::raw("IFNULL(CONCAT('Liberado por ', supervisor.nome, IFNULL(CONCAT(' - ', retiradas.observacao), '')), '') AS obs")
                 )

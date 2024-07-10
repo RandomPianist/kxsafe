@@ -32,6 +32,25 @@ class ControllerKX extends Controller {
         return $linha;
     }
 
+    protected function log_inserir2($acao, $tabela, $where, $nome, $api = false) {
+        if ($nome != "NULL") $nome = "'".$nome."'";
+        $sql = "INSERT INTO log (acao, tabela, nome, ";
+        if (!$api) $sql .= "id_pessoa, ";
+        $sql .= "fk) SELECT
+            '".$acao."',
+            '".$tabela."',
+            ".$nome.",
+        ";
+        if (!$api) $sql .= Auth::user()->id_pessoa.",";
+        $sql .= "
+            id
+
+            FROM ".$tabela."
+
+            WHERE ".$where;
+        DB::statement($sql);
+    }
+
     protected function log_consultar($tabela, $param = "") {
         $query = "
             SELECT
@@ -200,6 +219,19 @@ class ControllerKX extends Controller {
                 $gestor->save();
                 $this->log_inserir("C", "maquinas_produtos", $gestor->id, $api);
             }
+        }
+    }
+
+    protected function atribuicao_atualiza_ref($id, $antigo, $novo, $nome, $api = false) {
+        if ($id) {
+            $novo = trim($novo);
+            $where = "produto_ou_referencia_valor = '".$antigo."' AND produto_ou_referencia_chave = 'referencia'";
+            DB::statement("
+                UPDATE atribuicoes
+                SET ".($novo ? "produto_ou_referencia_valor = '".$novo."'" : "lixeira = 1")."
+                WHERE ".$where
+            );
+            $this->log_inserir2($novo ? "E" : "D", "atribuicoes", $where, $nome, $api);
         }
     }
 }

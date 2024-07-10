@@ -46,15 +46,22 @@
                         </div>
                         <div class = "col-2">
                             <label for = "quantidade" class = "custom-label-form">Quantidade: *</label>
-                            <input id = "quantidade" name = "quantidade" class = "form-control text-right" autocomplete = "off" type = "number" onkeyup = "$(this).trigger('change')" onchange = "limitar(this)" />
+                            <input id = "quantidade" class = "form-control text-right" autocomplete = "off" type = "number" onkeyup = "$(this).trigger('change')" onchange = "limitar(this)" />
                         </div>
                         <div class = "col-2">
                             <label for = "validade" class = "custom-label-form">Validade em dias: *</label>
-                            <input id = "validade" name = "validade" class = "form-control text-right" autocomplete = "off" type = "number" onkeyup = "$(this).trigger('change')" onchange = "limitar(this)" />
+                            <input id = "validade" class = "form-control text-right" autocomplete = "off" type = "number" onkeyup = "$(this).trigger('change')" onchange = "limitar(this)" />
                         </div>
-                        <div class = "col-2 text-right">
-                            <button type = "button" class = "btn btn-target mx-auto px-3 mt-4 w-100" onclick = "atribuir()">+</button>
+                        <div class = "col-2">
+                            <label for = "obrigatorio" class = "custom-label-form">Obrigatório: *</label>
+                            <select class = "form-control" id = "obrigatorio">
+                                <option value = "opt-1">SIM</option>
+                                <option value = "opt-0">NÃO</option>
+                            </select>
                         </div>
+                    </div>
+                    <div class = "d-flex">
+                        <button type = "button" class = "btn btn-target mx-auto mb-4 px-5" onclick = "atribuir()">Atribuir</button>
                     </div>
                     <div class = "row">
                         <div class = "col-12">

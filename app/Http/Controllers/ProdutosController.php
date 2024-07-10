@@ -42,25 +42,25 @@ class ProdutosController extends ControllerKX {
     }
 
     public function consultar(Request $request) {
-        $resultado = new \stdClass;
         if (!sizeof(
             DB::table("valores")
                 ->where("id", $request->id_categoria)
                 ->where("descr", $request->categoria)
                 ->get()
-        )) {
-            $resultado->tipo = "invalido";
-            $resultado->dado = "Categoria";
-        } else if (sizeof(
+        )) return "invalido";
+        if (sizeof(
             DB::table("produtos")
                 ->where("lixeira", 0)
                 ->where("cod_externo", $request->cod_externo)
                 ->get()
-        )) {
-            $resultado->tipo = "duplicado";
-            $resultado->dado = "cod";
-        }
-        return json_encode($resultado);
+        ) && !$request->id) return "duplicado";
+        if (sizeof(
+            DB::table("atribuicoes")
+                ->where("produto_ou_referencia_valor", Produtos::find($request->id)->referencia)
+                ->where("produto_ou_referencia_chave", "referencia")
+                ->get()
+        ) && !trim($request->referencia)) return "aviso";
+        return "";
     }
 
     public function mostrar($id) {
@@ -87,6 +87,7 @@ class ProdutosController extends ControllerKX {
 
     public function salvar(Request $request) {
         $linha = Produtos::firstOrNew(["id" => $request->id]);
+        $this->atribuicao_atualiza_ref($request->id, $linha->referencia, $request->referencia, "NULL");
         $linha->descr = mb_strtoupper($request->descr);
         $linha->preco = $request->preco;
         $linha->validade = $request->validade;
@@ -100,7 +101,6 @@ class ProdutosController extends ControllerKX {
         $linha->save();
         $this->log_inserir($request->id ? "E" : "C", "produtos", $linha->id);
         $this->mov_estoque($linha->id, false);
-        return redirect("/produtos");
     }
 
     public function excluir(Request $request) {

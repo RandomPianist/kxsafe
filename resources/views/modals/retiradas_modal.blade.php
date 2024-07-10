@@ -46,31 +46,33 @@
             <div class = "modal-body">
                 <div class = "container">
                     @csrf
-                    <div class = "row d-none">
+                    <div class = "row">
                         <div class = "col-12">
                             <label for = "variacao" class = "custom-label-form">Selecione uma variação: *</label>
                             <select class = "form-control" id = "variacao"></select>
                         </div>
                     </div>
                     <div class = "row">
-                        <div class = "col-8">
+                        <div class = "col-12">
                             <div class = "w-100">
-                                <input type = "range" id = "quantidade2" min = 1 max = {{ $max_atb }} value = 1 class = "slider" oninput = "atualizaQtd()"/>
-                                <p>
-                                    Quantidade: *
+                                <input type = "range" id = "quantidade2" min = 1 max = {{ intval($max_atb) }} value = 1 class = "slider" oninput = "atualizaQtd()"/>
+                                <p class = "custom-label-form">
+                                    Quantidade:
                                     <span id = "quantidade2_label"></span>
                                 </p>
                             </div>
                         </div>
-                        <div class = "col-4">
-                            <label for = "data-ret">Data da retirada: *</label>
+                    </div>
+                    <div class = "row">
+                        <div class = "col-12">
+                            <label for = "data-ret" class = "custom-label-form">Data da retirada: *</label>
                             <input id = "data-ret" class = "form-control data" autocomplete = "off" type = "text" onclick = "limpar_invalido()" />
                         </div>
                     </div>
                 </div>
             </div>
             <div class = "d-flex">
-                <button id = "btn-retirada" type = "button" class = "btn btn-target mx-auto mb-4 px-5">Retirar</button>
+                <button id = "btn-retirada" type = "button" class = "btn btn-target mx-auto my-4 mb-4 px-5">Retirar</button>
             </div>
         </div>
     </div>
@@ -95,6 +97,10 @@
             el.innerHTML = resultado;
             pai.remove("d-none");
             if (data.length < 2) pai.add("d-none");
+            el = document.getElementById("quantidade2");
+            pai = el.parentElement.parentElement.parentElement.classList;
+            pai.add("d-none")
+            if (parseInt(el.max) > 1) pai.remove("d-none");
             document.getElementById("btn-retirada").onclick = function() {
                 let erro = "";
                 let data_ret = document.getElementById("data-ret");
@@ -115,7 +121,9 @@
                     s_alert(erro);
                 }
             }
-            document.getElementById("retiradasModal").innerHTML = "Retirada retroativa - " + data[0].titulo;
+            let titulo = "Retirada retroativa - " + data[0].titulo;
+            if (titulo.length > 46) titulo = titulo.substring(0, 46).trim() + "...";
+            document.getElementById("retiradasModalLabel").innerHTML = titulo;
             $("#retiradasModal").modal();
         });
     }

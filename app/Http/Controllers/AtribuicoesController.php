@@ -71,6 +71,7 @@ class AtribuicoesController extends ControllerKX {
         $linha->produto_ou_referencia_valor = $produto_ou_referencia_valor;
         $linha->qtd = $request->qtd;
         $linha->validade = $request->validade;
+        $linha->obrigatorio = $request->obrigatorio;
         $linha->save();
         $this->log_inserir("C", "atribuicoes", $linha->id);
         return 201;
@@ -83,52 +84,60 @@ class AtribuicoesController extends ControllerKX {
         $this->log_inserir("D", "atribuicoes", $linha->id);
     }
 
-    public function mostrar(Request $request) {
-        $query = "SELECT atribuicoes.id, ";
-        if ($request->tipo == "produto") $query .= "produtos.descr AS ";
-        $query .= "produto_ou_referencia_valor, ";
-        $query .= "
-                atribuicoes.qtd,
-                atribuicoes.validade
+    private function consulta($select, $where) {
+        return DB::table("produtos")
+                    ->select(DB::raw($select))
+                    ->join("atribuicoes", function($join) {
+                        $join->on(function($sql) {
+                            $sql->on("atribuicoes.produto_ou_referencia_valor", "produtos.cod_externo")
+                                ->where("atribuicoes.produto_ou_referencia_chave", "produto");
+                        })->orOn(function($sql) {
+                            $sql->on("atribuicoes.produto_ou_referencia_valor", "produtos.referencia")
+                                ->where("atribuicoes.produto_ou_referencia_chave", "referencia");
+                        });
+                    })
+                    ->whereRaw($where)
+                    ->where("produtos.lixeira", 0)
+                    ->where("atribuicoes.lixeira", 0);
+    }
 
-            FROM atribuicoes
+    public function mostrar(Request $request) {
+        $select = "atribuicoes.id, ";
+        if ($request->tipo == "produto") $select .= "produtos.descr AS ";
+        $select .= "produto_ou_referencia_valor,
+            atribuicoes.qtd,
+            atribuicoes.validade, 
+            CASE
+                WHEN obrigatorio = 1 THEN 'SIM'
+                ELSE 'NÃO'
+            END AS obrigatorio
         ";
-        if ($request->tipo == "produto") $query .= " JOIN produtos ON produtos.cod_externo = produto_ou_referencia_valor ";
-        $query .= "WHERE
-                pessoa_ou_setor_valor = ".$request->id."
+        $where = "pessoa_ou_setor_valor = ".$request->id."
             AND produto_ou_referencia_chave = '".$request->tipo."'
-            AND pessoa_ou_setor_chave = '".$request->tipo2."'
-            AND atribuicoes.lixeira = 0
-        ";
-        return json_encode(DB::select(DB::raw($query)));
+            AND pessoa_ou_setor_chave = '".$request->tipo2."'";
+        return $this->consulta($select, $where)
+                    ->groupby(
+                        "atribuicoes.id",
+                        ($request->tipo == "produto" ? "produtos.descr" : "produto_ou_referencia_valor"),
+                        "atribuicoes.qtd",
+                        "atribuicoes.validade",
+                        "atribuicoes.obrigatorio"
+                    )
+                    ->orderby("atribuicoes.id")
+                    ->get();
     }
 
     public function produtos($id) {
-        return json_encode(
-            DB::table("produtos")
-                ->select(
-                    "produtos.id",
-                    DB::raw("CASE
-                        WHEN produto_ou_referencia_chave = 'referencia' THEN CONCAT(produtos.descr, ' ', tamanho)
-                        ELSE produtos.descr
-                    END AS descr"),
-                    DB::raw("CASE
-                        WHEN produto_ou_referencia_chave = 'referencia' THEN produtos.referencia
-                        ELSE produtos.descr
-                    END AS titulo")
-                )
-                ->join("atribuicoes", function($join) {
-                    $join->on(function($sql) {
-                        $sql->on("atribuicoes.produto_ou_referencia_valor", "produtos.cod_externo")
-                            ->where("atribuicoes.produto_ou_referencia_chave", "produto");
-                    })->orOn(function($sql) {
-                        $sql->on("atribuicoes.produto_ou_referencia_valor", "produtos.referencia")
-                            ->where("atribuicoes.produto_ou_referencia_chave", "referencia");
-                    });
-                })
-                ->where("atribuicoes.id", $id)
-                ->where("produtos.lixeira", 0)
-                ->get()
-        );
+        return json_encode($this->consulta("
+            produtos.id,
+            CASE
+                WHEN produto_ou_referencia_chave = 'referencia' THEN CONCAT(produtos.descr, ' ', tamanho)
+                ELSE produtos.descr
+            END AS descr,
+            CASE
+                WHEN produto_ou_referencia_chave = 'referencia' THEN produtos.referencia
+                ELSE produtos.descr
+            END AS titulo
+        ", "atribuicoes.id = ".$id)->orderby("descr")->get());
     }
 }
