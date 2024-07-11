@@ -1,4 +1,4 @@
-let relatorio, pessoa, pessoa_atribuindo, limite_maximo, gradeGlobal;
+let relatorio, pessoa, pessoa_atribuindo, limite_maximo, gradeGlobal, idatbglobal;
 let anteriores = new Array();
 let validacao_bloqueada = false;
 
@@ -600,8 +600,10 @@ function numerico(el) {
     el.value = el.value.replace(/\D/g, "");
 }
 
-function mostrar_atribuicoes() {
-    $.get(URL + "/atribuicoes/mostrar", {
+function mostrar_atribuicoes(_id) {
+    if (_id === undefined) _id = 0;
+    idatbglobal = _id;
+    $.get(URL + "/atribuicoes/listar", {
         id : pessoa_atribuindo,
         tipo : gradeGlobal ? "referencia" : "produto",
         tipo2 : location.href.indexOf("colaboradores") > -1 ? "pessoa" : "setor"
@@ -628,6 +630,7 @@ function mostrar_atribuicoes() {
                     "<td class = 'text-right'>" + atribuicao.validade + "</td>" +
                     "<td class = 'text-center'>" +
                         (location.href.indexOf("colaboradores") > -1 ? "<i class = 'my-icon far fa-hand-holding-box' title = 'Retirar' onclick = 'retirar(" + atribuicao.id + ")'></i>" : "") +
+                        "<i class = 'my-icon far fa-edit'      title = 'Editar'  onclick = 'editar_atribuicao(" + atribuicao.id + ")'></i>" +
                         "<i class = 'my-icon far fa-trash-alt' title = 'Excluir' onclick = 'excluir_atribuicao(" + atribuicao.id + ")'></i>" +
                     "</td>" +
                 "</tr>";
@@ -681,6 +684,7 @@ function atribuir() {
     const campo = gradeGlobal ? "referencia" : "produto";
     $.post(URL + "/atribuicoes/salvar", {
         _token : $("meta[name='csrf-token']").attr("content"),
+        id : idatbglobal,
         pessoa_ou_setor_chave : location.href.indexOf("colaboradores") > -1 ? "pessoa" : "setor",
         pessoa_ou_setor_valor : pessoa_atribuindo,
         produto_ou_referencia_chave : campo,
@@ -697,6 +701,7 @@ function atribuir() {
                 document.getElementById("produto").value = "";
                 document.getElementById("quantidade").value = 1;
                 document.getElementById("validade").value = 1;
+                document.getElementById("obrigatorio").value = "opt-0";
                 mostrar_atribuicoes();
                 break;
             case 403:
@@ -706,6 +711,30 @@ function atribuir() {
                 s_alert(gradeGlobal ? "Referência não encontrada" : "Produto não encontrado");
                 break;
         }
+    });
+}
+
+function editar_atribuicao(id) {
+    const campo = gradeGlobal ? "referencia" : "produto";
+    $.get(URL + "/atribuicoes/mostrar/" + id, function(data) {
+        document.getElementById("estiloAux").innerHTML = "autocomplete-result{display:none}";
+        [campo, "validade", "quantidade", "obrigatorio"].forEach((el) => {
+            document.getElementById(el).disabled = true;
+        });
+        if (typeof data == "string") data = $.parseJSON(data);
+        document.getElementById(campo).value = data.descr;
+        $("#" + campo).trigger("keyup");
+        setTimeout(function() {
+            $($(".autocomplete-line").first()).trigger("click");
+            document.getElementById("validade").value = data.validade;
+            document.getElementById("quantidade").value = parseInt(data.qtd);
+            document.getElementById("obrigatorio").value = "opt-" + data.obrigatorio;
+            document.getElementById("estiloAux").innerHTML = "";
+            [campo, "validade", "quantidade", "obrigatorio"].forEach((el) => {
+                document.getElementById(el).disabled = false;
+            });
+            mostrar_atribuicoes(id);
+        }, 500);
     });
 }
 

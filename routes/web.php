@@ -88,7 +88,8 @@ Route::middleware("auth")->group(function () {
 
     Route::group(["prefix" => "atribuicoes"], function() {
         Route::get ("/ver-maximo",    [AtribuicoesController::class, "verMaximo"]);
-        Route::get ("/mostrar",       [AtribuicoesController::class, "mostrar"]);
+        Route::get ("/listar",        [AtribuicoesController::class, "listar"]);
+        Route::get ("/mostrar/{id}",  [AtribuicoesController::class, "mostrar"]);
         Route::get ("/produtos/{id}", [AtribuicoesController::class, "produtos"]);
         Route::post("/salvar",        [AtribuicoesController::class, "salvar"]);
         Route::post("/excluir",       [AtribuicoesController::class, "excluir"]);

@@ -7,6 +7,23 @@ use Illuminate\Http\Request;
 use App\Models\Atribuicoes;
 
 class AtribuicoesController extends ControllerKX {
+    private function consulta($select, $where) {
+        return DB::table("produtos")
+                    ->select(DB::raw($select))
+                    ->join("atribuicoes", function($join) {
+                        $join->on(function($sql) {
+                            $sql->on("atribuicoes.produto_ou_referencia_valor", "produtos.cod_externo")
+                                ->where("atribuicoes.produto_ou_referencia_chave", "produto");
+                        })->orOn(function($sql) {
+                            $sql->on("atribuicoes.produto_ou_referencia_valor", "produtos.referencia")
+                                ->where("atribuicoes.produto_ou_referencia_chave", "referencia");
+                        });
+                    })
+                    ->whereRaw($where)
+                    ->where("produtos.lixeira", 0)
+                    ->where("atribuicoes.lixeira", 0);
+    }
+
     public function verMaximo(Request $request) {
         $resultado = new \stdClass;
 
@@ -63,8 +80,8 @@ class AtribuicoesController extends ControllerKX {
                 ->where("produto_ou_referencia_chave", $request->produto_ou_referencia_chave)
                 ->where("lixeira", 0)
                 ->get()
-        )) return 403;
-        $linha = new Atribuicoes;
+        ) && !intval($request->id)) return 403;
+        $linha = Atribuicoes::firstOrNew(["id" => $request->id]);
         $linha->pessoa_ou_setor_chave = $request->pessoa_ou_setor_chave;
         $linha->pessoa_ou_setor_valor = $request->pessoa_ou_setor_valor;
         $linha->produto_ou_referencia_chave = $request->produto_ou_referencia_chave;
@@ -84,24 +101,7 @@ class AtribuicoesController extends ControllerKX {
         $this->log_inserir("D", "atribuicoes", $linha->id);
     }
 
-    private function consulta($select, $where) {
-        return DB::table("produtos")
-                    ->select(DB::raw($select))
-                    ->join("atribuicoes", function($join) {
-                        $join->on(function($sql) {
-                            $sql->on("atribuicoes.produto_ou_referencia_valor", "produtos.cod_externo")
-                                ->where("atribuicoes.produto_ou_referencia_chave", "produto");
-                        })->orOn(function($sql) {
-                            $sql->on("atribuicoes.produto_ou_referencia_valor", "produtos.referencia")
-                                ->where("atribuicoes.produto_ou_referencia_chave", "referencia");
-                        });
-                    })
-                    ->whereRaw($where)
-                    ->where("produtos.lixeira", 0)
-                    ->where("atribuicoes.lixeira", 0);
-    }
-
-    public function mostrar(Request $request) {
+    public function listar(Request $request) {
         $select = "atribuicoes.id, ";
         if ($request->tipo == "produto") $select .= "produtos.descr AS ";
         $select .= "produto_ou_referencia_valor,
@@ -125,6 +125,18 @@ class AtribuicoesController extends ControllerKX {
                     )
                     ->orderby("atribuicoes.id")
                     ->get();
+    }
+
+    public function mostrar($id) {
+        return json_encode($this->consulta("
+            CASE
+                WHEN produto_ou_referencia_chave = 'referencia' THEN produtos.referencia
+                ELSE produtos.descr
+            END AS descr,
+            qtd,
+            atribuicoes.validade,
+            obrigatorio
+        ", "atribuicoes.id = ".$id)->first());
     }
 
     public function produtos($id) {

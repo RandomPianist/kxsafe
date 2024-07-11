@@ -1,5 +1,6 @@
 
 <!-- Modal -->
+<style type = "text/css" id = "estiloAux"></style>
 <div class = "modal fade" id = "atribuicoesModal" aria-labelledby = "atribuicoesModalLabel" aria-hidden = "true">
     <div class = "modal-dialog modal-xl" role = "document">
         <div class = "modal-content">
