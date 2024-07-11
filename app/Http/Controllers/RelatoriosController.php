@@ -87,11 +87,11 @@ class RelatoriosController extends ControllerKX {
     public function bilateral_consultar(Request $request) {
         $erro = "";
         if ($request->prioridade == "empresas") {
-            if ($this->consultar_empresa($request) && trim($request->empresa)) $erro = "empresa";
+            if ($this->empresa_consultar($request) && trim($request->empresa)) $erro = "empresa";
             if (!$erro && $this->consultar_maquina($request) && trim($request->maquina)) $erro = "maquina";
         } else {
             if ($this->consultar_maquina($request) && trim($request->maquina)) $erro = "maquina";
-            if (!$erro && $this->consultar_empresa($request) && trim($request->empresa)) $erro = "empresa";
+            if (!$erro && $this->empresa_consultar($request) && trim($request->empresa)) $erro = "empresa";
         }
         return $erro;
     }
