@@ -19,19 +19,13 @@ class RelatoriosController extends ControllerKX {
         ));
     }
 
-    private function comum() {
-        return "
-            FROM comodatos
-
-            JOIN valores
-                ON valores.id = comodatos.id_maquina
-
-            JOIN empresas
-                ON empresas.id = comodatos.id_empresa
-
-            WHERE valores.lixeira = 0
-              AND empresas.lixeira = 0
-        ";
+    private function comum($select) {
+        return DB::table("comodatos")
+                    ->join("valores", "valores.id", "comodatos.id_maquina")
+                    ->join("empresas", "empresas.id", "comodatos.id_empresa")
+                    ->select(DB::raw($select))
+                    ->where("valores.lixeira", 0)
+                    ->where("empresas.lixeira", 0);
     }
 
     private function bilateral_construtor(Request $request, $grupo) {
@@ -40,19 +34,15 @@ class RelatoriosController extends ControllerKX {
         if ($request->id_maquina) array_push($filtro, "id_maquina = ".$request->id_maquina);
         $filtro = join(" AND ", $filtro);
         if (!$filtro) $filtro = "1";
-        return collect(DB::select(DB::raw("
-            SELECT
+        return collect(
+            $this->comum("
                 empresas.nome_fantasia AS col1,
                 valores.descr AS col2
-            
-            ".$this->comum()."
-            
-            AND ".$filtro."
-            AND CURDATE() >= inicio
-            AND CURDATE() < fim
-
-            ORDER BY valores.descr
-        ")))->groupBy($grupo);
+            ")->whereRaw($filtro."
+                AND CURDATE() >= inicio
+                AND CURDATE() < fim
+            ")->orderby("valores.descr")->get()
+        )->groupBy($grupo);
     }
 
     private function maquinas_por_empresa(Request $request) {
@@ -107,17 +97,12 @@ class RelatoriosController extends ControllerKX {
     }
 
     public function comodatos() {
-        $resultado = DB::select(DB::raw("
-            SELECT
-                valores.descr AS maquina,
-                empresas.nome_fantasia AS empresa,
-                DATE_FORMAT(comodatos.inicio, '%d/%m/%Y') AS inicio,
-                DATE_FORMAT(comodatos.fim, '%d/%m/%Y') AS fim
-
-            ".$this->comum()."
-
-            ORDER BY comodatos.inicio
-        "));
+        $resultado = $this->comum("
+            valores.descr AS maquina,
+            empresas.nome_fantasia AS empresa,
+            DATE_FORMAT(comodatos.inicio, '%d/%m/%Y') AS inicio,
+            DATE_FORMAT(comodatos.fim, '%d/%m/%Y') AS fim
+        ")->orderby("comodatos.inicio")->get();
         return sizeof($resultado) ? view("reports/comodatos", compact("resultado")) : view("nada");
     }
 
