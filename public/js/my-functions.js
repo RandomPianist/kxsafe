@@ -715,27 +715,31 @@ function atribuir() {
 }
 
 function editar_atribuicao(id) {
-    const campo = gradeGlobal ? "referencia" : "produto";
-    $.get(URL + "/atribuicoes/mostrar/" + id, function(data) {
-        document.getElementById("estiloAux").innerHTML = "autocomplete-result{display:none}";
-        [campo, "validade", "quantidade", "obrigatorio"].forEach((el) => {
-            document.getElementById(el).disabled = true;
-        });
-        if (typeof data == "string") data = $.parseJSON(data);
-        document.getElementById(campo).value = data.descr;
-        $("#" + campo).trigger("keyup");
-        setTimeout(function() {
-            $($(".autocomplete-line").first()).trigger("click");
-            document.getElementById("validade").value = data.validade;
-            document.getElementById("quantidade").value = parseInt(data.qtd);
-            document.getElementById("obrigatorio").value = "opt-" + data.obrigatorio;
-            document.getElementById("estiloAux").innerHTML = "";
+    if (idatbglobal != id) {
+        const campo = gradeGlobal ? "referencia" : "produto";
+        $.get(URL + "/atribuicoes/mostrar/" + id, function(data) {
+            document.getElementById("estiloAux").innerHTML = ".autocomplete-result{display:none}";
             [campo, "validade", "quantidade", "obrigatorio"].forEach((el) => {
-                document.getElementById(el).disabled = false;
+                document.getElementById(el).disabled = true;
             });
-            mostrar_atribuicoes(id);
-        }, 500);
-    });
+            if (typeof data == "string") data = $.parseJSON(data);
+            document.getElementById(campo).value = data.descr;
+            $("#" + campo).trigger("keyup");
+            setTimeout(function() {
+                $($(".autocomplete-line").first()).trigger("click");
+            }, 500);
+            setTimeout(function() {
+                document.getElementById("validade").value = data.validade;
+                document.getElementById("quantidade").value = parseInt(data.qtd);
+                document.getElementById("obrigatorio").value = "opt-" + data.obrigatorio;
+                document.getElementById("estiloAux").innerHTML = "";
+                [campo, "validade", "quantidade", "obrigatorio"].forEach((el) => {
+                    document.getElementById(el).disabled = false;
+                });
+                mostrar_atribuicoes(id);
+            }, 1000);
+        });
+    }
 }
 
 function excluir_atribuicao(_id) {

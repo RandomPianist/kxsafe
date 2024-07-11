@@ -90,7 +90,7 @@ class AtribuicoesController extends ControllerKX {
         $linha->validade = $request->validade;
         $linha->obrigatorio = $request->obrigatorio;
         $linha->save();
-        $this->log_inserir("C", "atribuicoes", $linha->id);
+        $this->log_inserir($request->id ? "E" : "C", "atribuicoes", $linha->id);
         return 201;
     }
 
