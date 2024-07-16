@@ -107,6 +107,7 @@ class AtribuicoesController extends ControllerKX {
         $select .= "produto_ou_referencia_valor,
             atribuicoes.qtd,
             atribuicoes.validade, 
+            atribuicoes.id_empresa,
             CASE
                 WHEN obrigatorio = 1 THEN 'SIM'
                 ELSE 'NÃO'
@@ -115,16 +116,21 @@ class AtribuicoesController extends ControllerKX {
         $where = "pessoa_ou_setor_valor = ".$request->id."
             AND produto_ou_referencia_chave = '".$request->tipo."'
             AND pessoa_ou_setor_chave = '".$request->tipo2."'";
-        return $this->consulta($select, $where)
-                    ->groupby(
-                        "atribuicoes.id",
-                        ($request->tipo == "produto" ? "produtos.descr" : "produto_ou_referencia_valor"),
-                        "atribuicoes.qtd",
-                        "atribuicoes.validade",
-                        "atribuicoes.obrigatorio"
-                    )
-                    ->orderby("atribuicoes.id")
-                    ->get();
+        $consulta = $this->consulta($select, $where)
+                        ->groupby(
+                            "atribuicoes.id",
+                            ($request->tipo == "produto" ? "produtos.descr" : "produto_ou_referencia_valor"),
+                            "atribuicoes.qtd",
+                            "atribuicoes.validade",
+                            "atribuicoes.obrigatorio"
+                        )
+                        ->orderby("atribuicoes.id")
+                        ->get();
+        $resultado = array();
+        foreach ($consulta as $linha) {
+            array_push($linha);
+        }
+        return json_encode($resultado);
     }
 
     public function mostrar($id) {

@@ -11,14 +11,17 @@ use App\Models\Setores;
 
 class SetoresController extends ControllerKX {
     private function busca($param) {
-        return DB::table("setores")
-                ->select(
-                    "id",
-                    "descr"
-                )
-                ->whereRaw($param)
-                ->where("lixeira", 0)
-                ->get();
+        $resultado = new \stdClass;
+        $resultado->consulta = DB::table("setores")
+                                    ->select(
+                                        "id",
+                                        "descr"
+                                    )
+                                    ->whereRaw($param)
+                                    ->where("lixeira", 0)
+                                    ->get();
+        $resultado->empresa = Pessoas::find(Auth::user()->id_pessoa)->id_empresa;
+        return json_encode($resultado);
     }
 
     public function ver() {

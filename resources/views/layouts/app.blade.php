@@ -82,12 +82,10 @@
                             <i class = "my-icon fa-light fa-shelves-empty"></i>
                             <span>Máquinas</span>
                         </a>
-                        @if (!intval(App\Models\Pessoas::find(Auth::user()->id_pessoa)->id_empresa))
-                            <a href = "{{ config('app.root_url') }}/setores">
-                                <i class = "my-icon fa-light fa-layer-group"></i>
-                                <span>Setores</span>
-                            </a>
-                        @endif
+                        <a href = "{{ config('app.root_url') }}/setores">
+                            <i class = "my-icon fa-light fa-layer-group"></i>
+                            <span>Setores</span>
+                        </a>
                         <a href = "#">
                             <i class = "my-icon fa-light fa-file-chart-line"></i>
                             <span>Relatórios</span>

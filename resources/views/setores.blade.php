@@ -60,15 +60,19 @@
             }, function(data) {
                 let resultado = "";
                 if (typeof data == "string") data = $.parseJSON(data);
-                data.forEach((linha) => {
+                data.consulta.forEach((linha) => {
                     resultado += "<tr>" +
                         "<td class = 'text-right' width = '10%'>" + linha.id.toString().padStart(4, "0") + "</td>" +
                         "<td width = '75%'>" + linha.descr + "</td>" +
                         "<td class = 'text-center btn-table-action' width = '15%'>" +
-                            "<i class = 'my-icon far fa-box'       title = 'Atribuir produto' onclick = 'atribuicao(false, " + linha.id + ")'></i>" +
-                            "<i class = 'my-icon far fa-tshirt'    title = 'Atribuir grade'   onclick = 'atribuicao(true, " + linha.id + ")'></i>" +
-                            "<i class = 'my-icon far fa-edit'      title = 'Editar'           onclick = 'chamar_modal(" + linha.id + ")'></i>" +
-                            "<i class = 'my-icon far fa-trash-alt' title = 'Excluir'          onclick = 'excluir(" + linha.id + ", " + '"/setores"' + ")'></i>" +
+                            "<i class = 'my-icon far fa-box'    title = 'Atribuir produto' onclick = 'atribuicao(false, " + linha.id + ")'></i>" +
+                            "<i class = 'my-icon far fa-tshirt' title = 'Atribuir grade'   onclick = 'atribuicao(true, " + linha.id + ")'></i>" +
+                            (
+                                !parseInt(data.empresa) ?
+                                    "<i class = 'my-icon far fa-edit'      title = 'Editar'  onclick = 'chamar_modal(" + linha.id + ")'></i>" +
+                                    "<i class = 'my-icon far fa-trash-alt' title = 'Excluir' onclick = 'excluir(" + linha.id + ", " + '"/setores"' + ")'></i>"
+                                : ""
+                            ) +
                         "</td>" +
                     "</tr>";
                 });
