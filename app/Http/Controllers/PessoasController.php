@@ -88,7 +88,7 @@ class PessoasController extends ControllerKX {
     }
 
     private function cria_usuario($id) {
-        return intval($this->setor_mostar($id)->cria_usuario);
+        return intval($this->setor_mostrar($id)->cria_usuario);
     }
 
     public function ver($tipo) {
