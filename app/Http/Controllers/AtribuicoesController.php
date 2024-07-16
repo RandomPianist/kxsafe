@@ -142,7 +142,8 @@ class AtribuicoesController extends ControllerKX {
                             "atribuicoes.qtd",
                             "atribuicoes.validade",
                             "atribuicoes.id_empresa",
-                            "atribuicoes.obrigatorio"
+                            "atribuicoes.obrigatorio",
+                            "atribuicoes.pessoa_ou_setor_chave"
                         )
                         ->orderby("atribuicoes.id")
                         ->get();
