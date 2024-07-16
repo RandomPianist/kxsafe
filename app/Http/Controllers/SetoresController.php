@@ -141,24 +141,6 @@ class SetoresController extends ControllerKX {
         $linha->padrao = $request->setor_padrao;
         $linha->save();
         $this->log_inserir($request->id ? "E" : "C", "setores", $linha->id);
-        if ($linha->padrao) {
-            $consulta = DB::table("empresas")
-                            ->pluck("id");
-            foreach ($consulta as $empresa) {
-                if (!sizeof(
-                    DB::table("empresas_setores")
-                        ->where("id_empresa", $empresa)
-                        ->where("id_setor", $linha->id)
-                        ->get()
-                )) {
-                    $modelo = new EmpresasSetores;
-                    $modelo->id_empresa = $empresa->id;
-                    $modelo->id_setor = $linha->id;
-                    $modelo->save();
-                    $this->log_inserir("C", "empresas_setores", $modelo->id);
-                }
-            }
-        }
         return redirect("/setores");
     }
 

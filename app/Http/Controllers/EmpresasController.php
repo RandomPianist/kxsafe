@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use DB;
 use Auth;
 use Illuminate\Http\Request;
-use App\Models\EmpresasSetores;
 use App\Models\Empresas;
 use App\Models\Pessoas;
 
@@ -93,18 +92,6 @@ class EmpresasController extends ControllerKX {
         $linha->id_matriz = $request->id_matriz ? $request->id_matriz : 0;
         $linha->save();
         $this->log_inserir($request->id ? "E" : "C", "empresas", $linha->id);
-        if (!$request->id) {
-            $consulta = DB::table("setores")
-                            ->where("padrao", 1)
-                            ->pluck("id");
-            foreach ($consulta as $setor) {
-                $modelo = new EmpresasSetores;
-                $modelo->id_empresa = $linha->id;
-                $modelo->id_setor = $setor;
-                $modelo->save();
-                $this->log_inserir("C", "empresas_setores", $modelo->id);
-            }
-        }
         return redirect("/empresas");
     }
 
@@ -113,52 +100,5 @@ class EmpresasController extends ControllerKX {
         $linha->lixeira = 1;
         $linha->save();
         $this->log_inserir("D", "empresas", $linha->id);
-    }
-
-    public function listarSetores($id) {
-        return json_encode(
-            DB::table("empresas_setores AS es")
-                ->select(
-                    "es.id",
-                    "setores.descr"
-                )
-                ->join("setores", "setores.id", "es.id_setor")
-                ->join("empresas", "empresas.id", "es.id_empresa")
-                ->where("setores.lixeira", 0)
-                ->where("empresas.lixeira", 0)
-                ->where("es.lixeira", 0)
-                ->where("es.id_empresa", $id)
-                ->get()
-        );
-    }
-
-    public function salvarSetor(Request $request) {
-        if (!sizeof(
-            DB::table("setores")
-                ->where("id", $request->id_setor)    
-                ->where("descr", $request->setor)
-                ->where("lixeira", 0)
-                ->get()
-        )) return 404;
-        if (sizeof(
-            DB::table("empresas_setores")
-                ->where("id_empresa", $request->id_empresa)
-                ->where("id_setor", $request->id_setor)
-                ->where("lixeira", 0)
-                ->get()
-        )) return 403;
-        $linha = new EmpresasSetores;
-        $linha->id_empresa = $request->id_empresa;
-        $linha->id_setor = $request->id_setor;
-        $linha->save();
-        $this->log_inserir("C", "empresas_setores", $linha->id);
-        return 201;
-    }
-
-    public function excluirSetor(Request $request) {
-        $linha = EmpresasSetores::find($request->id);
-        $linha->lixeira = 1;
-        $linha->save();
-        $this->log_inserir("D", "empresas_setores", $linha->id);
     }
 }

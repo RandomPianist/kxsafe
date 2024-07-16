@@ -115,10 +115,9 @@
                 return "<summary class = 'texto-tabela' id = 'empresa-" + id + "' onclick = 'zebrar(true)'>" +
                     nome +
                     "<div class = 'btn-table-action'>" +
-                        "<i title = 'Atribuir setores' class = 'espacamento my-icon far fa-layer-group' onclick = 'spe(" + id + ", event)'></i>" +
-                        "<i title = 'Nova filial'      class = 'my-icon far fa-plus'                    onclick = 'criar_filial(" + id + ", event)'></i>" +
-                        "<i title = 'Editar'           class = 'my-icon far fa-edit'                    onclick = 'chamar_modal(" + id + ", event)'></i>" +
-                        "<i title = 'Excluir'          class = 'my-icon far fa-trash-alt'               onclick = 'excluir(" + id + ", " + '"/empresas"' + ", event)'></i>" +
+                        "<i title = 'Nova filial' class = 'espacamento my-icon far fa-plus' onclick = 'criar_filial(" + id + ", event)'></i>" +
+                        "<i title = 'Editar'      class = 'my-icon far fa-edit'             onclick = 'chamar_modal(" + id + ", event)'></i>" +
+                        "<i title = 'Excluir'     class = 'my-icon far fa-trash-alt'        onclick = 'excluir(" + id + ", " + '"/empresas"' + ", event)'></i>" +
                     "</div>" +
                 "</summary>";
             }
@@ -243,78 +242,7 @@
                 document.getElementById("id_matriz").value = matriz;
             });
         }
-
-        function excluir_spe(_id) {
-            excluirMain(_id, "/empresas/setores", "Tem certeza que deseja excluir?", function() {
-                mostrar_spe();
-            });
-        }
-
-        function mostrar_spe(_id) {
-            $.get(URL + "/empresas/setores/listar/" + _id, function(data) {
-                let resultado = "";
-                let elRes = document.getElementById("table-spe");
-                if (typeof data == "string") data = $.parseJSON(data);
-                if (data.length) {
-                    resultado += "<thead>" +
-                        "<tr>" +
-                            "<th>Setor</th>" +
-                            "<th>&nbsp;</th>" +
-                        "</tr>" +
-                    "</thead>" +
-                    "<tbody>";
-                    data.forEach((spe) => {
-                        resultado += "<tr>" +
-                            "<td>" + spe.descr + "</td>" +
-                            "<td class = 'text-center'>" +
-                                "<i class = 'my-icon far fa-trash-alt' title = 'Excluir' onclick = 'excluir_spe(" + spe.id + ")'></i>" +
-                            "</td>" +
-                        "</tr>";
-                    });
-                    resultado += "</tbody>";
-                    elRes.parentElement.classList.add("pb-4");
-                } else elRes.parentElement.classList.remove("pb-4");
-                elRes.innerHTML = resultado;
-            });
-        }
-
-        function spe(id, e) {
-            e.preventDefault();
-            emp_atual = id;
-            modal("speModal", 0, function() {
-                $.get(URL + "/empresas/mostrar/" + id, function(data) {
-                    if (typeof data == "string") data = $.parseJSON(data);
-                    document.getElementById("speModalLabel").innerHTML = data.nome_fantasia + " - Atribuindo setores";
-                    mostrar_spe(id);
-                });
-            });
-        }
-
-        function criar_spe() {
-            $.post(URL + "/empresas/setores/salvar", {
-                _token : $("meta[name='csrf-token']").attr("content"),
-                setor : document.getElementById("setor2").value,
-                id_setor : document.getElementById("id_setor2").value,
-                id_empresa : emp_atual
-            }, function(ret) {
-                ret = parseInt(ret);
-                switch(ret) {
-                    case 201:
-                        document.getElementById("id_setor2").value = "";
-                        document.getElementById("setor2").value = "";
-                        mostrar_spe(emp_atual);
-                        break;
-                    case 403:
-                        s_alert("Setor inválido");
-                        break;
-                    case 404:
-                        s_alert("Setor não encontrado");
-                        break;
-                }
-            });
-        }
     </script>
 
-    @include("modals.spe_modal")
     @include("modals.empresas_modal")
 @endsection
