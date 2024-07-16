@@ -13,7 +13,7 @@ class RetiradasController extends ControllerKX {
 
     public function salvar(Request $request) {
         $json = array(
-            "id_pessoa" => Atribuicoes::find($request->atribuicao)->pessoa_ou_setor_valor,
+            "id_pessoa" => $request->pessoa,
             "id_atribuicao" => $request->atribuicao,
             "id_produto" => $request->produto,
             "id_comodato" => 0,

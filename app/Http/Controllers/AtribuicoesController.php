@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use DB;
+use Auth;
 use Illuminate\Http\Request;
 use App\Models\Atribuicoes;
+use App\Models\Pessoas;
 
 class AtribuicoesController extends ControllerKX {
-    private function consulta($select, $where) {
+    private function consulta_main($select) {
         return DB::table("produtos")
                     ->select(DB::raw($select))
                     ->join("atribuicoes", function($join) {
@@ -18,7 +20,11 @@ class AtribuicoesController extends ControllerKX {
                             $sql->on("atribuicoes.produto_ou_referencia_valor", "produtos.referencia")
                                 ->where("atribuicoes.produto_ou_referencia_chave", "referencia");
                         });
-                    })
+                    });
+    }
+
+    private function consulta($select, $where) {
+        return $this->consulta_main($select)
                     ->whereRaw($where)
                     ->where("produtos.lixeira", 0)
                     ->where("atribuicoes.lixeira", 0);
@@ -89,6 +95,7 @@ class AtribuicoesController extends ControllerKX {
         $linha->qtd = $request->qtd;
         $linha->validade = $request->validade;
         $linha->obrigatorio = $request->obrigatorio;
+        $linha->id_empresa = Pessoas::find(Auth::user()->id_pessoa)->id_empresa;
         $linha->save();
         $this->log_inserir($request->id ? "E" : "C", "atribuicoes", $linha->id);
         return 201;
@@ -111,24 +118,53 @@ class AtribuicoesController extends ControllerKX {
             CASE
                 WHEN obrigatorio = 1 THEN 'SIM'
                 ELSE 'NÃO'
-            END AS obrigatorio
+            END AS obrigatorio,
+            pessoa_ou_setor_chave
         ";
-        $where = "pessoa_ou_setor_valor = ".$request->id."
-            AND produto_ou_referencia_chave = '".$request->tipo."'
-            AND pessoa_ou_setor_chave = '".$request->tipo2."'";
-        $consulta = $this->consulta($select, $where)
+        $consulta = $this->consulta_main($select)
+                        ->leftjoin("pessoas", function($join) {
+                            $join->on(function($sql) {
+                                $sql->on("pessoa_ou_setor_valor", "pessoas.id")
+                                    ->where("pessoa_ou_setor_chave", "pessoa");
+                            });
+                        })
+                        ->where(function($sql) {
+                            $sql->whereNotNull("pessoas.id")
+                                ->orWhere("pessoa_ou_setor_chave", $request->tipo2);
+                        })
+                        ->where("pessoa_ou_setor_valor", $request->id)
+                        ->where("produto_ou_referencia_chave", $request->tipo)
+                        ->where("produtos.lixeira", 0)
+                        ->where("atribuicoes.lixeira", 0)
                         ->groupby(
                             "atribuicoes.id",
                             ($request->tipo == "produto" ? "produtos.descr" : "produto_ou_referencia_valor"),
                             "atribuicoes.qtd",
                             "atribuicoes.validade",
+                            "atribuicoes.id_empresa",
                             "atribuicoes.obrigatorio"
                         )
                         ->orderby("atribuicoes.id")
                         ->get();
         $resultado = array();
         foreach ($consulta as $linha) {
-            array_push($linha);
+            $linha->pode_editar = 1;
+            $mostrar = $linha->pessoa_ou_setor_chave != "setor";
+            if (!$mostrar) {
+                $aux = DB::table("pessoas")
+                            ->select(
+                                DB::raw("IFNULL(empresas.id, 0) AS id_empresa"),
+                                DB::raw("IFNULL(empresas.id_matriz, 0) AS id_matriz")
+                            )
+                            ->leftjoin("empresas", "empresas.id", "pessoas.id_empresa")
+                            ->where("pessoas.id", Auth::user()->id_pessoa)
+                            ->first();
+                $empresa_atribuicao = intval($linha->id_empresa);
+                $empresa_logada = intval($aux->id_empresa);
+                $mostrar = in_array($empresa_atribuicao, [0, $empresa_logada, intval($aux->id_matriz)]);
+                $linha->pode_editar = $empresa_atribuicao == $empresa_logada ? 1 : 0;
+            }
+            if ($mostrar) array_push($resultado, $linha);
         }
         return json_encode($resultado);
     }

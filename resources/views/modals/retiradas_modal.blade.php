@@ -168,6 +168,7 @@
             _token : $("meta[name='csrf-token']").attr("content"),
             supervisor : _supervisor,
             atribuicao : id,
+            pessoa : pessoa_atribuindo,
             produto : document.getElementById("variacao").value.replace("prod-", ""),
             data : document.getElementById("data-ret").value,
             quantidade : document.getElementById("quantidade2").value

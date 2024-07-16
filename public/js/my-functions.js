@@ -630,8 +630,10 @@ function mostrar_atribuicoes(_id) {
                     "<td class = 'text-right'>" + atribuicao.validade + "</td>" +
                     "<td class = 'text-center'>" +
                         (location.href.indexOf("colaboradores") > -1 ? "<i class = 'my-icon far fa-hand-holding-box' title = 'Retirar' onclick = 'retirar(" + atribuicao.id + ")'></i>" : "") +
-                        "<i class = 'my-icon far fa-edit'      title = 'Editar'  onclick = 'editar_atribuicao(" + atribuicao.id + ")'></i>" +
-                        "<i class = 'my-icon far fa-trash-alt' title = 'Excluir' onclick = 'excluir_atribuicao(" + atribuicao.id + ")'></i>" +
+                        (parseInt(atribuicao.pode_editar) ?
+                            "<i class = 'my-icon far fa-edit'      title = 'Editar'  onclick = 'editar_atribuicao(" + atribuicao.id + ")'></i>" +
+                            "<i class = 'my-icon far fa-trash-alt' title = 'Excluir' onclick = 'excluir_atribuicao(" + atribuicao.id + ")'></i>"
+                        : "") +
                     "</td>" +
                 "</tr>";
             });
