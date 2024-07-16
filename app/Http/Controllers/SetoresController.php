@@ -138,7 +138,6 @@ class SetoresController extends ControllerKX {
         }
         $linha->descr = mb_strtoupper($request->descr);
         $linha->cria_usuario = $cria_usuario;
-        $linha->padrao = $request->setor_padrao;
         $linha->save();
         $this->log_inserir($request->id ? "E" : "C", "setores", $linha->id);
         return redirect("/setores");

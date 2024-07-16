@@ -6,10 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int    $id
- * @property int    $created_at
  * @property int    $cria_usuario
  * @property int    $lixeira
- * @property int    $padrao
+ * @property int    $created_at
  * @property int    $updated_at
  * @property string $descr
  */
@@ -35,7 +34,7 @@ class Setores extends Model
      * @var array
      */
     protected $fillable = [
-        'created_at', 'cria_usuario', 'descr', 'lixeira', 'padrao', 'updated_at'
+        'descr', 'cria_usuario', 'lixeira', 'created_at', 'updated_at'
     ];
 
     /**
@@ -53,7 +52,7 @@ class Setores extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'created_at' => 'timestamp', 'cria_usuario' => 'int', 'descr' => 'string', 'lixeira' => 'int', 'padrao' => 'int', 'updated_at' => 'timestamp'
+        'id' => 'int', 'descr' => 'string', 'cria_usuario' => 'int', 'lixeira' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp'
     ];
 
     /**
