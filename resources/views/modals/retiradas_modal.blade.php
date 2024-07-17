@@ -179,6 +179,8 @@
                 icon : "success",
                 title : "Sucesso",
                 confirmButtonColor : "rgb(31, 41, 55)"
+            }).then((result) => {
+                listar();
             });
         });
     }

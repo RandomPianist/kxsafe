@@ -126,11 +126,16 @@ class AtribuicoesController extends ControllerKX {
                             $join->on(function($sql) {
                                 $sql->on("pessoa_ou_setor_valor", "pessoas.id")
                                     ->where("pessoa_ou_setor_chave", "pessoa");
+                            })->orOn(function($sql) {
+                                $sql->on("pessoa_ou_setor_valor", "pessoas.id_setor")
+                                    ->where("pessoa_ou_setor_chave", "setor");
                             });
                         })
-                        ->where(function($sql) {
-                            $sql->whereNotNull("pessoas.id")
-                                ->orWhere("pessoa_ou_setor_chave", $request->tipo2);
+                        ->where(function($sql) use($request) {
+                            if ($request->tipo2 != "setor") {
+                                $sql->whereNotNull("pessoas.id")
+                                    ->orWhere("pessoa_ou_setor_chave", $request->tipo2);
+                            } else $sql->where("pessoa_ou_setor_chave", $request->tipo2);
                         })
                         ->where("pessoa_ou_setor_valor", $request->id)
                         ->where("produto_ou_referencia_chave", $request->tipo)

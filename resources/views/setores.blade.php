@@ -59,7 +59,7 @@
                 filtro : document.getElementById("busca").value
             }, function(data) {
                 let resultado = "";
-                if (typeof data == "string") data = $.parseJSON(data);
+                while (typeof data == "string") data = $.parseJSON(data);
                 data.consulta.forEach((linha) => {
                     resultado += "<tr>" +
                         "<td class = 'text-right' width = '10%'>" + linha.id.toString().padStart(4, "0") + "</td>" +

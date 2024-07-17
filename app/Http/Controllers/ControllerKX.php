@@ -181,8 +181,7 @@ class ControllerKX extends Controller {
             return DB::table("setores")
                         ->select(
                             "descr",
-                            "cria_usuario",
-                            "padrao"
+                            "cria_usuario"
                         )
                         ->where("id", $id)
                         ->first();

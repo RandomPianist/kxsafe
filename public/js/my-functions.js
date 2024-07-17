@@ -623,18 +623,19 @@ function mostrar_atribuicoes(_id) {
             "</thead>" +
             "<tbody>";
             data.forEach((atribuicao) => {
+                let acoes = "";
+                if (location.href.indexOf("colaboradores") > -1) acoes += "<i class = 'my-icon far fa-hand-holding-box' title = 'Retirar' onclick = 'retirar(" + atribuicao.id + ")'></i>";
+                if (parseInt(atribuicao.pode_editar)) {
+                    acoes += "<i class = 'my-icon far fa-edit' title = 'Editar' onclick = 'editar_atribuicao(" + atribuicao.id + ")'></i>" +
+                        "<i class = 'my-icon far fa-trash-alt' title = 'Excluir' onclick = 'excluir_atribuicao(" + atribuicao.id + ")'></i>";
+                }
+                if (!acoes) acoes = "---";
                 resultado += "<tr>" +
                     "<td>" + atribuicao.produto_ou_referencia_valor + "</td>" +
                     "<td>" + atribuicao.obrigatorio + "</td>" +
                     "<td class = 'text-right'>" + atribuicao.qtd + "</td>" +
                     "<td class = 'text-right'>" + atribuicao.validade + "</td>" +
-                    "<td class = 'text-center'>" +
-                        (location.href.indexOf("colaboradores") > -1 ? "<i class = 'my-icon far fa-hand-holding-box' title = 'Retirar' onclick = 'retirar(" + atribuicao.id + ")'></i>" : "") +
-                        (parseInt(atribuicao.pode_editar) ?
-                            "<i class = 'my-icon far fa-edit'      title = 'Editar'  onclick = 'editar_atribuicao(" + atribuicao.id + ")'></i>" +
-                            "<i class = 'my-icon far fa-trash-alt' title = 'Excluir' onclick = 'excluir_atribuicao(" + atribuicao.id + ")'></i>"
-                        : "") +
-                    "</td>" +
+                    "<td class = 'text-center manter-junto'>" + acoes + "</td>" +
                 "</tr>";
             });
             resultado += "</tbody>";
