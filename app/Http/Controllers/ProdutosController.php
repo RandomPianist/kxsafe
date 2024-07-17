@@ -57,7 +57,7 @@ class ProdutosController extends ControllerKX {
         if (sizeof(
             DB::table("atribuicoes")
                 ->where("produto_ou_referencia_valor", Produtos::find($request->id)->referencia)
-                ->where("produto_ou_referencia_chave", "referencia")
+                ->where("produto_ou_referencia_chave", "R")
                 ->get()
         ) && !trim($request->referencia)) return "aviso";
         return "";
@@ -125,11 +125,11 @@ class ProdutosController extends ControllerKX {
         $consulta = DB::table("atribuicoes")
                         ->where(function($sql) use ($request) {
                             $sql->whereIn("produto_ou_referencia_valor", DB::table("produtos")->where("id", $request->id)->pluck("cod_externo")->toArray())
-                                ->where("produto_ou_referencia_chave", "produto");
+                                ->where("produto_ou_referencia_chave", "P");
                         })
                         ->orWhere(function($sql) use ($request) {
                             $sql->whereIn("produto_ou_referencia_valor", DB::table("produtos")->where("id", $request->id)->pluck("referencia")->toArray())
-                                ->where("produto_ou_referencia_chave", "referencia");
+                                ->where("produto_ou_referencia_chave", "R");
                         })
                         ->pluck("id");
         foreach ($consulta as $atb) {

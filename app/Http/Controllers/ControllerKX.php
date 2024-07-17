@@ -81,7 +81,7 @@ class ControllerKX extends Controller {
                         id,
                         pessoa_ou_setor_valor
                     FROM atribuicoes
-                    WHERE pessoa_ou_setor_chave = 'pessoa'
+                    WHERE pessoa_ou_setor_chave = 'P'
                 ) AS atb ON atb.id = log.fk
 
                 LEFT JOIN pessoas AS aux2
@@ -119,11 +119,11 @@ class ControllerKX extends Controller {
                 LEFT JOIN (
                     SELECT id
                     FROM atribuicoes
-                    WHERE pessoa_ou_setor_chave = 'setor'
+                    WHERE pessoa_ou_setor_chave = 'S'
                 ) AS atb ON atb.id = log.fk
 
                 WHERE log.tabela = 'setores'
-                OR (log.tabela = 'atribuicoes' AND atb.id IS NOT NULL)
+                  OR (log.tabela = 'atribuicoes' AND atb.id IS NOT NULL)
             ";
         } else $query .= " WHERE log.tabela = '".$tabela."'";
 
@@ -214,7 +214,7 @@ class ControllerKX extends Controller {
     protected function atribuicao_atualiza_ref($id, $antigo, $novo, $nome, $api = false) {
         if ($id) {
             $novo = trim($novo);
-            $where = "produto_ou_referencia_valor = '".$antigo."' AND produto_ou_referencia_chave = 'referencia'";
+            $where = "produto_ou_referencia_valor = '".$antigo."' AND produto_ou_referencia_chave = 'R'";
             DB::statement("
                 UPDATE atribuicoes
                 SET ".($novo ? "produto_ou_referencia_valor = '".$novo."'" : "lixeira = 1")."

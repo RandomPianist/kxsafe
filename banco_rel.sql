@@ -135,10 +135,10 @@ CREATE TABLE comodatos (
 
 CREATE TABLE atribuicoes (
 	id INT AUTO_INCREMENT PRIMARY KEY,
-	pessoa_ou_setor_chave VARCHAR(16),
+	pessoa_ou_setor_chave CHAR,
 	pessoa_ou_setor_valor INT,
-	produto_ou_referencia_chave VARCHAR(16),
-	produto_ou_referencia_valor VARCHAR(256),
+	produto_ou_referencia_chave CHAR,
+	produto_ou_referencia_valor VARCHAR(64),
 	qtd NUMERIC(10,5),
 	validade INT,
 	obrigatorio TINYINT DEFAULT 0,

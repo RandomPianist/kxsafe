@@ -694,11 +694,11 @@ function atualizaValidade() {
 }
 
 function atribuir() {
-    const campo = gradeGlobal ? "referencia" : "produto";
+    const campo = gradeGlobal ? "R" : "P";
     $.post(URL + "/atribuicoes/salvar", {
         _token : $("meta[name='csrf-token']").attr("content"),
         id : idatbglobal,
-        pessoa_ou_setor_chave : location.href.indexOf("colaboradores") > -1 ? "pessoa" : "setor",
+        pessoa_ou_setor_chave : location.href.indexOf("colaboradores") > -1 ? "P" : "S",
         pessoa_ou_setor_valor : pessoa_atribuindo,
         produto_ou_referencia_chave : campo,
         produto_ou_referencia_valor : document.getElementById(campo).value,

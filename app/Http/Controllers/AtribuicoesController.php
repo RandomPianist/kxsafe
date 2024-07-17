@@ -15,10 +15,10 @@ class AtribuicoesController extends ControllerKX {
                     ->join("atribuicoes", function($join) {
                         $join->on(function($sql) {
                             $sql->on("atribuicoes.produto_ou_referencia_valor", "produtos.cod_externo")
-                                ->where("atribuicoes.produto_ou_referencia_chave", "produto");
+                                ->where("atribuicoes.produto_ou_referencia_chave", "P");
                         })->orOn(function($sql) {
                             $sql->on("atribuicoes.produto_ou_referencia_valor", "produtos.referencia")
-                                ->where("atribuicoes.produto_ou_referencia_chave", "referencia");
+                                ->where("atribuicoes.produto_ou_referencia_chave", "R");
                         });
                     });
     }
@@ -33,11 +33,11 @@ class AtribuicoesController extends ControllerKX {
     public function salvar(Request $request) {
         if (!sizeof(
             DB::table("produtos")
-                ->where($request->produto_ou_referencia_chave == "produto" ? "descr" : "referencia", $request->produto_ou_referencia_valor)
+                ->where($request->produto_ou_referencia_chave == "P" ? "descr" : "referencia", $request->produto_ou_referencia_valor)
                 ->where("lixeira", 0)
                 ->get()
         )) return 404;
-        $produto_ou_referencia_valor = $request->produto_ou_referencia_chave == "produto" ?
+        $produto_ou_referencia_valor = $request->produto_ou_referencia_chave == "P" ?
             DB::table("produtos")
                 ->where("descr", $request->produto_ou_referencia_valor)
                 ->where("lixeira", 0)
@@ -90,10 +90,10 @@ class AtribuicoesController extends ControllerKX {
                         ->leftjoin("pessoas", function($join) {
                             $join->on(function($sql) {
                                 $sql->on("pessoa_ou_setor_valor", "pessoas.id")
-                                    ->where("pessoa_ou_setor_chave", "pessoa");
+                                    ->where("pessoa_ou_setor_chave", "P");
                             })->orOn(function($sql) {
                                 $sql->on("pessoa_ou_setor_valor", "pessoas.id_setor")
-                                    ->where("pessoa_ou_setor_chave", "setor");
+                                    ->where("pessoa_ou_setor_chave", "S");
                             });
                         })
                         ->where(function($sql) use($request) {
@@ -120,7 +120,7 @@ class AtribuicoesController extends ControllerKX {
         $resultado = array();
         foreach ($consulta as $linha) {
             $linha->pode_editar = 1;
-            $mostrar = $linha->pessoa_ou_setor_chave != "setor";
+            $mostrar = $linha->pessoa_ou_setor_chave != "S";
             if (!$mostrar) {
                 $aux = DB::table("pessoas")
                             ->select(
@@ -143,7 +143,7 @@ class AtribuicoesController extends ControllerKX {
     public function mostrar($id) {
         return json_encode($this->consulta("
             CASE
-                WHEN produto_ou_referencia_chave = 'referencia' THEN produtos.referencia
+                WHEN produto_ou_referencia_chave = 'R' THEN produtos.referencia
                 ELSE produtos.descr
             END AS descr,
             qtd,
@@ -156,11 +156,11 @@ class AtribuicoesController extends ControllerKX {
         return json_encode($this->consulta("
             produtos.id,
             CASE
-                WHEN produto_ou_referencia_chave = 'referencia' THEN CONCAT(produtos.descr, ' ', tamanho)
+                WHEN produto_ou_referencia_chave = 'R' THEN CONCAT(produtos.descr, ' ', tamanho)
                 ELSE produtos.descr
             END AS descr,
             CASE
-                WHEN produto_ou_referencia_chave = 'referencia' THEN produtos.referencia
+                WHEN produto_ou_referencia_chave = 'R' THEN produtos.referencia
                 ELSE produtos.descr
             END AS titulo
         ", "atribuicoes.id = ".$id)->orderby("descr")->get());

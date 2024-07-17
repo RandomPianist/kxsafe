@@ -261,12 +261,12 @@ class ApiController extends ControllerKX {
                             FROM atribuicoes
 
                             JOIN pessoas
-                                ON (atribuicoes.pessoa_ou_setor_chave = 'pessoa' AND atribuicoes.pessoa_ou_setor_valor = pessoas.id)
-                                    OR (atribuicoes.pessoa_ou_setor_chave = 'setor' AND atribuicoes.pessoa_ou_setor_valor = pessoas.id_setor)
+                                ON (atribuicoes.pessoa_ou_setor_chave = 'P' AND atribuicoes.pessoa_ou_setor_valor = pessoas.id)
+                                    OR (atribuicoes.pessoa_ou_setor_chave = 'S' AND atribuicoes.pessoa_ou_setor_valor = pessoas.id_setor)
                             
                             WHERE (
-                                (produto_ou_referencia_chave = 'produto' AND produto_ou_referencia_valor = produtos.cod_externo)
-                            OR (produto_ou_referencia_chave = 'referencia' AND produto_ou_referencia_valor = produtos.referencia)
+                                (produto_ou_referencia_chave = 'P' AND produto_ou_referencia_valor = produtos.cod_externo)
+                            OR (produto_ou_referencia_chave = 'R' AND produto_ou_referencia_valor = produtos.referencia)
                             ) AND pessoas.cpf = '".$request->cpf."'
                               AND pessoas.lixeira = 0
                               AND atribuicoes.lixeira = 0

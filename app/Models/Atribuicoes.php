@@ -13,8 +13,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property int    $updated_at
  * @property int    $obrigatorio
  * @property int    $id_empresa
- * @property string $pessoa_ou_setor_chave
- * @property string $produto_ou_referencia_chave
  * @property string $produto_ou_referencia_valor
  */
 class Atribuicoes extends Model
@@ -57,7 +55,7 @@ class Atribuicoes extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'pessoa_ou_setor_chave' => 'string', 'pessoa_ou_setor_valor' => 'int', 'produto_ou_referencia_chave' => 'string', 'produto_ou_referencia_valor' => 'string', 'validade' => 'int', 'lixeira' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp', 'obrigatorio' => 'int', 'id_empresa' => 'int'
+        'id' => 'int', 'pessoa_ou_setor_valor' => 'int', 'produto_ou_referencia_valor' => 'string', 'validade' => 'int', 'lixeira' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp', 'obrigatorio' => 'int', 'id_empresa' => 'int'
     ];
 
     /**
