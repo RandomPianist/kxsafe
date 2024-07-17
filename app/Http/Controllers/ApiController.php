@@ -12,6 +12,37 @@ use App\Models\Retiradas;
 use App\Models\Atribuicoes;
 
 class ApiController extends ControllerKX {
+    private function saldo($id_maquina, $id_produto) {
+        return floatval(DB::table(DB::raw("(
+            SELECT
+                CASE
+                    WHEN (es = 'E') THEN qtd
+                    ELSE qtd * -1
+                END AS qtd
+            
+            FROM estoque
+
+            JOIN maquinas_produtos AS mp
+                ON mp.id = estoque.id_mp
+
+            WHERE id_maquina = ".$id_maquina."
+              AND id_produto = ".$id_produto."
+        ) AS tab"))->selectRaw("SUM(qtd) AS qtd")->value("qtd"));
+    }
+
+    private function saida_estoque($id_maquina, $id_produto, $qtd) {
+        $linha = new Estoque;
+        $linha->es = 'S';
+        $linha->descr = 'RETIRADA';
+        $linha->qtd = $qtd;
+        $linha->id_mp = DB::table("maquinas_produtos")
+                            ->where("id_produto", $id_produto)
+                            ->where("id_maquina", $id_maquina)
+                            ->value("id");
+        $linha->save();
+        $this->log_inserir("C", "estoque", $linha->id, true);
+    }
+
     public function empresas() {
         return json_encode(
             DB::table("empresas")
@@ -328,6 +359,11 @@ class ApiController extends ControllerKX {
                 $resultado->msg = "Essa quantidade de produtos não é permitida para essa pessoa";
                 return json_encode($resultado);
             }
+            if (floatval($retirada["qtd"]) > $this->saldo(intval($maquinas[0]->id), intval($retirada["id_produto"]))) {
+                $resultado->code = 500;
+                $resultado->msg = "Essa quantidade de produtos não está disponível em estoque";
+                return json_encode($resultado);
+            }
             $this->retirada_salvar(array(
                 "id_pessoa" => $retirada["id_pessoa"],
                 "id_produto" => $retirada["id_produto"],
@@ -336,6 +372,7 @@ class ApiController extends ControllerKX {
                 "qtd" => $retirada["qtd"],
                 "data" => date("Y-m-d")
             ));
+            $this->saida_estoque(intval($maquinas[0]->id), intval($retirada["id_produto"]), floatval($retirada["qtd"]));
             $cont++;
         }
         $resultado->code = 201;
@@ -378,6 +415,11 @@ class ApiController extends ControllerKX {
                 $resultado->msg = "Máquina não comodatada para nenhuma empresa";
                 return json_encode($resultado);
             }
+            if (floatval($retirada["qtd"]) > $this->saldo(intval($maquinas[0]->id), intval($retirada["id_produto"]))) {
+                $resultado->code = 500;
+                $resultado->msg = "Essa quantidade de produtos não está disponível em estoque";
+                return json_encode($resultado);
+            }
             $this->retirada_salvar(array(
                 "id_pessoa" => $retirada["id_pessoa"],
                 "id_produto" => $retirada["id_produto"],
@@ -388,6 +430,7 @@ class ApiController extends ControllerKX {
                 "id_supervisor" => $retirada["id_supervisor"],
                 "obs" => $retirada["obs"]
             ));
+            $this->saida_estoque(intval($maquinas[0]->id), intval($retirada["id_produto"]), floatval($retirada["qtd"]));
             $cont++;
         }
         $resultado->code = 201;
