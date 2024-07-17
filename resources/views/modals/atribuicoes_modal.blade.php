@@ -25,7 +25,7 @@
                                 type = "text"
                                 autocomplete = "off"
                             />
-                            <input id = "id_produto" type = "hidden" onchange = "idatbglobal=0;atualizaLimiteMaximo()" />
+                            <input id = "id_produto" type = "hidden" onchange = "idatbglobal=0;atualizaValidade()" />
                         </div>
                         <div class = "col-5" id = "div-produto">
                             <label for = "produto" class = "custom-label-form">Produto: *</label>

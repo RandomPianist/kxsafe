@@ -1,4 +1,4 @@
-let relatorio, pessoa, pessoa_atribuindo, limite_maximo, gradeGlobal, idatbglobal, colGlobal;
+let relatorio, pessoa, pessoa_atribuindo, gradeGlobal, idatbglobal, colGlobal;
 let anteriores = new Array();
 let validacao_bloqueada = false;
 
@@ -604,7 +604,6 @@ function RelatorioRetiradas() {
 
 function limitar(el) {
     let texto = el.value.toString();
-    if (el.id == "quantidade" && location.href.indexOf("colaboradores") > -1 && parseInt(texto) > limite_maximo) el.value = limite_maximo;
     if (!texto.length || parseInt(texto) < 1) el.value = 1;
     if (texto.length > 11) el.value = "".padStart(11, "9");
 }
@@ -682,16 +681,14 @@ function atribuicao(grade, id) {
     });
 }
 
-function atualizaLimiteMaximo() {
+function atualizaValidade() {
     id_produto = document.getElementById("id_produto").value;
     if (id_produto) {
-        $.get(URL + "/atribuicoes/ver-maximo", {
+        $.get(URL + "/atribuicoes/validade", {
             id : id_produto,
             tipo : gradeGlobal ? "referencia" : "produto"
-        }, function(data) {
-            if (typeof data == "string") data = $.parseJSON(data);
-            document.getElementById("validade").value = data.validade;
-            limite_maximo = parseFloat(data.maximo);
+        }, function(validade) {
+            document.getElementById("validade").value = validade;
         });
     }
 }

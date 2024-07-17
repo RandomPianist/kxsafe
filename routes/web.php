@@ -77,12 +77,12 @@ Route::middleware("auth")->group(function () {
         Route::get ("/consultar",    [ProdutosController::class, "consultar"]);
         Route::get ("/mostrar/{id}", [ProdutosController::class, "mostrar"]);
         Route::get ("/aviso/{id}",   [ProdutosController::class, "aviso"]);
+        Route::get ("/validade",     [ProdutosController::class, "validade"]);
         Route::post("/salvar",       [ProdutosController::class, "salvar"]);
         Route::post("/excluir",      [ProdutosController::class, "excluir"]);
     });
 
     Route::group(["prefix" => "atribuicoes"], function() {
-        Route::get ("/ver-maximo",    [AtribuicoesController::class, "verMaximo"]);
         Route::get ("/listar",        [AtribuicoesController::class, "listar"]);
         Route::get ("/mostrar/{id}",  [AtribuicoesController::class, "mostrar"]);
         Route::get ("/produtos/{id}", [AtribuicoesController::class, "produtos"]);

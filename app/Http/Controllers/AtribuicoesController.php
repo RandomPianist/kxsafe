@@ -30,41 +30,6 @@ class AtribuicoesController extends ControllerKX {
                     ->where("atribuicoes.lixeira", 0);
     }
 
-    public function verMaximo(Request $request) {
-        $resultado = new \stdClass;
-
-        $subquery = "(
-            SELECT
-                CASE
-                    WHEN (es = 'E') THEN qtd
-                    ELSE qtd * -1
-                END AS qtd,
-        ";
-        $subquery .= $request->tipo == "produto" ? "id_produto" : "referencia";
-        $subquery .= " FROM estoque";
-        $subquery .= " JOIN maquinas_produtos AS mp ON mp.id = estoque.id";
-        if ($request->tipo == "referencia") $subquery .= " JOIN produtos ON produtos.id = mp.id_produto";
-        $subquery .= ") AS estq";
-
-        $where = $request->tipo == "produto" ? "id_produto = ".$request->id : "referencia IN (
-            SELECT referencia
-            FROM produtos
-            WHERE id = ".$request->id."
-        )";
-
-        $resultado->maximo = DB::table(DB::raw($subquery))
-                                    ->selectRaw("IFNULL(SUM(qtd), 0) AS saldo")
-                                    ->whereRaw($where)
-                                    ->value("saldo");
-        
-        $resultado->validade = DB::table("produtos")
-                                    ->selectRaw($request->tipo == "produto" ? "validade" : "MAX(validade) AS validade")
-                                    ->whereRaw(str_replace("id_produto", "id", $where))
-                                    ->value("validade");
-
-        return json_encode($resultado);
-    }
-
     public function salvar(Request $request) {
         if (!sizeof(
             DB::table("produtos")

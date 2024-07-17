@@ -85,6 +85,19 @@ class ProdutosController extends ControllerKX {
         return json_encode($resultado);
     }
 
+    public function validade(Request $request) {
+        return DB::table("produtos")
+                ->selectRaw($request->tipo == "produto" ? "validade" : "MAX(validade) AS validade")
+                ->whereRaw(
+                    $request->tipo == "produto" ? "id = ".$request->id : "referencia IN (
+                        SELECT referencia
+                        FROM produtos
+                        WHERE id = ".$request->id."
+                    )"
+                )
+                ->value("validade");
+    }
+
     public function salvar(Request $request) {
         $linha = Produtos::firstOrNew(["id" => $request->id]);
         $this->atribuicao_atualiza_ref($request->id, $linha->referencia, $request->referencia, "NULL");
