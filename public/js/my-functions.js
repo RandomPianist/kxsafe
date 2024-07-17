@@ -1,4 +1,4 @@
-let relatorio, pessoa, pessoa_atribuindo, limite_maximo, gradeGlobal, idatbglobal;
+let relatorio, pessoa, pessoa_atribuindo, limite_maximo, gradeGlobal, idatbglobal, colGlobal;
 let anteriores = new Array();
 let validacao_bloqueada = false;
 
@@ -107,6 +107,10 @@ window.onload = function() {
         
         th.click(function() {
             var inverse = $(this).hasClass("text-dark") && $(this).html().indexOf("fa-sort-down") > -1;
+            if ($(this).hasClass("nao-inverte")) {
+                inverse = !inverse;
+                $(this).removeClass("nao-inverte");
+            }
             $(this).parent().find(".text-dark").removeClass("text-dark");
             $(this).parent().find(".my-icon").remove();
             $(this).addClass("text-dark");
@@ -121,6 +125,7 @@ window.onload = function() {
             }, function() {
                 return this.parentNode;
             });
+            colGlobal = thIndex;
         });
     });
 
@@ -220,7 +225,15 @@ window.onload = function() {
         foto_pessoa(".main-toolbar .user-pic", data.foto ? data.foto : "");
     });
 
-    listar();
+    listar(location.href.indexOf("produtos") > -1 ? 1 : 0);
+}
+
+function ordenar(coluna) {
+    if (coluna === undefined) {
+        coluna = colGlobal;
+        $($(".sortable-columns").children()[coluna]).addClass("nao-inverte");
+    }
+    $($(".sortable-columns").children()[coluna]).trigger("click");
 }
 
 function contar_char(el, max) {

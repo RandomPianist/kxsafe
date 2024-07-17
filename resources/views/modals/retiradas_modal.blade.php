@@ -124,6 +124,9 @@
             let titulo = "Retirada retroativa - " + data[0].titulo;
             if (titulo.length > 46) titulo = titulo.substring(0, 46).trim() + "...";
             document.getElementById("retiradasModalLabel").innerHTML = titulo;
+            document.getElementById("quantidade2").value = 1;
+            atualizaQtd();
+            document.getElementById("data-ret").value = "";
             $("#retiradasModal").modal();
         });
     }

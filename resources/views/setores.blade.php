@@ -54,7 +54,7 @@
         let ant_usr = false;
         let ant_padrao = false;
 
-        function listar() {
+        function listar(coluna) {
             $.get(URL + "/setores/listar", {
                 filtro : document.getElementById("busca").value
             }, function(data) {
@@ -77,7 +77,7 @@
                     "</tr>";
                 });
                 document.getElementById("table-dados").innerHTML = resultado;
-                $($(".sortable-columns").children()[0]).trigger("click");
+                ordenar(coluna);
             });
         }
 

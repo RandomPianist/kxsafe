@@ -56,7 +56,7 @@
         <i class = "my-icon fas fa-plus"></i>
     </button>
     <script type = "text/javascript" language = "JavaScript">
-        function listar() {
+        function listar(coluna) {
             $.get(URL + "/valores/{{ $alias }}/listar", {
                 filtro : document.getElementById("busca").value
             }, function(data) {
@@ -87,7 +87,7 @@
                     resultado += "</td></tr>";
                 });
                 document.getElementById("table-dados").innerHTML = resultado;
-                $($(".sortable-columns").children()[0]).trigger("click");
+                ordenar(coluna);
             });
         }
 

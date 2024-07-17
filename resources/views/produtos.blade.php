@@ -58,7 +58,7 @@
         <i class = "my-icon fas fa-plus"></i>
     </button>
     <script type = "text/javascript" language = "JavaScript">
-        function listar() {
+        function listar(coluna) {
             $.get(URL + "/produtos/listar", {
                 filtro : document.getElementById("busca").value
             }, function(data) {
@@ -88,7 +88,7 @@
                     $(this).html(dinheiro(texto_final));
                     $(this).addClass("text-right");
                 });
-                $($(".sortable-columns").children()[1]).trigger("click");
+                ordenar(coluna);
             });
         }
 
