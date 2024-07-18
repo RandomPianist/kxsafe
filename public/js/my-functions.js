@@ -617,8 +617,8 @@ function mostrar_atribuicoes(_id) {
     idatbglobal = _id;
     $.get(URL + "/atribuicoes/listar", {
         id : pessoa_atribuindo,
-        tipo : gradeGlobal ? "referencia" : "produto",
-        tipo2 : location.href.indexOf("colaboradores") > -1 ? "pessoa" : "setor"
+        tipo : gradeGlobal ? "R" : "P",
+        tipo2 : location.href.indexOf("colaboradores") > -1 ? "P" : "S"
     }, function(data) {
         let resultado = "";
         let elRes = document.getElementById("table-atribuicoes");
