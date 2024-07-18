@@ -75,7 +75,7 @@ class AtribuicoesController extends ControllerKX {
 
     public function listar(Request $request) {
         $select = "atribuicoes.id, ";
-        if ($request->tipo == "produto") $select .= "produtos.descr AS ";
+        if ($request->tipo == "P") $select .= "produtos.descr AS ";
         $select .= "produto_ou_referencia_valor,
             atribuicoes.qtd,
             atribuicoes.validade, 
