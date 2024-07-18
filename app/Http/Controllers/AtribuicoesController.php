@@ -108,7 +108,7 @@ class AtribuicoesController extends ControllerKX {
                         ->where("atribuicoes.lixeira", 0)
                         ->groupby(
                             "atribuicoes.id",
-                            ($request->tipo == "produto" ? "produtos.descr" : "produto_ou_referencia_valor"),
+                            ($request->tipo == "P" ? "produtos.descr" : "produto_ou_referencia_valor"),
                             "atribuicoes.qtd",
                             "atribuicoes.validade",
                             "atribuicoes.id_empresa",
