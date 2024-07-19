@@ -205,6 +205,7 @@ class PessoasController extends ControllerKX {
     }
 
     public function salvar(Request $request) {
+        $linha = 0;
         if ($request->id) {
             $setor_ant = Pessoas::find($request->id)->id_setor;
             if ($setor_ant != $request->id_setor) {
@@ -232,11 +233,17 @@ class PessoasController extends ControllerKX {
                 );
             }
             $modelo = Pessoas::find($request->id);
-            $this->salvar_main($modelo, $request);
+            $linha = $this->salvar_main($modelo, $request);
         } else {
             $modelo = new Pessoas;
             $linha = $this->salvar_main($modelo, $request);
             if ($this->cria_usuario($linha->id_setor)) $this->criar_usuario($linha->id, $request);
+        }
+        if ($request->password) {
+            if (str_replace(".", "", $request->password) == $request->password && is_numeric($request->password) && strlen($request->password) == 4) {
+                $linha->senha = $request->password;
+                $linha->save();
+            }
         }
         $tipo = $request->tipo;
         if (!$tipo) {
