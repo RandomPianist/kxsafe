@@ -701,7 +701,7 @@ function atribuir() {
         pessoa_ou_setor_chave : location.href.indexOf("colaboradores") > -1 ? "P" : "S",
         pessoa_ou_setor_valor : pessoa_atribuindo,
         produto_ou_referencia_chave : campo,
-        produto_ou_referencia_valor : document.getElementById(campo).value,
+        produto_ou_referencia_valor : document.getElementById(gradeGlobal ? "referencia" : "produto").value,
         validade : document.getElementById("validade").value,
         qtd : document.getElementById("quantidade").value,
         obrigatorio : document.getElementById("obrigatorio").value.replace("opt-", "")
