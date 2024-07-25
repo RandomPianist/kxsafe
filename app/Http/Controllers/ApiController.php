@@ -43,6 +43,76 @@ class ApiController extends ControllerKX {
         $this->log_inserir("C", "estoque", $linha->id, true);
     }
 
+    private function retirarMain($retirada) {
+        $atribuicao = Atribuicoes::find($retirada["id_atribuicao"]);
+        if ($atribuicao == null) {
+            $resultado->code = 404;
+            $resultado->msg = "Atribuição não encontrada";
+            return json_encode($resultado);
+        }
+        $maquinas = DB::table("valores")
+                        ->where("seq", $retirada["id_maquina"])
+                        ->where("alias", "maquinas")
+                        ->get();
+        if (!sizeof($maquinas)) {
+            $resultado->code = 404;
+            $resultado->msg = "Máquina não encontrada";
+            return json_encode($resultado);
+        }
+        $comodato = DB::table("comodatos")
+                        ->select("id")
+                        ->where("id_maquina", $maquinas[0]->id)
+                        ->whereRaw("inicio <= CURDATE()")
+                        ->whereRaw("fim >= CURDATE()")
+                        ->get();
+        if (!sizeof($comodato)) {
+            $resultado->code = 404;
+            $resultado->msg = "Máquina não comodatada para nenhuma empresa";
+            return json_encode($resultado);
+        }
+        if (!isset($retirada["id_supervisor"]) && !$this->retirada_consultar($retirada["id_atribuicao"], $retirada["qtd"])) {
+            $resultado->code = 401;
+            $resultado->msg = "Essa quantidade de produtos não é permitida para essa pessoa";
+            return json_encode($resultado);
+        }
+        if (floatval($retirada["qtd"]) > $this->saldo(intval($maquinas[0]->id), intval($retirada["id_produto"]))) {
+            $resultado->code = 500;
+            $resultado->msg = "Essa quantidade de produtos não está disponível em estoque";
+            return json_encode($resultado);
+        }
+        $salvar = array(
+            "id_pessoa" => $retirada["id_pessoa"],
+            "id_produto" => $retirada["id_produto"],
+            "id_atribuicao" => $retirada["id_atribuicao"],
+            "id_comodato" => $comodato[0]->id,
+            "qtd" => $retirada["qtd"],
+            "data" => date("Y-m-d")
+        );
+        if (isset($retirada["id_supervisor"])) {
+            $salvar += [
+                "id_supervisor" => $retirada["id_supervisor"],
+                "obs" => $retirada["obs"]
+            ];
+        }
+        $this->retirada_salvar($salvar);
+        $this->saida_estoque(intval($maquinas[0]->id), intval($retirada["id_produto"]), floatval($retirada["qtd"]));
+        return "ok";
+    }
+
+    private function retirarCall(Request $request) {
+        $resultado = new \stdClass;
+        $cont = 0;
+        $retorno = "ok";
+        while (isset($request[$cont]["id_atribuicao"])) {
+            $retorno = $this->retirarMain($request[$cont]);
+            if ($retorno != "ok") return $retorno;
+            $cont++;
+        }
+        $resultado->code = 201;
+        $resultado->msg = "Sucesso";
+        return json_encode($resultado);
+    }
+
     public function empresas() {
         return json_encode(
             DB::table("empresas")
@@ -324,60 +394,7 @@ class ApiController extends ControllerKX {
     }
 
     public function retirar(Request $request) {
-        $resultado = new \stdClass;
-        $cont = 0;
-        while (isset($request[$cont]["id_atribuicao"])) {
-            $retirada = $request[$cont];
-            $atribuicao = Atribuicoes::find($retirada["id_atribuicao"]);
-            if ($atribuicao == null) {
-                $resultado->code = 404;
-                $resultado->msg = "Atribuição não encontrada";
-                return json_encode($resultado);
-            }
-            $maquinas = DB::table("valores")
-                            ->where("seq", $retirada["id_maquina"])
-                            ->where("alias", "maquinas")
-                            ->get();
-            if (!sizeof($maquinas)) {
-                $resultado->code = 404;
-                $resultado->msg = "Máquina não encontrada";
-                return json_encode($resultado);
-            }
-            $comodato = DB::table("comodatos")
-                            ->select("id")
-                            ->where("id_maquina", $maquinas[0]->id)
-                            ->whereRaw("inicio <= CURDATE()")
-                            ->whereRaw("fim >= CURDATE()")
-                            ->get();
-            if (!sizeof($comodato)) {
-                $resultado->code = 404;
-                $resultado->msg = "Máquina não comodatada para nenhuma empresa";
-                return json_encode($resultado);
-            }
-            if (!$this->retirada_consultar($retirada["id_atribuicao"], $retirada["qtd"])) {
-                $resultado->code = 401;
-                $resultado->msg = "Essa quantidade de produtos não é permitida para essa pessoa";
-                return json_encode($resultado);
-            }
-            if (floatval($retirada["qtd"]) > $this->saldo(intval($maquinas[0]->id), intval($retirada["id_produto"]))) {
-                $resultado->code = 500;
-                $resultado->msg = "Essa quantidade de produtos não está disponível em estoque";
-                return json_encode($resultado);
-            }
-            $this->retirada_salvar(array(
-                "id_pessoa" => $retirada["id_pessoa"],
-                "id_produto" => $retirada["id_produto"],
-                "id_atribuicao" => $retirada["id_atribuicao"],
-                "id_comodato" => $comodato[0]->id,
-                "qtd" => $retirada["qtd"],
-                "data" => date("Y-m-d")
-            ));
-            $this->saida_estoque(intval($maquinas[0]->id), intval($retirada["id_produto"]), floatval($retirada["qtd"]));
-            $cont++;
-        }
-        $resultado->code = 201;
-        $resultado->msg = "Sucesso";
-        return json_encode($resultado);
+        return $this->retirarCall($request);
     }
 
     public function validarSpv(Request $request) {
@@ -385,56 +402,6 @@ class ApiController extends ControllerKX {
     }
 
     public function retirarComSupervisao(Request $request) {
-        $resultado = new \stdClass;
-        $cont = 0;
-        while (isset($request[$cont]["id_atribuicao"])) {
-            $retirada = $request[$cont];
-            $atribuicao = Atribuicoes::find($retirada["id_atribuicao"]);
-            if ($atribuicao == null) {
-                $resultado->code = 404;
-                $resultado->msg = "Atribuição não encontrada";
-                return json_encode($resultado);
-            }
-            $maquinas = DB::table("valores")
-                            ->where("seq", $retirada["id_maquina"])
-                            ->where("alias", "maquinas")
-                            ->get();
-            if (!sizeof($maquinas)) {
-                $resultado->code = 404;
-                $resultado->msg = "Máquina não encontrada";
-                return json_encode($resultado);
-            }
-            $comodato = DB::table("comodatos")
-                            ->select("id")
-                            ->where("id_maquina", $maquinas[0]->id)
-                            ->whereRaw("inicio <= CURDATE()")
-                            ->whereRaw("fim >= CURDATE()")
-                            ->get();
-            if (!sizeof($comodato)) {
-                $resultado->code = 404;
-                $resultado->msg = "Máquina não comodatada para nenhuma empresa";
-                return json_encode($resultado);
-            }
-            if (floatval($retirada["qtd"]) > $this->saldo(intval($maquinas[0]->id), intval($retirada["id_produto"]))) {
-                $resultado->code = 500;
-                $resultado->msg = "Essa quantidade de produtos não está disponível em estoque";
-                return json_encode($resultado);
-            }
-            $this->retirada_salvar(array(
-                "id_pessoa" => $retirada["id_pessoa"],
-                "id_produto" => $retirada["id_produto"],
-                "id_atribuicao" => $retirada["id_atribuicao"],
-                "id_comodato" => $comodato[0]->id,
-                "qtd" => $retirada["qtd"],
-                "data" => date("Y-m-d"),
-                "id_supervisor" => $retirada["id_supervisor"],
-                "obs" => $retirada["obs"]
-            ));
-            $this->saida_estoque(intval($maquinas[0]->id), intval($retirada["id_produto"]), floatval($retirada["qtd"]));
-            $cont++;
-        }
-        $resultado->code = 201;
-        $resultado->msg = "Sucesso";
-        return json_encode($resultado);
+        return $this->retirarCall($request);
     }
 }
