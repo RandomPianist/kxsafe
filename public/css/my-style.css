@@ -106,12 +106,12 @@ main {
 
 .btn-target {
     color: #fff;
-    background: #8C7E03
+    background: #084f96
 }
 
 .btn-target:hover {
     color: #fff;
-    background: #8C7E0396
+    background: #084f9696
 }
 
 .main-toolbar {
@@ -140,7 +140,7 @@ main {
 }
 
 .main-toolbar a {
-    color: #8C7E03
+    color: #084f96
 }
 
 .user-card:hover {
@@ -172,7 +172,7 @@ main {
 }
 
 .user-pic {
-    background: #8C7E03;
+    background: #084f96;
     border-radius: 1.5rem;
     color: white;
     font-family: tahoma;
@@ -350,7 +350,7 @@ main {
     background: white;
     border-color: #ced4da;
     border-left: unset;
-    color: #8C7E03;
+    color: #084f96;
     font-size: 0.9rem
 }
 
@@ -358,7 +358,7 @@ main {
     background: white;
     border-color: #ced4da;
     border-left: unset;
-    color: #8C7E039d
+    color: #084f969d
 }
 
 .btn-toolbar > a > .my-icon:not(.dropdown-icon) {
@@ -469,7 +469,7 @@ main {
 .btn-table-action > .my-icon:hover,
 .texto-tabela:hover, .texto-tabela:hover i,
 #table-atribuicoes .my-icon:hover {
-    color: #B4A204
+    color: #0416b4
 }
 
 .custom-fab {
