@@ -10,8 +10,10 @@ use App\Models\Produtos;
 use App\Models\Estoque;
 use App\Models\Retiradas;
 use App\Models\Atribuicoes;
+use App\Models\Empresas;
 
 class ApiController extends ControllerKX {
+    //GETS
     private function retirarMain(Request $request) {
         $resultado = new \stdClass;
         $cont = 0;
@@ -108,8 +110,8 @@ class ApiController extends ControllerKX {
                         CONCAT(
                             empresas.nome_fantasia,
                             IFNULL(CONCAT(' - ', matriz.nome_fantasia), '')
-                        ) AS descr
-                    ")
+                        ) AS descr, IFNULL(empresas.cod_externo, '') as cod_externo
+                    "),
                 )
                 ->leftjoin("empresas AS matriz", "matriz.id", "empresas.id_matriz")
                 ->where("empresas.lixeira", 0)
@@ -176,6 +178,33 @@ class ApiController extends ControllerKX {
         return json_encode($consulta);
     }
 
+    public function retiradas_por_periodo(Request $request) {
+        $sql  = "SELECT empresas.id as empid, empresas.nome_fantasia, IFNULL(empresas.cod_externo, '') as cft_externo,";
+        $sql .= " produtos.cod_externo, SUM(retiradas.qtd) as qtd,";
+        $sql .= " GROUP_CONCAT(retiradas.id) as ids FROM retiradas";
+        $sql .= "       LEFT OUTER JOIN produtos ON retiradas.id_produto = produtos.id";
+        $sql .= "       LEFT OUTER JOIN pessoas ON retiradas.id_pessoa = pessoas.id";
+        $sql .= "       LEFT OUTER JOIN empresas ON pessoas.id_empresa = empresas.id";
+        $sql .= "       LEFT OUTER JOIN comodatos ON retiradas.id_comodato = comodatos.id";
+        $sql .= " WHERE data between '" . $request->dini . "' AND '" . $request->dfim . "'";
+        if ($request->idemp) {
+            $sql .= "   AND (empresas.id = " . $request->idemp;
+            $sql .= "        OR empresas.id_matriz = " . $request->idemp . ")";
+        }
+        if ($request->idmaq) $sql .= " AND comodatos.id_maquina = " . $request->idmaq;
+        if (!$request->listagerados) $sql .= " AND retiradas.gerou_pedido = 'N'";
+        $sql .= " GROUP BY empresas.id, empresas.nome_fantasia, produtos.cod_externo";
+
+        $retorno = DB::select($sql);
+
+        foreach ($retorno as $item) {
+            $item->qtd = floatval($item->qtd);
+        }
+
+        return json_encode($retorno);
+    }
+
+    //POSTS
     public function categorias(Request $request) {
         $linha = Valores::firstOrNew(["id" => $request->id]);
         $linha->descr = mb_strtoupper($request->descr);
@@ -206,6 +235,7 @@ class ApiController extends ControllerKX {
         $linha->descr = mb_strtoupper($request->descr);
         $linha->preco = $request->preco;
         $linha->validade = $request->validade;
+        $linha->validade_ca = $request->validade_ca;
         $linha->ca = $request->ca;
         $linha->cod_externo = $request->codExterno;
         $linha->id_categoria = $request->idCategoria;
@@ -389,5 +419,24 @@ class ApiController extends ControllerKX {
 
     public function retirarComSupervisao(Request $request) {
         return $this->retirarMain($request);
+    }
+
+    public function marcarGerouPedido(Request $request) {
+        foreach ($request->ids as $id) {
+            $retirada = Retiradas::firstOrNew(["id" => $id]);
+            $retirada->gerou_pedido = "S";
+            $retirada->numero_ped = $request->numped;
+            $retirada->save();
+        }
+
+        return "salvou";
+    }
+
+    public function associar_empresa(Request $request) {
+        $empresa = Empresas::firstOrNew(["id" => $request->idemp]);
+        $empresa->cod_externo = $request->cod_cli;
+        $empresa->save();
+
+        return $empresa->id;
     }
 }

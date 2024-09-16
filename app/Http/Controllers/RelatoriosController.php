@@ -226,7 +226,16 @@ class RelatoriosController extends ControllerKX {
                 ->select(
                     "retiradas.id_pessoa",
                     "pessoas.nome",
+                    "pessoas.cpf",
+                    "pessoas.admissao",
+                    "pessoas.funcao",
+                    "setores.descr AS setor",
                     "produtos.descr AS produto",
+                    "produtos.ca",
+                    "empresas.razao_social",
+                    "empresas.cnpj",
+                    "produtos.validade_ca",
+                    "retiradas.qtd",
                     DB::raw("CASE
                         WHEN valores.descr IS NOT NULL THEN valores.descr
                         ELSE CONCAT('Sistema - ', ret_sis.nome)
@@ -240,6 +249,7 @@ class RelatoriosController extends ControllerKX {
                 ->leftjoin("valores", "valores.id", "comodatos.id_maquina")
                 ->leftjoin("pessoas AS supervisor", "supervisor.id", "retiradas.id_supervisor")
                 ->leftjoin("empresas", "empresas.id", "pessoas.id_empresa")
+                ->leftjoin("setores", "setores.id", "pessoas.id_setor")
                 ->leftjoin("log", function($join) {
                     $join->on(function($sql) {
                         $sql->on("log.fk", "retiradas.id")
@@ -272,7 +282,8 @@ class RelatoriosController extends ControllerKX {
                     } else if ($id_emp) {
                         $sql->where(function($query) use($id_emp) {
                             $query->where("pessoas.id_empresa", $id_emp)
-                                ->orWhere("empresas.id_matriz", $id_emp);
+                                ->orWhere("empresas.id_matriz", $id_emp)
+                                ->orWhere("empresas.id", $id_emp);
                         });
                     }
                 })
@@ -281,18 +292,29 @@ class RelatoriosController extends ControllerKX {
         )->groupBy("id_pessoa")->map(function($itens) {
             return [
                 "nome" => $itens[0]->nome,
+                "cpf" => $itens[0]->cpf,
+                "admissao" => $itens[0]->admissao,
+                "funcao" => $itens[0]->funcao,
+                "setor" => $itens[0]->setor,
+                "empresa" => $itens[0]->razao_social,
+                "cnpj" => $itens[0]->cnpj,
                 "retiradas" => $itens->map(function($retirada) {
                     return [
-                        "produto" => $retirada->produto,
-                        "maquina" => $retirada->maquina,
-                        "data"    => $retirada->data,
-                        "obs"     => $retirada->obs
+                        "produto"     => $retirada->produto,
+                        "maquina"     => $retirada->maquina,
+                        "data"        => $retirada->data,
+                        "obs"         => $retirada->obs,
+                        "ca"          => $retirada->ca,
+                        "validade_ca" => $retirada->validade_ca,
+                        "qtd"         => $retirada->qtd,
                     ];
                 })->values()->all()
             ];
         })->sortBy("nome")->values()->all();
         $criterios = join(" | ", $criterios);
-        return sizeof($resultado) ? view("reports/retiradas", compact("resultado", "criterios")) : view("nada");
+        $cidade = "Barueri";
+        $data_extenso = ucfirst(strftime("%d de %B de %Y"));
+        return sizeof($resultado) ? view("reports/retiradas", compact("resultado", "criterios", "cidade", "data_extenso")) : view("nada");
     }
 
     public function retiradas_consultar(Request $request) {

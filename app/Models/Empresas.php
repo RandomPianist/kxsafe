@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $cnpj
  * @property string $nome_fantasia
  * @property string $razao_social
+ * @property string $cod_externo
  */
 class Empresas extends Model
 {
@@ -36,7 +37,7 @@ class Empresas extends Model
      * @var array
      */
     protected $fillable = [
-        'cnpj', 'created_at', 'id_matriz', 'lixeira', 'nome_fantasia', 'razao_social', 'updated_at'
+        'cnpj', 'created_at', 'id_matriz', 'lixeira', 'nome_fantasia', 'razao_social', 'cod_externo', 'updated_at'
     ];
 
     /**
@@ -54,7 +55,7 @@ class Empresas extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'cnpj' => 'string', 'created_at' => 'timestamp', 'id_matriz' => 'int', 'lixeira' => 'int', 'nome_fantasia' => 'string', 'razao_social' => 'string', 'updated_at' => 'timestamp'
+        'id' => 'int', 'cnpj' => 'string', 'created_at' => 'timestamp', 'id_matriz' => 'int', 'lixeira' => 'int', 'nome_fantasia' => 'string', 'razao_social' => 'string', 'cod_externo' => 'string', 'updated_at' => 'timestamp'
     ];
 
     /**

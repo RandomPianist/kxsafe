@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $foto
  * @property string $referencia
  * @property string $tamanho
+ * @property string $validade_ca
  */
 class Produtos extends Model
 {
@@ -41,7 +42,7 @@ class Produtos extends Model
      * @var array
      */
     protected $fillable = [
-        'ca', 'cod_externo', 'created_at', 'descr', 'detalhes', 'foto', 'id_categoria', 'lixeira', 'preco', 'referencia', 'tamanho', 'updated_at', 'validade'
+        'ca', 'cod_externo', 'created_at', 'descr', 'detalhes', 'foto', 'id_categoria', 'lixeira', 'preco', 'referencia', 'tamanho', 'updated_at', 'validade', 'validade_ca'
     ];
 
     /**
@@ -59,7 +60,7 @@ class Produtos extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'ca' => 'string', 'cod_externo' => 'string', 'created_at' => 'timestamp', 'descr' => 'string', 'detalhes' => 'string', 'foto' => 'string', 'id_categoria' => 'int', 'lixeira' => 'int', 'referencia' => 'string', 'tamanho' => 'string', 'updated_at' => 'timestamp', 'validade' => 'int'
+        'id' => 'int', 'ca' => 'string', 'cod_externo' => 'string', 'created_at' => 'timestamp', 'descr' => 'string', 'detalhes' => 'string', 'foto' => 'string', 'id_categoria' => 'int', 'lixeira' => 'int', 'referencia' => 'string', 'tamanho' => 'string', 'updated_at' => 'timestamp', 'validade' => 'int', 'validade_ca' => 'date'
     ];
 
     /**
@@ -68,7 +69,7 @@ class Produtos extends Model
      * @var array
      */
     protected $dates = [
-        'created_at', 'updated_at'
+        'created_at', 'updated_at', 'validade_ca'
     ];
 
     /**
