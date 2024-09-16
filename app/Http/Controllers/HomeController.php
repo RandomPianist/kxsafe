@@ -15,7 +15,7 @@ class HomeController extends Controller {
 
     public function autocomplete(Request $request) {        
         $where = " AND ".$request->column." LIKE '".$request->search."%'";
-
+        
         $id_emp = intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa);
         if ($id_emp) {
             switch ($request->table) {
@@ -34,6 +34,10 @@ class HomeController extends Controller {
                         SELECT id_matriz
                         FROM empresas
                         WHERE id = ".$id_emp."
+                    ) OR id_empresa IN (
+                        SELECT id
+                        FROM empresas
+                        WHERE id_matriz = ".$id_emp."
                     ))";
                     break;
                 case "setores":

@@ -179,28 +179,32 @@ class ApiController extends ControllerKX {
     }
 
     public function retiradas_por_periodo(Request $request) {
-        $sql  = "SELECT empresas.id as empid, empresas.nome_fantasia, IFNULL(empresas.cod_externo, '') as cft_externo,";
-        $sql .= " produtos.cod_externo, SUM(retiradas.qtd) as qtd,";
-        $sql .= " GROUP_CONCAT(retiradas.id) as ids FROM retiradas";
-        $sql .= "       LEFT OUTER JOIN produtos ON retiradas.id_produto = produtos.id";
-        $sql .= "       LEFT OUTER JOIN pessoas ON retiradas.id_pessoa = pessoas.id";
-        $sql .= "       LEFT OUTER JOIN empresas ON pessoas.id_empresa = empresas.id";
-        $sql .= "       LEFT OUTER JOIN comodatos ON retiradas.id_comodato = comodatos.id";
-        $sql .= " WHERE data between '" . $request->dini . "' AND '" . $request->dfim . "'";
-        if ($request->idemp) {
-            $sql .= "   AND (empresas.id = " . $request->idemp;
-            $sql .= "        OR empresas.id_matriz = " . $request->idemp . ")";
-        }
-        if ($request->idmaq) $sql .= " AND comodatos.id_maquina = " . $request->idmaq;
-        if (!$request->listagerados) $sql .= " AND retiradas.gerou_pedido = 'N'";
-        $sql .= " GROUP BY empresas.id, empresas.nome_fantasia, produtos.cod_externo";
-
-        $retorno = DB::select($sql);
-
-        foreach ($retorno as $item) {
-            $item->qtd = floatval($item->qtd);
-        }
-
+        $retorno = DB::table("retiradas")
+                        ->select(
+                            "empresas.id AS empid",
+                            "empresas.nome_fantasia",
+                            "produtos.cod_externo",
+                            DB::raw("IFNULL(empresas.cod_externo, '') AS cft_externo"),
+                            DB::raw("SUM(retiradas.qtd) AS qtd"),
+                            DB::raw("GROUP_CONCAT(retiradas.id) AS ids")
+                        )
+                        ->leftjoin("produtos", "produtos.id", "retiradas.id_produto")
+                        ->leftjoin("pessoas", "pessoas.id", "retiradas.id_pessoa")
+                        ->leftjoin("empresas", "empresas.id", "pessoas.id_empresa")
+                        ->leftjoin("comodatos", "comodatos.id", "retiradas.id_comodato")
+                        ->whereRaw("data BETWEEN '".$request->dini."' AND '".$request->dfim."'")
+                        ->where(function($sql) use($request) {
+                            if ($request->idemp) $sql->whereRaw($request->idemp." IN (empresas.id, empresas.id_matriz)");
+                            if ($request->idmaq) $sql->where("comodatos.id_maquina", $request->idmaq);
+                            if (!$request->listagerados) $sql->where("retiradas.gerou_pedido", "N");
+                        })
+                        ->groupBy(
+                            "empresas.id",
+                            "empresas.nome_fantasia",
+                            "produtos.cod_externo"
+                        )
+                        ->get();
+        foreach ($retorno as $item) $item->qtd = floatval($item->qtd);
         return json_encode($retorno);
     }
 
@@ -428,7 +432,6 @@ class ApiController extends ControllerKX {
             $retirada->numero_ped = $request->numped;
             $retirada->save();
         }
-
         return "salvou";
     }
 
@@ -436,7 +439,6 @@ class ApiController extends ControllerKX {
         $empresa = Empresas::firstOrNew(["id" => $request->idemp]);
         $empresa->cod_externo = $request->cod_cli;
         $empresa->save();
-
         return $empresa->id;
     }
 }
