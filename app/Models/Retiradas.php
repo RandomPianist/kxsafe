@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int    $created_at
  * @property int    $updated_at
  * @property string $observacao
+ * @property string $gerou_pedido
+ * @property int    $numero_ped
  * @property Date   $data
  */
 class Retiradas extends Model
@@ -38,7 +40,7 @@ class Retiradas extends Model
      * @var array
      */
     protected $fillable = [
-        'qtd', 'id_atribuicao', 'id_comodato', 'id_pessoa', 'id_supervisor', 'id_produto', 'observacao', 'data', 'created_at', 'updated_at'
+        'qtd', 'id_atribuicao', 'id_comodato', 'id_pessoa', 'id_supervisor', 'id_produto', 'observacao', 'gerou_pedido', 'numero_ped', 'data', 'created_at', 'updated_at'
     ];
 
     /**
@@ -56,7 +58,7 @@ class Retiradas extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'id_atribuicao' => 'int', 'id_comodato' => 'int', 'id_pessoa' => 'int', 'id_supervisor' => 'int', 'id_produto' => 'int', 'observacao' => 'string', 'data' => 'date', 'created_at' => 'timestamp', 'updated_at' => 'timestamp'
+        'id' => 'int', 'id_atribuicao' => 'int', 'id_comodato' => 'int', 'id_pessoa' => 'int', 'id_supervisor' => 'int', 'id_produto' => 'int', 'observacao' => 'string', 'gerou_pedido' => 'string', 'numero_ped' => 'int', 'data' => 'date', 'created_at' => 'timestamp', 'updated_at' => 'timestamp'
     ];
 
     /**

@@ -32,7 +32,8 @@ CREATE TABLE empresas (
 	lixeira TINYINT DEFAULT 0,
 	id_matriz INT,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	cod_externo VARCHAR(20)
 );
 
 ALTER TABLE empresas ADD FOREIGN KEY (id_matriz) REFERENCES empresas(id);
@@ -85,6 +86,7 @@ CREATE TABLE produtos (
 	referencia VARCHAR(64),
 	tamanho VARCHAR(32),
 	detalhes TEXT,
+	validade_ca DATE,
 	FOREIGN KEY (id_categoria) REFERENCES valores(id)
 );
 
@@ -165,6 +167,8 @@ CREATE TABLE retiradas (
 	data DATE,
 	created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	gerou_pedido CHAR,
+	numero_ped INT,
 	FOREIGN KEY (id_atribuicao) REFERENCES atribuicoes(id),
 	FOREIGN KEY (id_comodato) REFERENCES comodatos(id),
 	FOREIGN KEY (id_pessoa) REFERENCES pessoas(id),
