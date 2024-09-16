@@ -9,34 +9,11 @@
             <div>
                 <span>CNPJ: {{ $resultado[0]["cnpj"] }}</span>
             </div>
-            {{-- <img height = "75px" src = "{{ asset('img/logo.png') }}" /> --}}
         </div>
-        {{-- <div class = "float-right">
-            <ul class = "m-0">
-                <li class = "text-right">
-                    <h6 class = "m-0 fw-600">Retiradas</h6>
-                </li>
-                <li class = "text-right">
-                    <h6 class = "m-0 traduzir">
-                        @php
-                            date_default_timezone_set("America/Sao_Paulo");
-                            echo ucfirst(strftime("%d de %B de %Y"));
-                        @endphp
-                    </h6>
-                </li>
-                <li class = "text-right">
-                    @if ($criterios)
-                        <h6 class = "m-0">Critérios:</h6>
-                        <small>{{ $criterios }}</small>
-                    @endif
-                </li>
-            </ul>
-        </div> --}}
     </div>
     <div class="nome-rel">
         <span class="m-auto">Controle de Entrega e Reposição de Equipamentos de Proteção Individual - E.P.I</span>
     </div>
-    {{-- <div class = "mt-2 mb-3 linha"></div> --}}
     @foreach ($resultado AS $item)
         <div class="d-grid">
             <div class="c-1">Nome do Funcionário: {{ $item["nome"] }}</div>
@@ -83,10 +60,10 @@
                             <td width = "9%">{{ $retirada["ca"] }}</td>
                             <td width = "7%">{{ $retirada["validade_ca"] != null ? date_format(date_create($retirada["validade_ca"]), "d/m/Y") : "" }}</td>
                             <td width = "7%">{{ $retirada["qtd"] }}</td>
-                            <td width = "15%">{{ "" }}</td>
-                            <td width = "10%">{{ "" }}</td>
-                            <td width = "10%">{{ "" }}</td>
-                            <td width = "15%">{{ "" }}</td>
+                            <td width = "15%">&nbsp;</td>
+                            <td width = "10%">&nbsp;</td>
+                            <td width = "10%">&nbsp;</td>
+                            <td width = "15%">&nbsp;</td>
                         </tr>
                     @endforeach
                 </tbody>
