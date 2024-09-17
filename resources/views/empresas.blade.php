@@ -135,7 +135,7 @@
                             linha(empresa.id, empresa.nome_fantasia) +
                         "</details>";
                         if (!parseInt(data.matriz_editavel)) document.querySelector("#empresa-" + empresa.id_matriz + " .btn-table-action").style.visibility = "hidden";
-                    } else document.querySelector("#principal").innerHTML += linha(empresa.id, empresa.nome_fantasia);
+                    }
                 });
                 Array.from(document.querySelectorAll("summary.texto-tabela")).forEach((el) => {
                     if (!$($(el).parent()).find("details").length) $($(el).parent()).replaceWith("<div class = 'sem-filhos texto-tabela' id = '" + el.id + "'>" + $(el).html() + "</div>");
