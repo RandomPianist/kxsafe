@@ -269,7 +269,8 @@ class ApiController extends ControllerKX {
                             "id_categoria AS idCategoria",
                             "cod_externo AS codExterno",
                             DB::raw("'123' AS usu"),
-                            "consumo"
+                            "consumo",
+                            "validade_ca"
                         )
                         ->where("id", $linha->id)
                         ->first();
