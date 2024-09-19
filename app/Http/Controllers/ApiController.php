@@ -268,7 +268,8 @@ class ApiController extends ControllerKX {
                             DB::raw("IFNULL(tamanho, '') AS tamanho"),
                             "id_categoria AS idCategoria",
                             "cod_externo AS codExterno",
-                            DB::raw("'123' AS usu")
+                            DB::raw("'123' AS usu"),
+                            "consumo"
                         )
                         ->where("id", $linha->id)
                         ->first();
