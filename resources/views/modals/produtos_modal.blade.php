@@ -87,6 +87,15 @@
                                 <span class = "custom-label-form tam-max"></span>
                             </div>
                         </div>
+                        <div class = "row mb-3" style = "padding-top:5px">
+                            <div class = "col-12">
+                                <div class = "custom-control custom-switch">
+                                    <input id = "consumo" name = "consumo" type = "hidden" />
+                                    <input id = "consumo-chk" class = "checkbox custom-control-input" type = "checkbox" onchange = "document.getElementById('consumo').value = this.checked ? 1 : 0" />
+                                    <label for = "consumo-chk" class = "custom-control-label">Consumo<label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class = "d-flex">

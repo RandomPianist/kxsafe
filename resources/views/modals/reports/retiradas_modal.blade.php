@@ -13,7 +13,7 @@
                 <div class = "modal-body">
                     <div class = "container">
                         <div class = "row">
-                            <div class = "col-12 form-search">
+                            <div class = "col-6 form-search">
                                 <label for = "rel-pessoa" class = "custom-label-form">Colaborador:</label>
                                 <input id = "rel-pessoa"
                                     name = "pessoa"
@@ -27,6 +27,14 @@
                                     autocomplete = "off"
                                 />
                                 <input id = "rel-id_pessoa" name = "id_pessoa" type = "hidden" />
+                            </div>
+                            <div class = "col-6">
+                                <label for = "rel-consumo" class = "custom-label-form">Tipo de produto:</label>
+                                <select class = "form-control" id = "rel-consumo" name = "consumo">
+                                    <option value = "todos">Todos</option>
+                                    <option value = "consumo">Consumo</option>
+                                    <option value = "epi">EPI</option>
+                                </select>
                             </div>
                         </div>
                         <div class = "row">

@@ -159,6 +159,7 @@
                         document.getElementById(_id).value = data[_id];
                         document.getElementById("cod_externo").disabled = true;
                     });
+                    document.getElementById("consumo-chk").checked = parseInt(data.e_consumo) == 1;
                     modal("produtosModal", id, function() {
                         el_img.src = data.foto;
                         el_img.parentElement.classList.remove("d-none");

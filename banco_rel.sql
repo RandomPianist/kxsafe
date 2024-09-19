@@ -87,6 +87,7 @@ CREATE TABLE produtos (
 	tamanho VARCHAR(32),
 	detalhes TEXT,
 	validade_ca DATE,
+	consumo TINYINT,
 	FOREIGN KEY (id_categoria) REFERENCES valores(id)
 );
 

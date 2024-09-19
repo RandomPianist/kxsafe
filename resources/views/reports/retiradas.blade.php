@@ -12,16 +12,16 @@
         </div>
     </div>
     <div class="nome-rel">
-        <span class="m-auto">Controle de Entrega e Reposição de Equipamentos de Proteção Individual - E.P.I</span>
+        <span class="m-auto">Controle de Entrega e Reposição de Equipamentos de Proteção Individual - E.P.I.</span>
     </div>
     @foreach ($resultado AS $item)
-        <div class="d-grid">
-            <div class="c-1">Nome do Funcionário: {{ $item["nome"] }}</div>
-            <div class="c-2">CPF: {{ $item["cpf"] }}</div>
-            <div class="c-3"></div>
-            <div class="c-1">CARGO: {{ $item["funcao"] }}</div>
-            <div class="c-2">SETOR: {{ $item["setor"] }}</div>
-            <div class="c-3">DATA ADMISSÃO: {{ date_format(date_create($item["admissao"]), "d/m/Y") }}</div>
+        <div class = "d-grid">
+            <div class = "c-1">Nome do Funcionário: {{ $item["nome"] }}</div>
+            <div class = "c-2">CPF: {{ $item["cpf"] }}</div>
+            <div class = "c-3"></div>
+            <div class = "c-1">CARGO: {{ $item["funcao"] }}</div>
+            <div class = "c-2">SETOR: {{ $item["setor"] }}</div>
+            <div class = "c-3">DATA ADMISSÃO: {{ date_format(date_create($item["admissao"]), "d/m/Y") }}</div>
         </div>
         <table class = "table table-sm table-bordered table-striped">
             <thead>

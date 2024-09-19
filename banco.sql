@@ -63,7 +63,8 @@ CREATE TABLE produtos (
 	referencia VARCHAR(64),
 	tamanho VARCHAR(32),
 	detalhes TEXT,
-	validade_ca DATE
+	validade_ca DATE,
+	consumo TINYINT
 );
 
 CREATE TABLE maquinas_produtos (

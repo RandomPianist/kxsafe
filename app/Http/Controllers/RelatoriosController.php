@@ -286,6 +286,7 @@ class RelatoriosController extends ControllerKX {
                                 ->orWhere("empresas.id", $id_emp);
                         });
                     }
+                    if ($request->consumo != "todos") $sql->where("produtos.consumo", $request->consumo == "epi" ? 0 : 1);
                 })
                 ->orderby("retiradas.id")
                 ->get()
