@@ -11,6 +11,15 @@
     -webkit-font-smoothing: antialiased
 }
 
+@keyframes spin {
+    0% {
+        transform: rotate(0deg)
+    }
+    100% {
+        transform: rotate(360deg)
+    }
+}
+
 .d-grid {
     display: grid
 }
@@ -18,7 +27,8 @@
 html,
 body,
 main,
-#app {
+#app,
+#loader {
     height: 100%;
     width: 100%
 }
@@ -644,4 +654,22 @@ span, label, table, h1, h2, h3, h4, h5, h6, .texto-tabela {
 .px-20 {
     padding-left: 20px;
     padding-right: 20px
+}
+
+#loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(255, 255, 255, 0.7);
+    display: none
+}
+
+#loader div {
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid #3498db;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+    margin: auto
 }

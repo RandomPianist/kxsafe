@@ -79,6 +79,106 @@ class RelatoriosController extends ControllerKX {
         return sizeof($resultado) ? view("reports/bilateral", compact("resultado", "criterios", "titulo")) : view("nada");
     }
 
+    private function retiradasMain(Request $request) {
+        $retorno = new \stdClass;
+        $criterios = array();
+        $retorno->resultado = collect(
+            DB::table("retiradas")
+                ->select(
+                    "retiradas.id_pessoa",
+                    "pessoas.nome",
+                    "pessoas.cpf",
+                    "pessoas.admissao",
+                    "pessoas.funcao",
+                    "setores.descr AS setor",
+                    "produtos.descr AS produto",
+                    "produtos.ca",
+                    "empresas.razao_social",
+                    "empresas.cnpj",
+                    "produtos.validade_ca",
+                    "retiradas.qtd",
+                    DB::raw("CASE
+                        WHEN valores.descr IS NOT NULL THEN valores.descr
+                        ELSE CONCAT('Sistema - ', ret_sis.nome)
+                    END AS maquina"),
+                    DB::raw("DATE_FORMAT(retiradas.data, '%d/%m/%Y') AS data"),
+                    DB::raw("IFNULL(CONCAT('Liberado por ', supervisor.nome, IFNULL(CONCAT(' - ', retiradas.observacao), '')), '') AS obs")
+                )
+                ->join("produtos", "produtos.id", "retiradas.id_produto")
+                ->join("pessoas", "pessoas.id", "retiradas.id_pessoa")
+                ->leftjoin("comodatos", "comodatos.id", "retiradas.id_comodato")
+                ->leftjoin("valores", "valores.id", "comodatos.id_maquina")
+                ->leftjoin("pessoas AS supervisor", "supervisor.id", "retiradas.id_supervisor")
+                ->leftjoin("empresas", "empresas.id", "pessoas.id_empresa")
+                ->leftjoin("setores", "setores.id", "pessoas.id_setor")
+                ->leftjoin("log", function($join) {
+                    $join->on(function($sql) {
+                        $sql->on("log.fk", "retiradas.id")
+                            ->where("log.tabela", "retiradas");
+                    });
+                })
+                ->leftjoin("pessoas AS ret_sis", "ret_sis.id", "log.id_pessoa")
+                ->where(function($sql) use($request, &$criterios) {
+                    if ($request->inicio || $request->fim) {
+                        $periodo = "Período";
+                        if ($request->inicio) {
+                            $inicio = Carbon::createFromFormat('d/m/Y', $request->inicio)->format('Y-m-d');
+                            $sql->whereDate("retiradas.data", ">=", $inicio);
+                            $periodo .= " de ".$request->inicio;
+                        }
+                        if ($request->fim) {
+                            $fim = Carbon::createFromFormat('d/m/Y', $request->fim)->format('Y-m-d');
+                            $sql->whereDate("retiradas.data", "<=", $fim);
+                            $periodo .= " até ".$request->fim;
+                        }
+                        array_push($criterios, $periodo);
+                    }
+                    $id_emp = intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa);
+                    if ($request->id_pessoa) {
+                        $pessoa = DB::table("pessoas")
+                                        ->where("id", $request->id_pessoa)
+                                        ->value("nome");
+                        array_push($criterios, "Colaborador: ".$pessoa);
+                        $sql->where("retiradas.id_pessoa", $request->id_pessoa);
+                    } else if ($id_emp) {
+                        $sql->where(function($query) use($id_emp) {
+                            $query->where("pessoas.id_empresa", $id_emp)
+                                ->orWhere("empresas.id_matriz", $id_emp)
+                                ->orWhere("empresas.id", $id_emp);
+                        });
+                    }
+                    if ($request->consumo != "todos") $sql->where("produtos.consumo", $request->consumo == "epi" ? 0 : 1);
+                })
+                ->orderby("retiradas.id")
+                ->get()
+        )->groupBy("id_pessoa")->map(function($itens) {
+            return [
+                "nome" => $itens[0]->nome,
+                "cpf" => $itens[0]->cpf,
+                "admissao" => $itens[0]->admissao,
+                "funcao" => $itens[0]->funcao,
+                "setor" => $itens[0]->setor,
+                "empresa" => $itens[0]->razao_social,
+                "cnpj" => $itens[0]->cnpj,
+                "retiradas" => $itens->map(function($retirada) {
+                    return [
+                        "produto"     => $retirada->produto,
+                        "maquina"     => $retirada->maquina,
+                        "data"        => $retirada->data,
+                        "obs"         => $retirada->obs,
+                        "ca"          => $retirada->ca,
+                        "validade_ca" => $retirada->validade_ca,
+                        "qtd"         => $retirada->qtd,
+                    ];
+                })->values()->all()
+            ];
+        })->sortBy("nome")->values()->all();
+        $retorno->criterios = join(" | ", $criterios);
+        $retorno->cidade = "Barueri";
+        $retorno->data_extenso = ucfirst(strftime("%d de %B de %Y"));
+        return $retorno;
+    }
+
     public function bilateral(Request $request) {
         if ($request->rel_grupo == "empresas-por-maquina") return $this->empresas_por_maquina($request);
         return $this->maquinas_por_empresa($request);
@@ -87,11 +187,11 @@ class RelatoriosController extends ControllerKX {
     public function bilateral_consultar(Request $request) {
         $erro = "";
         if ($request->prioridade == "empresas") {
-            if ($this->empresa_consultar($request) && trim($request->empresa)) $erro = "empresa";
-            if (!$erro && $this->consultar_maquina($request) && trim($request->maquina)) $erro = "maquina";
+            if (($this->empresa_consultar($request) && trim($request->empresa)) || (trim($request->id_empresa) && !trim($request->empresa))) $erro = "empresa";
+            if (!$erro && (($this->consultar_maquina($request) && trim($request->maquina)) || (trim($request->id_maquina) && !trim($request->maquina)))) $erro = "maquina";
         } else {
-            if ($this->consultar_maquina($request) && trim($request->maquina)) $erro = "maquina";
-            if (!$erro && $this->empresa_consultar($request) && trim($request->empresa)) $erro = "empresa";
+            if (($this->consultar_maquina($request) && trim($request->maquina)) || (trim($request->id_maquina) && !trim($request->maquina))) $erro = "maquina";
+            if (!$erro && ($this->empresa_consultar($request) && trim($request->empresa)) || (trim($request->id_empresa) && !trim($request->empresa))) $erro = "empresa";
         }
         return $erro;
     }
@@ -216,115 +316,50 @@ class RelatoriosController extends ControllerKX {
                 ->where("lixeira", 0)
                 ->get()
         )) $erro = "produto";
+        if (trim($request->id_maquina) && !trim($request->maquina)) $erro = "maquina";
+        if (trim($request->id_produto) && !trim($request->produto)) $erro = "produto";
         return $erro;
     }
 
     public function retiradas(Request $request) {
-        $criterios = array();        
-        $resultado = collect(
-            DB::table("retiradas")
-                ->select(
-                    "retiradas.id_pessoa",
-                    "pessoas.nome",
-                    "pessoas.cpf",
-                    "pessoas.admissao",
-                    "pessoas.funcao",
-                    "setores.descr AS setor",
-                    "produtos.descr AS produto",
-                    "produtos.ca",
-                    "empresas.razao_social",
-                    "empresas.cnpj",
-                    "produtos.validade_ca",
-                    "retiradas.qtd",
-                    DB::raw("CASE
-                        WHEN valores.descr IS NOT NULL THEN valores.descr
-                        ELSE CONCAT('Sistema - ', ret_sis.nome)
-                    END AS maquina"),
-                    DB::raw("DATE_FORMAT(retiradas.data, '%d/%m/%Y') AS data"),
-                    DB::raw("IFNULL(CONCAT('Liberado por ', supervisor.nome, IFNULL(CONCAT(' - ', retiradas.observacao), '')), '') AS obs")
-                )
-                ->join("produtos", "produtos.id", "retiradas.id_produto")
-                ->join("pessoas", "pessoas.id", "retiradas.id_pessoa")
-                ->leftjoin("comodatos", "comodatos.id", "retiradas.id_comodato")
-                ->leftjoin("valores", "valores.id", "comodatos.id_maquina")
-                ->leftjoin("pessoas AS supervisor", "supervisor.id", "retiradas.id_supervisor")
-                ->leftjoin("empresas", "empresas.id", "pessoas.id_empresa")
-                ->leftjoin("setores", "setores.id", "pessoas.id_setor")
-                ->leftjoin("log", function($join) {
-                    $join->on(function($sql) {
-                        $sql->on("log.fk", "retiradas.id")
-                            ->where("log.tabela", "retiradas");
-                    });
-                })
-                ->leftjoin("pessoas AS ret_sis", "ret_sis.id", "log.id_pessoa")
-                ->where(function($sql) use($request, &$criterios) {
-                    if ($request->inicio || $request->fim) {
-                        $periodo = "Período";
-                        if ($request->inicio) {
-                            $inicio = Carbon::createFromFormat('d/m/Y', $request->inicio)->format('Y-m-d');
-                            $sql->whereDate("retiradas.data", ">=", $inicio);
-                            $periodo .= " de ".$request->inicio;
-                        }
-                        if ($request->fim) {
-                            $fim = Carbon::createFromFormat('d/m/Y', $request->fim)->format('Y-m-d');
-                            $sql->whereDate("retiradas.data", "<=", $fim);
-                            $periodo .= " até ".$request->fim;
-                        }
-                        array_push($criterios, $periodo);
-                    }
-                    $id_emp = intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa);
-                    if ($request->id_pessoa) {
-                        $pessoa = DB::table("pessoas")
-                                        ->where("id", $request->id_pessoa)
-                                        ->value("nome");
-                        array_push($criterios, "Colaborador: ".$pessoa);
-                        $sql->where("retiradas.id_pessoa", $request->id_pessoa);
-                    } else if ($id_emp) {
-                        $sql->where(function($query) use($id_emp) {
-                            $query->where("pessoas.id_empresa", $id_emp)
-                                ->orWhere("empresas.id_matriz", $id_emp)
-                                ->orWhere("empresas.id", $id_emp);
-                        });
-                    }
-                    if ($request->consumo != "todos") $sql->where("produtos.consumo", $request->consumo == "epi" ? 0 : 1);
-                })
-                ->orderby("retiradas.id")
-                ->get()
-        )->groupBy("id_pessoa")->map(function($itens) {
-            return [
-                "nome" => $itens[0]->nome,
-                "cpf" => $itens[0]->cpf,
-                "admissao" => $itens[0]->admissao,
-                "funcao" => $itens[0]->funcao,
-                "setor" => $itens[0]->setor,
-                "empresa" => $itens[0]->razao_social,
-                "cnpj" => $itens[0]->cnpj,
-                "retiradas" => $itens->map(function($retirada) {
-                    return [
-                        "produto"     => $retirada->produto,
-                        "maquina"     => $retirada->maquina,
-                        "data"        => $retirada->data,
-                        "obs"         => $retirada->obs,
-                        "ca"          => $retirada->ca,
-                        "validade_ca" => $retirada->validade_ca,
-                        "qtd"         => $retirada->qtd,
-                    ];
-                })->values()->all()
-            ];
-        })->sortBy("nome")->values()->all();
-        $criterios = join(" | ", $criterios);
-        $cidade = "Barueri";
-        $data_extenso = ucfirst(strftime("%d de %B de %Y"));
+        $principal = $this->retiradasMain($request);
+        $resultado = $principal->resultado;
+        $criterios = $principal->criterios;
+        $cidade = $principal->cidade;
+        $data_extenso = $principal->data_extenso;
         return sizeof($resultado) ? view("reports/retiradas", compact("resultado", "criterios", "cidade", "data_extenso")) : view("nada");
     }
 
     public function retiradas_consultar(Request $request) {
-        return (!sizeof(
+        return ((!sizeof(
             DB::table("pessoas")
                 ->where("id", $request->id_pessoa)
                 ->where("nome", $request->pessoa)
                 ->where("lixeira", 0)
                 ->get()
-        ) && trim($request->pessoa)) ? "erro" : "";
+        ) && trim($request->pessoa)) || (!trim($request->pessoa) && trim($request->id_pessoa))) ? "erro" : "";
+    }
+
+    public function retiradas_existe(Request $request) {
+        return sizeof($this->retiradasMain($request)->resultado) ? "1" : "0";
+    }
+
+    public function retiradas_pessoas() {
+        return json_encode(
+            DB::table("pessoas")
+                ->where(function($sql) {
+                    $id_emp = intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa);
+                    if ($id_emp) {
+                        $sql->where(function($query) use($id_emp) {
+                            $query->where(function($query2) use($id_emp) {
+                                $query2->whereIn("id_empresa", DB::table("empresas")->where("id", $id_emp)->pluck("id_matriz")->toArray());
+                            })->orWhere("id_empresa", $id_emp);
+                        })->orWhere(function($query) use($id_emp) {
+                            $query->whereIn("id_empresa", DB::table("empresas")->where("id_matriz", $id_emp)->pluck("id")->toArray());
+                        });
+                    }
+                })
+                ->pluck("id")
+        );
     }
 }

@@ -543,6 +543,8 @@ function RelatorioItens() {
         let el_maquina = document.getElementById("rel-maquina2");
         if (el_inicio.value && el_fim.value) erro = validar_datas(el_inicio, el_fim, false);
         $.get(URL + "/relatorios/extrato/consultar", {
+            maquina : el_maquina.value,
+            produto : el_produto.value,
             id_produto : document.getElementById("rel-id_produto").value,
             id_maquina : document.getElementById("rel-id_maquina2").value,
         }, function(data) {
@@ -580,8 +582,10 @@ function RelatorioRetiradas() {
         let erro = "";
         let el_pessoa = document.getElementById("rel-pessoa");
         if (el_inicio.value && el_fim.value) erro = validar_datas(el_inicio, el_fim, false);
+        const id_pessoa = document.getElementById("rel-id_pessoa").value;
         $.get(URL + "/relatorios/retiradas/consultar", {
-            id_pessoa : document.getElementById("rel-id_pessoa").value
+            pessoa : el_pessoa.value,
+            id_pessoa : id_pessoa
         }, function(data) {
             if (data) {
                 if (!erro) {
@@ -589,6 +593,11 @@ function RelatorioRetiradas() {
                     erro = "Colaborador não encontrado";
                 }
                 s_alert(erro);
+            } else if (!id_pessoa.trim()) {
+                $.get(URL + "/relatorios/retiradas/pessoas", function(data2) {
+                    if (typeof data2 == "string") data2 = $.parseJSON(data2);
+                    retiradaTodos(data2);
+                });
             } else document.querySelector("#relatorioRetiradasModal form").submit();
         });
     }
@@ -803,4 +812,39 @@ function validar_cpf(__cpf) {
     if ((resto == 10) || (resto == 11)) resto = 0;
     if (resto != parseInt(__cpf.substring(10, 11))) return false;
     return true;
+}
+
+async function retiradaTodos(ids) {
+    let lista = Array.from(document.getElementsByClassName("btn-primary"));
+    let loader = document.getElementById("loader").style;
+    let modal = document.getElementById("relatorioRetiradasModal").style;
+    let algum_existe = false;
+    lista.forEach((el) => {
+        el.style.zIndex = "0";
+    });
+    loader.display = "flex";
+    modal.zIndex = "0";
+    for (let i = 0; i < ids.length; i++) {
+        document.getElementById("rel-id_pessoa").value = ids[i];
+        let existe = await $.get(URL + "/relatorios/retiradas/existe", {
+            id_pessoa : ids[i],
+            consumo : document.getElementById("rel-consumo").value,
+            inicio : document.getElementById("rel-inicio2").value,
+            fim : document.getElementById("rel-fim2").value
+        });
+        if (parseInt(existe)) {
+            algum_existe = true;
+            document.querySelector("#relatorioRetiradasModal form").submit();
+        }
+    }
+    lista.forEach((el) => {
+        el.style.removeProperty("z-index");
+    });
+    modal.removeProperty("z-index");
+    loader.removeProperty("display");
+    document.getElementById("rel-id_pessoa").value = "";
+    if (!algum_existe) {
+        document.getElementById("rel-pessoa").classList.add("invalido");
+        s_alert("Colaborador não encontrado");
+    }
 }

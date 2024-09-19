@@ -152,6 +152,9 @@
                 @include("modals.reports.retiradas_modal")
             </main>
         </div>
+        <div id = "loader">
+            <div></div>
+        </div>
         <script type = "text/javascript" language = "JavaScript">
             const URL = "{{ config('app.root_url') }}";
             const USUARIO = {{ Auth::user()->id_pessoa }};

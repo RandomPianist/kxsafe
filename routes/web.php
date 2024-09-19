@@ -120,6 +120,8 @@ Route::middleware("auth")->group(function () {
         Route::group(["prefix" => "retiradas"], function() {
             Route::get("/",          [RelatoriosController::class, "retiradas"]);
             Route::get("/consultar", [RelatoriosController::class, "retiradas_consultar"]);
+            Route::get("/existe",    [RelatoriosController::class, "retiradas_existe"]);
+            Route::get("/pessoas",   [RelatoriosController::class, "retiradas_pessoas"]);
         });
     });
 });
