@@ -58,6 +58,8 @@
         <i class = "my-icon fas fa-plus"></i>
     </button>
     <script type = "text/javascript" language = "JavaScript">
+        let ant_consumo = false;
+
         function listar(coluna) {
             $.get(URL + "/produtos/listar", {
                 filtro : document.getElementById("busca").value
@@ -111,7 +113,7 @@
 
         function validar() {
             limpar_invalido();
-            const aux = verifica_vazios(["cod_externo", "descr", "ca", "validade", "categoria", "tamanho"]);
+            const aux = verifica_vazios(["cod_externo", "descr", "ca", "validade", "categoria", "tamanho", "validade_ca"]);
             let erro = aux.erro;
             let alterou = aux.alterou;
             let preco = document.getElementById("preco");
@@ -119,7 +121,7 @@
                 erro = "Valor inválido";
                 preco.classList.add("invalido");
             }
-            if (preco.value.trim() != dinheiro(anteriores.preco.toString())) alterou = true;
+            if (preco.value.trim() != dinheiro(anteriores.preco.toString()) || document.getElementById("consumo-chk").checked != ant_consumo) alterou = true;
             $.get(URL + "/produtos/consultar/", {
                 id : document.getElementById("id").value,
                 cod_externo : document.getElementById("cod_externo").value,
@@ -155,11 +157,12 @@
             if (id) {
                 $.get(URL + "/produtos/mostrar/" + id, function(data) {
                     if (typeof data == "string") data = $.parseJSON(data);
-                    ["cod_externo", "descr", "preco", "ca", "validade", "categoria", "id_categoria", "referencia", "tamanho", "detalhes"].forEach((_id) => {
-                        document.getElementById(_id).value = data[_id];
-                        document.getElementById("cod_externo").disabled = true;
+                    ["cod_externo", "descr", "preco", "ca", "validade", "categoria", "id_categoria", "referencia", "tamanho", "detalhes", "validade_ca_fmt"].forEach((_id) => {
+                        document.getElementById(_id.replace("_fmt", "")).value = data[_id];
                     });
+                    document.getElementById("cod_externo").disabled = true;
                     document.getElementById("consumo-chk").checked = parseInt(data.e_consumo) == 1;
+                    ant_consumo = parseInt(data.e_consumo) == 1;
                     modal("produtosModal", id, function() {
                         el_img.src = data.foto;
                         el_img.parentElement.classList.remove("d-none");
@@ -170,6 +173,9 @@
                 modal("produtosModal", id, function() {
                     el_img.parentElement.classList.add("d-none");
                     document.getElementById("cod_externo").disabled = false;
+                    document.getElementById("validade_ca").value = hoje();
+                    document.getElementById("consumo-chk").checked = false;
+                    ant_consumo = false;
                 });
             }
         }

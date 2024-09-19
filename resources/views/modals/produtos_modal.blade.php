@@ -40,7 +40,11 @@
                                 <input id = "ca" name = "ca" class = "form-control" autocomplete = "off" type = "text" onkeyup = "contar_char(this, 16)" />
                                 <span class = "custom-label-form tam-max"></span>
                             </div>
-                            <div class = "col-6">
+                            <div class = "col-4">
+                                <label for = "validade_ca" class = "custom-label-form">Validade do CA: *</label>
+                                <input id = "validade_ca" name = "validade_ca" class = "form-control data" autocomplete = "off" type = "text" />
+                            </div>
+                            <div class = "col-2">
                                 <label for = "referencia" class = "custom-label-form">Referência:</label>
                                 <input id = "referencia" name = "referencia" class = "form-control" autocomplete = "off" type = "text" onkeyup = "contar_char(this, 50)" />
                                 <span class = "custom-label-form tam-max"></span>

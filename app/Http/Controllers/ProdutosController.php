@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use DB;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Produtos;
 use App\Models\Atribuicoes;
@@ -68,7 +69,8 @@ class ProdutosController extends ControllerKX {
                         ->select(
                             DB::raw("produtos.*"),
                             DB::raw("IFNULL(valores.descr, 'A CLASSIFICAR') AS categoria"),
-                            DB::raw("IFNULL(produtos.consumo, 0) AS e_consumo")
+                            DB::raw("IFNULL(produtos.consumo, 0) AS e_consumo"),
+                            DB::raw("DATE_FORMAT(produtos.validade_ca, '%d/%m/%Y') AS validade_ca_fmt")
                         )
                         ->leftjoin("valores", "valores.id", "produtos.id_categoria")
                         ->where("produtos.id", $id)
@@ -112,6 +114,7 @@ class ProdutosController extends ControllerKX {
         $linha->tamanho = $request->tamanho;
         $linha->detalhes = $request->detalhes;
         $linha->consumo = $request->consumo;
+        $linha->validade_ca = Carbon::createFromFormat('d/m/Y', $request->validade_ca)->format('Y-m-d');
         if ($request->file("foto")) $linha->foto = $request->file("foto")->store("uploads", "public");
         $linha->save();
         $this->log_inserir($request->id ? "E" : "C", "produtos", $linha->id);
