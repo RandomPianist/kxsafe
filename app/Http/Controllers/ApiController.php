@@ -247,6 +247,7 @@ class ApiController extends ControllerKX {
         $linha->lixeira = $request->lixeira;
         if (isset($request->refer)) $linha->referencia = $request->refer;
         if (isset($request->tamanho)) $linha->tamanho = $request->tamanho;
+        if (isset($request->consumo)) $linha->consumo = $request->consumo;
         $linha->save();
         $letra_log = $request->id ? "E" : "C";
         if (intval($request->lixeira)) $letra_log = "D";
