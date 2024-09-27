@@ -10,16 +10,16 @@
                 </button>
             </div>
             <form action = "{{ config('app.root_url') }}/relatorios/bilateral" method = "GET" target = "_blank">
-                <input id = "rel-grupo" name = "rel_grupo" type = "hidden" />
+                <input id = "rel-grupo1" name = "rel_grupo" type = "hidden" />
                 <div class = "modal-body">
                     <div class = "container">
                         <div class = "row">
                             <div class = "col-12 form-search">
-                                <label for = "rel-empresa" class = "custom-label-form">Empresa:</label>
-                                <input id = "rel-empresa"
+                                <label for = "rel-empresa1" class = "custom-label-form">Empresa:</label>
+                                <input id = "rel-empresa1"
                                     name = "empresa"
                                     class = "form-control autocomplete"
-                                    data-input = "#rel-id_empresa"
+                                    data-input = "#rel-id_empresa1"
                                     data-table = "empresas"
                                     data-column = "nome_fantasia"
                                     data-filter_col = ""
@@ -27,7 +27,7 @@
                                     type = "text"
                                     autocomplete = "off"
                                 />
-                                <input id = "rel-id_empresa" name = "id_empresa" type = "hidden" />
+                                <input id = "rel-id_empresa1" name = "id_empresa" type = "hidden" />
                             </div>
                         </div>
                         <div class = "row">

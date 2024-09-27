@@ -73,18 +73,18 @@
                                 <input id = "cpf" name = "cpf" class = "form-control" autocomplete = "off" type = "text" onkeyup = "formatar_cpf(this)" />
                             </div>
                             <div class = "col-5 pr-0 form-search-2">
-                                <label for = "setor" class = "custom-label-form">Setor: *</label>
-                                <input id = "setor"
+                                <label for = "pessoa-setor" class = "custom-label-form">Setor: *</label>
+                                <input id = "pessoa-setor"
                                     class = "form-control autocomplete"
-                                    data-input = "#id_setor"
+                                    data-input = "#pessoa-id_setor"
                                     data-table = "setores"
                                     data-column = "descr"
-                                    data-filter_col = ""
+                                    data-filter_col = "cria_usuario"
                                     data-filter = ""
                                     type = "text"
                                     autocomplete = "off"
                                 />
-                                <input id = "id_setor" name = "id_setor" type = "hidden" onchange = "pessoa.toggle_user(parseInt(this.value))"/>
+                                <input id = "pessoa-id_setor" name = "pessoa-id_setor" type = "hidden" onchange = "pessoa.toggle_user(parseInt(this.value))"/>
                             </div>
                             <div class = "col-1 pt-4 d-flex align-items-center">
                                 <a href = "{{ config('app.root_url') }}/setores" title = "Cadastro de setores" target = "_blank">

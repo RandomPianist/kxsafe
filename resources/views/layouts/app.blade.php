@@ -51,14 +51,14 @@
                                 </li>
                                 <li>
                                     <!-- <span>Colaboradores</span> -->
-                                    <span>Colaboradores<img class="dropdown-icon" src="/kxsafe-consulta/img/sort-down.png"></span>
-                                    <ul class="subdropdown-toolbar">
+                                    <span>Colaboradores<img class = "dropdown-icon" src = "/kxsafe-consulta/img/sort-down.png"></span>
+                                    <ul class = "subdropdown-toolbar">
                                         @if (!intval(App\Models\Pessoas::find(Auth::user()->id_pessoa)->id_empresa))
-                                            <li onclick="redirect('/kxsafe-consulta/colaboradores/pagina/A')">Administradores</li>
+                                            <li onclick = "redirect('/kxsafe-consulta/colaboradores/pagina/A')">Administradores</li>
                                         @endif
-                                        <li onclick="redirect('/kxsafe-consulta/colaboradores/pagina/F')">Funcionários</li>
-                                        <li onclick="redirect('/kxsafe-consulta/colaboradores/pagina/S')">Supervisores</li>
-                                        <li onclick="redirect('/kxsafe-consulta/colaboradores/pagina/U')">Usuários</li>
+                                        <li onclick = "redirect('/kxsafe-consulta/colaboradores/pagina/F')">Funcionários</li>
+                                        <li onclick = "redirect('/kxsafe-consulta/colaboradores/pagina/S')">Supervisores</li>
+                                        <li onclick = "redirect('/kxsafe-consulta/colaboradores/pagina/U')">Usuários</li>
                                     </ul>
                                 </li>
                             </ul>
@@ -91,22 +91,29 @@
                             <span>Relatórios</span>
                             <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
                             <ul class = "dropdown-toolbar">
+                                <li onclick = "relatorio = new RelatorioControle()">
+                                    <span>Controle de Entrega</span>
+                                </li>
                                 @if (!intval(App\Models\Pessoas::find(Auth::user()->id_pessoa)->id_empresa))
-                                    <li onclick = "window.open('/kxsafe-consulta/relatorios/comodatos', '_blank')">
-                                        <span>Locação</span>
-                                    </li>
                                     <li onclick = "relatorio = new RelatorioBilateral('empresas-por-maquina')">
                                         <span>Empresas por máquina</span>
                                     </li>
                                     <li onclick = "relatorio = new RelatorioItens()">
                                         <span>Extrato de itens</span>
                                     </li>
+                                    <li onclick = "window.open('/kxsafe-consulta/relatorios/comodatos', '_blank')">
+                                        <span>Locação</span>
+                                    </li>
                                     <li onclick = "relatorio = new RelatorioBilateral('maquinas-por-empresa')">
                                         <span>Máquinas por empresa</span>
                                     </li>
                                 @endif
-                                <li onclick = "relatorio = new RelatorioRetiradas()">
-                                    <span>Retiradas</span>
+                                <li>
+                                    <span>Retiradas<img class = "dropdown-icon" src = "/kxsafe-consulta/img/sort-down.png"></span>
+                                    <ul class = "subdropdown-toolbar">
+                                        <li onclick = "relatorio = new RelatorioRetiradas('pessoa')">por colaborador</li>
+                                        <li onclick = "relatorio = new RelatorioRetiradas('setor')">por setor</li>
+                                    </ul>
                                 </li>
                             </ul>
                         </a>
@@ -150,6 +157,7 @@
                 @include("modals.reports.bilateral_modal")
                 @include("modals.reports.itens_modal")
                 @include("modals.reports.retiradas_modal")
+                @include("modals.reports.controle_modal")
             </main>
         </div>
         <div id = "loader">
@@ -222,7 +230,7 @@
                     limpar_invalido();
                     let erro = "";
 
-                    const id_setor = document.getElementById("id_setor").value;
+                    const id_setor = document.getElementById("pessoa-id_setor").value;
 
                     let _email = document.getElementById("email");
                     let _cpf = document.getElementById("cpf");
@@ -241,7 +249,7 @@
                             else erro = "Preencha os campos";
                             _cpf.classList.add("invalido");
                         }
-                        let lista = ["nome", "setor", "pessoa-empresa", "funcao", "admissao", "supervisor"];
+                        let lista = ["nome", "pessoa-setor", "pessoa-empresa", "funcao", "admissao", "supervisor"];
                         if (!parseInt(document.getElementById("pessoa-id").value)) lista.push(parseInt(data.cria_usuario) ? "password" : "senha");
                         let aux = verifica_vazios(lista, erro);
                         erro = aux.erro;
@@ -273,13 +281,13 @@
                             email : _email.value,
                             empresa : document.getElementById("pessoa-empresa").value,
                             id_empresa : document.getElementById("pessoa-id_empresa").value,
-                            setor : document.getElementById("setor").value,
-                            id_setor : document.getElementById("id_setor").value
+                            setor : document.getElementById("pessoa-setor").value,
+                            id_setor : document.getElementById("pessoa-id_setor").value
                         }, function(data) {
                             if (typeof data == "string") data = $.parseJSON(data);
                             if (!erro && data.tipo == "invalido") {
                                 erro = data.dado + " não encontrad" + (data.dado == "Empresa" ? "a" : "o");
-                                document.getElementById(data.dado == "Empresa" ? "pessoa-empresa" : "setor").classList.add("invalido");
+                                document.getElementById("pessoa-" + data.dato.toLowerCase()).classList.add("invalido");
                             }
                             if (!erro && data.tipo == "duplicado" && !parseInt(document.getElementById("pessoa-id").value)) {
                                 erro = "Já existe um registro com esse " + data.dado;
@@ -301,14 +309,14 @@
                 if (id) {
                     $.get(URL + "/colaboradores/mostrar/" + id, function(data) {
                         if (typeof data == "string") data = $.parseJSON(data);
-                        ["nome", "cpf", "setor", "pessoa-empresa", "id_setor", "pessoa-id_empresa", "email", "funcao", "admissao", "supervisor"].forEach((_id) => {
+                        ["nome", "cpf", "pessoa-setor", "pessoa-empresa", "pessoa-id_setor", "pessoa-id_empresa", "email", "funcao", "admissao", "supervisor"].forEach((_id) => {
                             document.getElementById(_id).value = data[_id.replace("pessoa-", "")];
                         });
                         setTimeout(function() {
                             modal("pessoasModal", id, function() {
                                 that.toggle_user(parseInt(data.id_setor));
                                 estilo_bloco_senha.display = id != USUARIO && document.getElementById("pessoasModalLabel").innerHTML.indexOf("administrador") > -1 ? "none" : "";
-                                document.getElementById("setor").disabled = id == USUARIO;
+                                document.getElementById("pessoa-setor").disabled = id == USUARIO;
                                 document.getElementById("supervisor-chk").checked = parseInt(data.supervisor) == 1;
                                 Array.from(document.getElementsByClassName("pessoa-senha")).forEach((el) => {
                                     el.innerHTML = "Senha:";
@@ -330,7 +338,7 @@
                         modal("pessoasModal", id, function() {
                             that.toggle_user(id);
                             estilo_bloco_senha.removeProperty("display");
-                            document.getElementById("setor").disabled = false;
+                            document.getElementById("pessoa-setor").disabled = false;
                             Array.from(document.getElementsByClassName("pessoa-senha")).forEach((el) => {
                                 el.innerHTML = "Senha: *";
                             });
@@ -340,8 +348,8 @@
                             if (tipo == "A" || tipo == "U") {
                                 $.get(URL + "/setores/primeiro-admin", function(data) {
                                     if (typeof data == "string") data = $.parseJSON(data);
-                                    document.getElementById("setor").value = data.descr;
-                                    document.getElementById("id_setor").value = data.id;
+                                    document.getElementById("pessoa-setor").value = data.descr;
+                                    document.getElementById("pessoa-id_setor").value = data.id;
                                     that.toggle_user(data.id);
                                 });
                             } else if (tipo == "S") {

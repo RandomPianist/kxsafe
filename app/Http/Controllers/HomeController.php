@@ -41,12 +41,12 @@ class HomeController extends Controller {
                     ))";
                     break;
                 case "setores":
-                    $where .= " AND cria_usuario = 0";
+                    if ($request->filter_col) $where .= " AND ".$request->filter_col." = 0";
                     break;
             }
         }
 
-        if ($request->filter) {
+        if ($request->filter_col && $request->table != "setores") {
             $where .= $request->column != "referencia" ? " AND ".$request->filter_col." = '".$request->filter."'" : " AND referencia NOT IN (
                 SELECT produto_ou_referencia_valor
                 FROM atribuicoes

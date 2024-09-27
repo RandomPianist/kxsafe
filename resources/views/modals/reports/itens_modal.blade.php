@@ -1,6 +1,5 @@
-
 <!-- Modal -->
-<div class = "modal fade" id = "relatorioItensModal" aria-labelledby = "relatorioItensModalLabel" aria-hidden = "true">
+<div class = "modal fade" id = "relatorioItensModal" aria-hidden = "true">
     <div class = "modal-dialog modal-lg" role = "document">
         <div class = "modal-content">
             <div class = "modal-header">
@@ -48,12 +47,12 @@
                         </div>
                         <div class = "row">
                             <div class = "col-6">
-                                <label for = "rel-inicio" class = "custom-label-form">Início:</label>
-                                <input id = "rel-inicio" name = "inicio" class = "form-control data" autocomplete = "off" type = "text" />
+                                <label for = "rel-inicio1" class = "custom-label-form">Início:</label>
+                                <input id = "rel-inicio1" name = "inicio" class = "form-control data" autocomplete = "off" type = "text" />
                             </div>
                             <div class = "col-6">
-                                <label for = "rel-fim" class = "custom-label-form">Fim:</label>
-                                <input id = "rel-fim" name = "fim" class = "form-control data" autocomplete = "off" type = "text" />
+                                <label for = "rel-fim1" class = "custom-label-form">Fim:</label>
+                                <input id = "rel-fim1" name = "fim" class = "form-control data" autocomplete = "off" type = "text" />
                             </div>
                         </div>
                         <div class = "row" style = "padding-top:5px">

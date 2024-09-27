@@ -3,92 +3,72 @@
 @section("content")
     <div class = "report-header">
         <div class = "float-left">
-            <div>
-                <span>{{ $resultado[0]["empresa"] }}</span>
-            </div>
-            <div>
-                <span>CNPJ: {{ $resultado[0]["cnpj"] }}</span>
-            </div>
+            <img height = "75px" src = "{{ asset('img/logo.png') }}" />
+        </div>
+        <div class = "float-right">
+            <ul class = "m-0">
+                <li class = "text-right">
+                    <h6 class = "m-0 fw-600">Retiradas</h6>
+                </li>
+                <li class = "text-right">
+                    <h6 class = "m-0 traduzir">
+                        @php
+                            date_default_timezone_set("America/Sao_Paulo");
+                            echo ucfirst(strftime("%A, %d de %B de %Y"));
+                        @endphp
+                    </h6>
+                </li>
+                <li class = "text-right">
+                    @if ($criterios)
+                        <h6 class = "m-0">Critérios:</h6>
+                        <small>{{ $criterios }}</small>
+                    @endif
+                </li>
+            </ul>
         </div>
     </div>
-    <div class="nome-rel">
-        <span class="m-auto">Controle de Entrega e Reposição de Equipamentos de Proteção Individual - E.P.I.</span>
-    </div>
+    <div class = "mt-2 mb-3 linha"></div>
     @foreach ($resultado AS $item)
-        <div class = "d-grid">
-            <div class = "c-1">Nome do Funcionário: {{ $item["nome"] }}</div>
-            <div class = "c-2">CPF: {{ $item["cpf"] }}</div>
-            <div class = "c-3"></div>
-            <div class = "c-1">CARGO: {{ $item["funcao"] }}</div>
-            <div class = "c-2">SETOR: {{ $item["setor"] }}</div>
-            <div class = "c-3">DATA ADMISSÃO: {{ date_format(date_create($item["admissao"]), "d/m/Y") }}</div>
-        </div>
-        <table class = "table table-sm table-bordered table-striped">
-            <thead>
-                <tr class = "report-row rep-tb-header">
-                    <td width = "65%">
-                        <span>RECEBIMENTO DE E.P.I</span>
-                    </td>
-                    <td width = "35%">
-                        <span>DEVOLUÇÃO DE E.P.I</span>
-                    </td>
-                </tr>
-            </thead>
-        </table>
-        <table class = "report-body table table-sm table-bordered table-striped px-5 rep-tb-color-black">
-            <thead>
-                <tr class = "report-row">
-                    <td width = "7%">Data</td>
-                    <td width = "20%">E.P.I</td>
-                    <td width = "9%">C.A</td>
-                    <td width = "7%">Validade do C.A</td>
-                    <td width = "7%">Quantidade</td>
-                    <td width = "15%">Assinatura</td>
-                    <td width = "10%">Data</td>
-                    <td width = "10%">C.A</td>
-                    <td width = "15%">Assinatura</td>
-                </tr>
-            </thead>
-        </table>
-        <div class = "mb-3 rep-tb-color-black">
-            <table class = "report-body table table-sm table-bordered table-striped">
-                <tbody>
-                    @foreach ($item["retiradas"] as $retirada)
-                        <tr class = "report-row">
-                            <td width = "7%">{{ $retirada["data"] }}</td>
-                            <td width = "20%">{{ $retirada["produto"] }}</td>
-                            <td width = "9%">{{ $retirada["ca"] }}</td>
-                            <td width = "7%">{{ $retirada["validade_ca"] != null ? date_format(date_create($retirada["validade_ca"]), "d/m/Y") : "" }}</td>
-                            <td width = "7%">{{ $retirada["qtd"] }}</td>
-                            <td width = "15%">&nbsp;</td>
-                            <td width = "10%">&nbsp;</td>
-                            <td width = "10%">&nbsp;</td>
-                            <td width = "15%">&nbsp;</td>
-                        </tr>
-                    @endforeach
-                </tbody>
+        <h5>{{ $item["grupo"] }}</h5>
+        @if ($tipo == 'A')
+            <table class = "report-body table table-sm table-bordered table-striped px-5">
+                <thead>
+                    <tr class = "report-row">
+                        <td width = "20%">Data</td>
+                        @if ($item["quebra"] == "setor")
+                            <td width = "25%">Produto</td>
+                            <td width = "25%">Colaborador</td>
+                        @else
+                            <td width = "50%">Produto</td>
+                        @endif
+                        <td width = "10%" class = "text-right">Qtde.</td>
+                        <td width = "20%" class = "text-right">Valor</td>
+                    </tr>
+                </thead>
             </table>
-        </div>
+            <div class = "mb-3">
+                <table class = "report-body table table-sm table-bordered table-striped">
+                    <tbody>
+                        @foreach ($item["retiradas"] as $retirada)
+                            <tr class = "report-row">
+                                <td width = "20%">{{ $retirada["data"] }}</td>
+                                @if ($item["quebra"] == "setor")
+                                    <td width = "25%">{{ $retirada["produto"] }}</td>
+                                    <td width = "25%">{{ $retirada["pessoa"] }}</td>
+                                @else
+                                    <td width = "50%">{{ $retirada["produto"] }}</td>
+                                @endif
+                                
+                                <td width = "10%" class = "text-right">{{ $retirada["qtd"] }}</td>
+                                <td width = "20%" class = "text-right">R$ {{ number_format($retirada["valor"], 2, ",", ".") }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+        <h6>Quantidade total: {{ $item["total_qtd"] }}</h6>
+        <h6>Valor total: R$ {{ number_format($item["total_valor"], 2, ",", ".") }}</h6>
         <div class = "line-div"></div>
     @endforeach
-    <div class="rep-ret-rodape">
-        <p>Declaro para os devidos fins, que recebi gratuitamente os E.P.I.s e/ou uniforme acima descritos e me comprometo:
-        <ul>
-            <li>Usá-los apenas para a finalidade a que se destinam;</li>
-            <li>Responsabilizar-me por sua guarda e conservação;</li>
-            <li>Comunicar ao empregador qualquer modificação que os tornem imprópios para o uso;</li>
-            <li>Responsabilizar-me pela danificação do E.P.I e/ou uniforme devido ao uso inadequado ou fora das atividades a que se destina, bem como pelo seu extravio;</li>
-            <li>Ciente que serei advertido de acordo com o artigo 482 da CLT se não fizer uso devido dos E.P.I e uniformes entregues a mim.</li>
-        </ul>
-        <p>Declaro estar ciente de que o uso <span class="bold">é obrigatório</span> enquanto eu estiver exercendo minhas funções.</p>
-        <p>Sob pena de ser punido conforme Lei n. 6.514, de 22/12/77, artigo 158</p>
-        <p>Declaro, ainda que recebi treinamento e orientação referente ao uso do E.P.I e as Normas de Segurança do Trabalho.</p>
-        <div class="data-extenso">
-            <span class="traduzir">{{$cidade}}, {{$data_extenso}}</span>
-        </div>
-        <div class="assinatura">
-            <div class="asn_1"><span>{{$resultado[0]["empresa"]}}</span></div>
-            <div class="asn_2"><span> {{$resultado[0]["nome"]}}</span></div>
-        </div>
-    </div>
 @endsection
