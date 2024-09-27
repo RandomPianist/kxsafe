@@ -49,7 +49,7 @@
                                 <input id = "rel-setor"
                                     name = "setor"
                                     class = "form-control autocomplete"
-                                    data-input = "#rel-setor"
+                                    data-input = "#rel-id_setor"
                                     data-table = "setores"
                                     data-column = "descr"
                                     data-filter_col = ""

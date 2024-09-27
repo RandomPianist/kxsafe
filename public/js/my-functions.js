@@ -380,7 +380,8 @@ function carrega_autocomplete() {
         $(this).keyup(function(e) {
             $(this).removeClass("invalido");
             if (e.keyCode == 13) validacao_bloqueada = true;
-            if ([9, 13, 17, 38, 40].indexOf(e.keyCode) == -1) autocomplete($(this));
+            if ([9, 13, 17, 38, 40].indexOf(e.keyCode) == -1 && $(this).val().trim()) autocomplete($(this));
+            if (!$(this).val().trim()) $($(this).data().input).val("");
             setTimeout(function() {
                 validacao_bloqueada = false;
             }, 50);
