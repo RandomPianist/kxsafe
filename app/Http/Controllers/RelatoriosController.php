@@ -97,10 +97,6 @@ class RelatoriosController extends ControllerKX {
                     "empresas.cnpj",
                     "produtos.validade_ca",
                     "retiradas.qtd",
-                    DB::raw("CASE
-                        WHEN valores.descr IS NOT NULL THEN valores.descr
-                        ELSE CONCAT('Sistema - ', ret_sis.nome)
-                    END AS maquina"),
                     DB::raw("DATE_FORMAT(retiradas.data, '%d/%m/%Y') AS data"),
                     DB::raw("IFNULL(CONCAT('Liberado por ', supervisor.nome, IFNULL(CONCAT(' - ', retiradas.observacao), '')), '') AS obs")
                 )
@@ -111,13 +107,6 @@ class RelatoriosController extends ControllerKX {
                 ->leftjoin("pessoas AS supervisor", "supervisor.id", "retiradas.id_supervisor")
                 ->leftjoin("empresas", "empresas.id", "pessoas.id_empresa")
                 ->leftjoin("setores", "setores.id", "pessoas.id_setor")
-                ->leftjoin("log", function($join) {
-                    $join->on(function($sql) {
-                        $sql->on("log.fk", "retiradas.id")
-                            ->where("log.tabela", "retiradas");
-                    });
-                })
-                ->leftjoin("pessoas AS ret_sis", "ret_sis.id", "log.id_pessoa")
                 ->where(function($sql) use($request, &$criterios) {
                     if ($request->inicio || $request->fim) {
                         $periodo = "Período";
@@ -163,7 +152,6 @@ class RelatoriosController extends ControllerKX {
                 "retiradas" => $itens->map(function($retirada) {
                     return [
                         "produto"     => $retirada->produto,
-                        "maquina"     => $retirada->maquina,
                         "data"        => $retirada->data,
                         "obs"         => $retirada->obs,
                         "ca"          => $retirada->ca,
