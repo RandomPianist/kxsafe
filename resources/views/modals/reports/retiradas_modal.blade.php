@@ -19,7 +19,7 @@
                                 <input id = "rel-empresa2"
                                     name = "empresa"
                                     class = "form-control autocomplete"
-                                    data-input = "#rel-id_empresa1"
+                                    data-input = "#rel-id_empresa2"
                                     data-table = "empresas"
                                     data-column = "nome_fantasia"
                                     data-filter_col = ""
