@@ -193,6 +193,7 @@ class ApiController extends ControllerKX {
                         ->leftjoin("empresas", "empresas.id", "pessoas.id_empresa")
                         ->leftjoin("comodatos", "comodatos.id", "retiradas.id_comodato")
                         ->whereRaw("data BETWEEN '".$request->dini."' AND '".$request->dfim."'")
+                        ->where("empresas.id", "<>", 0)
                         ->where(function($sql) use($request) {
                             if ($request->idemp) $sql->whereRaw($request->idemp." IN (empresas.id, empresas.id_matriz)");
                             if ($request->idmaq) $sql->where("comodatos.id_maquina", $request->idmaq);
