@@ -54,7 +54,7 @@ body {
 	font-size: 1rem;
 	font-weight: 400;
 	line-height: 1.5;
-	color: #858796;
+	color: #000;
 	text-align: left;
 	background-color: white;
 	display: table;
@@ -600,7 +600,7 @@ small,
 }
 
 .text-dark {
-	color: #5a5c69 !important
+	color: #000 !important
 }
 
 @media print {
@@ -689,15 +689,18 @@ h5 {
 }
 
 .floating-action-button {
-	border-radius: 1.5rem;
-	bottom: 20px;
-	color: white;
-	font-size: 1.2rem;
-	right: 20px;
-	padding: 10px;
-	position: fixed;
-	height: 50px;
-	width: 50px
+    border-radius: 50%;
+    bottom: 19px;
+    color: white;
+    font-size: 1.2rem;
+    right: 20px;
+    padding: 16px;
+    padding-bottom: 42px;
+    position: fixed;
+    height: 37px;
+    width: 50px;
+    background: #084f96;
+	cursor: pointer
 }
 
 .fw-600 {

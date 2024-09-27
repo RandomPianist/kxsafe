@@ -358,6 +358,8 @@ class RelatoriosController extends ControllerKX {
 
     public function retiradas(Request $request) {
         $criterios = array();
+        $qtd_total = 0;
+        $val_total = 0;
         $resultado = collect(
             DB::table("retiradas")
                 ->select(
@@ -420,9 +422,10 @@ class RelatoriosController extends ControllerKX {
                 })
                 ->orderby("retiradas.id")
                 ->get()
-        )->groupBy("id_".$request->rel_grupo)->map(function($itens) use($request) {
+        )->groupBy("id_".$request->rel_grupo)->map(function($itens) use($request, &$qtd_total, &$val_total) {
+            $qtd_total += $itens->sum("qtd");
+            $val_total += $itens->sum("valor");
             return [
-                "quebra" => $request->rel_grupo,
                 "grupo" => $request->rel_grupo == "pessoa" ? $itens[0]->nome : $itens[0]->setor,
                 "total_valor" => $itens->sum("valor"),
                 "total_qtd" => $itens->sum("qtd"),
@@ -439,7 +442,8 @@ class RelatoriosController extends ControllerKX {
         })->values()->all();
         $criterios = join(" | ", $criterios);
         $tipo = $request->tipo;
-        return sizeof($resultado) ? view("reports/retiradas", compact("resultado", "criterios", "tipo")) : view("nada");
+        $quebra = $request->rel_grupo;
+        return sizeof($resultado) ? view("reports/retiradas", compact("resultado", "criterios", "tipo", "quebra", "val_total", "qtd_total")) : view("nada");
     }
 
     public function retiradas_consultar(Request $request) {

@@ -91,6 +91,13 @@
                             <span>Relatórios</span>
                             <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
                             <ul class = "dropdown-toolbar">
+                                <li>
+                                    <span>Consumo<img class = "dropdown-icon" src = "/kxsafe-consulta/img/sort-down.png"></span>
+                                    <ul class = "subdropdown-toolbar">
+                                        <li onclick = "relatorio = new RelatorioRetiradas('pessoa')">por colaborador</li>
+                                        <li onclick = "relatorio = new RelatorioRetiradas('setor')">por setor</li>
+                                    </ul>
+                                </li>
                                 <li onclick = "relatorio = new RelatorioControle()">
                                     <span>Controle de Entrega</span>
                                 </li>
@@ -108,13 +115,6 @@
                                         <span>Máquinas por empresa</span>
                                     </li>
                                 @endif
-                                <li>
-                                    <span>Retiradas<img class = "dropdown-icon" src = "/kxsafe-consulta/img/sort-down.png"></span>
-                                    <ul class = "subdropdown-toolbar">
-                                        <li onclick = "relatorio = new RelatorioRetiradas('pessoa')">por colaborador</li>
-                                        <li onclick = "relatorio = new RelatorioRetiradas('setor')">por setor</li>
-                                    </ul>
-                                </li>
                             </ul>
                         </a>
                     </div>

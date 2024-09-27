@@ -8,7 +8,7 @@
         <div class = "float-right">
             <ul class = "m-0">
                 <li class = "text-right">
-                    <h6 class = "m-0 fw-600">Retiradas</h6>
+                    <h6 class = "m-0 fw-600">Consumo</h6>
                 </li>
                 <li class = "text-right">
                     <h6 class = "m-0 traduzir">
@@ -28,47 +28,85 @@
         </div>
     </div>
     <div class = "mt-2 mb-3 linha"></div>
+    @if ($tipo == 'S')
+        <table class = "report-body table table-sm table-bordered">
+            <tbody>
+                <tr>
+                    <td width = "70%">
+                        <h5>Setor</h5>
+                    </td>
+                    <td width = "10%" class = "text-right">
+                        <h5>Quantidade</h5>
+                    </td>
+                    <td width = "20%" class = "text-right">
+                        <h5>Valor</h5>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    @endif
     @foreach ($resultado AS $item)
-        <h5>{{ $item["grupo"] }}</h5>
         @if ($tipo == 'A')
+            <h5>{{ $item["grupo"] }}</h5>
             <table class = "report-body table table-sm table-bordered table-striped px-5">
                 <thead>
                     <tr class = "report-row">
                         <td width = "20%">Data</td>
-                        @if ($item["quebra"] == "setor")
+                        @if ($quebra == "setor")
                             <td width = "25%">Produto</td>
                             <td width = "25%">Colaborador</td>
                         @else
                             <td width = "50%">Produto</td>
                         @endif
-                        <td width = "10%" class = "text-right">Qtde.</td>
+                        <td width = "10%" class = "text-right">Quantidade</td>
                         <td width = "20%" class = "text-right">Valor</td>
                     </tr>
                 </thead>
             </table>
-            <div class = "mb-3">
-                <table class = "report-body table table-sm table-bordered table-striped">
-                    <tbody>
+        @endif
+        @if ($tipo == 'A') <div class = "mb-3"> @endif
+            <table class = "report-body table table-sm table-bordered @if ($tipo == 'A') table-striped @endif">
+                <tbody>
+                    @if ($tipo == 'A')
                         @foreach ($item["retiradas"] as $retirada)
                             <tr class = "report-row">
                                 <td width = "20%">{{ $retirada["data"] }}</td>
-                                @if ($item["quebra"] == "setor")
+                                @if ($quebra == "setor")
                                     <td width = "25%">{{ $retirada["produto"] }}</td>
                                     <td width = "25%">{{ $retirada["pessoa"] }}</td>
                                 @else
                                     <td width = "50%">{{ $retirada["produto"] }}</td>
                                 @endif
-                                
-                                <td width = "10%" class = "text-right">{{ $retirada["qtd"] }}</td>
+                                <td width = "10%" class = "text-right">{{ number_format($retirada["qtd"], 0) }}</td>
                                 <td width = "20%" class = "text-right">R$ {{ number_format($retirada["valor"], 2, ",", ".") }}</td>
                             </tr>
                         @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
-        <h6>Quantidade total: {{ $item["total_qtd"] }}</h6>
-        <h6>Valor total: R$ {{ number_format($item["total_valor"], 2, ",", ".") }}</h6>
-        <div class = "line-div"></div>
+                    @endif
+                    <tr class = "report-row">
+                        <td width = "70%" @if ($tipo == 'A') colspan = @if ($quebra == 'setor') 3 @else 2 @endif @endif>
+                            <b>@if ($tipo == 'A') Total: @else {{ $item["grupo"] }} @endif</b>
+                        </td>
+                        <td width = "10%" class = "text-right"><b>{{ number_format($item["total_qtd"], 0) }}</b></td>
+                        <td width = "20%" class = "text-right"><b>R$ {{ number_format($item["total_valor"], 2, ",", ".") }}</b></td>
+                    </tr>
+                </tbody>
+            </table>
+        @if ($tipo == 'A') </div>
+        <div class = "line-div"></div> @endif
     @endforeach
+    <table class = "report-body table table-sm table-bordered @if ($tipo == 'A') table-striped @endif">
+        <tbody>
+            <tr>
+                <td width = "70%">
+                    <h5>Totais:</h5>
+                </td>
+                <td width = "10%" class = "text-right">
+                    <h5>{{ number_format($qtd_total, 0) }}</h5>
+                </td>
+                <td width = "20%" class = "text-right">
+                    <h5>R$ {{ number_format($val_total, 2, ",", ".") }}</h5>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 @endsection
