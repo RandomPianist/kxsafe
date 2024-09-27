@@ -641,6 +641,7 @@ function RelatorioRetiradas(quebra) {
                 elementos.setor.value = "";
                 elementos.id_setor.value = "";
             }
+            document.getElementById("relatorioRetiradasModalLabel").innerHTML = "Consumo por " + quebra.replace("pessoa", "colaborador");
             document.getElementById("rel-grupo2").value = quebra;
         });
     }, 0);

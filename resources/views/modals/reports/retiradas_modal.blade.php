@@ -1,10 +1,10 @@
 
 <!-- Modal -->
-<div class = "modal fade" id = "relatorioRetiradasModal" aria-hidden = "true">
+<div class = "modal fade" id = "relatorioRetiradasModal" aria-labelledby = "relatorioRetiradasModalLabel" aria-hidden = "true">
     <div class = "modal-dialog modal-lg" role = "document">
         <div class = "modal-content">
             <div class = "modal-header">
-                <h6 class = "modal-title header-color">Consumo</h6>
+                <h6 class = "modal-title header-color" id = "relatorioRetiradasModalLabel"></h6>
                 <button type = "button" class = "close" data-dismiss = "modal" aria-label = "Close">
                     <span aria-hidden = "true">&times;</span>
                 </button>
@@ -51,7 +51,7 @@
                                     class = "form-control autocomplete"
                                     data-input = "#rel-setor"
                                     data-table = "setores"
-                                    data-column = "nome"
+                                    data-column = "descr"
                                     data-filter_col = ""
                                     data-filter = ""
                                     type = "text"
