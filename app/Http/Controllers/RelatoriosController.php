@@ -441,9 +441,8 @@ class RelatoriosController extends ControllerKX {
             ];
         })->values()->all();
         $criterios = join(" | ", $criterios);
-        $tipo = $request->tipo;
         $quebra = $request->rel_grupo;
-        return sizeof($resultado) ? view("reports/retiradas", compact("resultado", "criterios", "tipo", "quebra", "val_total", "qtd_total")) : view("nada");
+        return sizeof($resultado) ? view("reports/retiradas".$tipo, compact("resultado", "criterios", "quebra", "val_total", "qtd_total")) : view("nada");
     }
 
     public function retiradas_consultar(Request $request) {
