@@ -150,7 +150,10 @@ class RelatoriosController extends ControllerKX {
                                 ->orWhere("empresas.id", $id_emp);
                         });
                     }
-                    if ($request->consumo != "todos") $sql->where("produtos.consumo", $request->consumo == "epi" ? 0 : 1);
+                    if ($request->consumo != "todos") {
+                        $sql->where("produtos.consumo", $request->consumo == "epi" ? 0 : 1);
+                        array_push($criterios, "Apenas ".($request->consumo == "epi" ? "EPI" : "produtos de consumo"));
+                    }
                 })
                 ->orderby("retiradas.id")
                 ->get()
@@ -417,8 +420,18 @@ class RelatoriosController extends ControllerKX {
                             $query->where("empresas.id", $request->id_empresa)
                                 ->orWhere("empresas.id_matriz", $request->id_empresa);
                         });
+                        $empresa = DB::table("empresas")->where("id", $request->id_empresa)->value("razao_social");
+                        if (sizeof(
+                            DB::table("empresas")
+                                ->where("id_matriz", $request->id_empresa)
+                                ->get()
+                        )) $empresa .= " e filiais";
+                        array_push($criterios, "Empresa: ".$empresa);
                     }
-                    if ($request->consumo != "todos") $sql->where("produtos.consumo", $request->consumo == "epi" ? 0 : 1);
+                    if ($request->consumo != "todos") {
+                        $sql->where("produtos.consumo", $request->consumo == "epi" ? 0 : 1);
+                        array_push($criterios, "Apenas ".($request->consumo == "epi" ? "EPI" : "produtos de consumo"));
+                    }
                 })
                 ->orderby("retiradas.id")
                 ->get()
@@ -442,7 +455,8 @@ class RelatoriosController extends ControllerKX {
         })->values()->all();
         $criterios = join(" | ", $criterios);
         $quebra = $request->rel_grupo;
-        return sizeof($resultado) ? view("reports/retiradas".$tipo, compact("resultado", "criterios", "quebra", "val_total", "qtd_total")) : view("nada");
+        $titulo = $request->rel_grupo == "pessoa" ? "Consumo por colaborador" : "Consumo por setor";
+        return sizeof($resultado) ? view("reports/retiradas".$request->tipo, compact("resultado", "criterios", "quebra", "val_total", "qtd_total", "titulo")) : view("nada");
     }
 
     public function retiradas_consultar(Request $request) {

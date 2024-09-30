@@ -572,7 +572,7 @@ function RelatorioItens() {
 }
 
 function RelatorioControle() {
-    let elementos = relObterElementos(["inicio2", "fim2", "pessoa1"]);
+    let elementos = relObterElementos(["inicio2", "fim2", "pessoa1", "consumo1"]);
 
     this.validar = function() {
         limpar_invalido();
@@ -599,12 +599,13 @@ function RelatorioControle() {
         modal("relatorioControleModal", 0, function() {
             elementos.inicio.value = hoje();
             elementos.fim.value = hoje();
+            elementos.consumo.value = "todos";
         });
     }, 0);
 }
 
 function RelatorioRetiradas(quebra) {
-    let elementos = relObterElementos(["inicio3", "fim3", "empresa2", "pessoa2", "setor"]);
+    let elementos = relObterElementos(["inicio3", "fim3", "empresa2", "pessoa2", "setor", "consumo2", "tipo"]);
 
     this.validar = function() {
         limpar_invalido();
@@ -634,14 +635,12 @@ function RelatorioRetiradas(quebra) {
             if (quebra == "setor") {
                 elementos.pessoa.parentElement.classList.add("d-none");
                 elementos.setor.parentElement.classList.remove("d-none");
-                elementos.pessoa.value = "";
-                elementos.id_pessoa.value = "";
             } else {
                 elementos.setor.parentElement.classList.add("d-none");
                 elementos.pessoa.parentElement.classList.remove("d-none");
-                elementos.setor.value = "";
-                elementos.id_setor.value = "";
             }
+            elementos.consumo.value = "todos";
+            elementos.tipo.value = "A";
             document.getElementById("relatorioRetiradasModalLabel").innerHTML = "Consumo por " + quebra.replace("pessoa", "colaborador");
             document.getElementById("rel-grupo2").value = quebra;
         });
