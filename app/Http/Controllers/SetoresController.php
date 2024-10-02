@@ -5,23 +5,19 @@ namespace App\Http\Controllers;
 use DB;
 use Auth;
 use Illuminate\Http\Request;
-use App\Models\EmpresasSetores;
 use App\Models\Pessoas;
 use App\Models\Setores;
 
 class SetoresController extends ControllerKX {
     private function busca($param) {
-        $resultado = new \stdClass;
-        $resultado->consulta = DB::table("setores")
-                                    ->select(
-                                        "id",
-                                        "descr"
-                                    )
-                                    ->whereRaw($param)
-                                    ->where("lixeira", 0)
-                                    ->get();
-        $resultado->empresa = Pessoas::find(Auth::user()->id_pessoa)->id_empresa;
-        return json_encode($resultado);
+        return DB::table("setores")
+                    ->select(
+                        "id",
+                        "descr"
+                    )
+                    ->whereRaw($param)
+                    ->where("lixeira", 0)
+                    ->get();
     }
 
     public function ver() {
@@ -30,13 +26,17 @@ class SetoresController extends ControllerKX {
     }
 
     public function listar(Request $request) {
+        $busca = null;
+        $resultado = new \stdClass;
         $filtro = trim($request->filtro);
         if ($filtro) {
             $busca = $this->busca("descr LIKE '".$filtro."%'");
             if (sizeof($busca) < 3) $busca = $this->busca("descr LIKE '%".$filtro."%'");
             if (sizeof($busca) < 3) $busca = $this->busca("(descr LIKE '%".implode("%' AND descr LIKE '%", explode(" ", str_replace("  ", " ", $filtro)))."%')");
         } else $busca = $this->busca("1");
-        return json_encode($busca);
+        $resultado->consulta = $busca;
+        $resultado->empresa = Pessoas::find(Auth::user()->id_pessoa)->id_empresa;
+        return json_encode($resultado);
     }
 
     public function consultar(Request $request) {
