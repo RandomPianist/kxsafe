@@ -52,7 +52,6 @@
     </button>
     <script type = "text/javascript" language = "JavaScript">
         let ant_usr = false;
-        let ant_padrao = false;
 
         function listar(coluna) {
             $.get(URL + "/setores/listar", {
@@ -125,23 +124,17 @@
             document.getElementById("setoresModalLabel").innerHTML = titulo;
             let el_cria_usuario = document.getElementById("cria_usuario");
             let el_cria_usuario_chk = document.getElementById("cria_usuario-chk");
-            let el_setor_padrao = document.getElementById("setor_padrao");
-            let el_setor_padrao_chk = document.getElementById("setor_padrao-chk");
             if (id) {
                 $.get(URL + "/setores/mostrar/" + id, function(data) {
                     if (typeof data == "string") data = $.parseJSON(data);
                     document.getElementById("descr").value = data.descr;
                     el_cria_usuario.value = parseInt(data.cria_usuario) ? "S" : "N";
                     el_cria_usuario_chk.checked = el_cria_usuario.value == "S";
-                    el_setor_padrao.value = data.padrao;
-                    el_setor_padrao_chk.checked = parseInt(data.padrao) == 1;
                     ant_usr = el_cria_usuario_chk.checked;
-                    ant_padrao = el_setor_padrao_chk.checked;
                     modal("setoresModal", id);
                 });
             } else modal("setoresModal", id, function() {
                 el_cria_usuario.value = "N";
-                el_setor_padrao.value = 0;
                 el_cria_usuario_chk.checked = false;
                 el_setor_padrao_chk.checked = false;
             }); 
