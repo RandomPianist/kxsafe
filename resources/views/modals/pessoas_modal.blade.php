@@ -84,7 +84,7 @@
                                     type = "text"
                                     autocomplete = "off"
                                 />
-                                <input id = "pessoa-id_setor" name = "pessoa-id_setor" type = "hidden" onchange = "pessoa.toggle_user(parseInt(this.value))"/>
+                                <input id = "pessoa-id_setor" name = "id_setor" type = "hidden" onchange = "pessoa.toggle_user(parseInt(this.value))"/>
                             </div>
                             <div class = "col-1 pt-4 d-flex align-items-center">
                                 <a href = "{{ config('app.root_url') }}/setores" title = "Cadastro de setores" target = "_blank">

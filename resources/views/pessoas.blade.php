@@ -91,6 +91,7 @@
                 req[chave] = "";
             });
             req.id_pessoa = id_pessoa;
+            req.tipo = 'A';
             let link = document.createElement("a");
             link.href = URL + "/relatorios/retiradas?" + $.param(req);
             link.target = "_blank";
