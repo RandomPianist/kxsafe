@@ -25,7 +25,7 @@
                                 type = "text"
                                 autocomplete = "off"
                             />
-                            <input id = "id_produto" type = "hidden" onchange = "idatbglobal=0;atualizaValidade()" />
+                            <input id = "id_produto" type = "hidden" onchange = "/*idatbglobal=0*/" />
                         </div>
                         <div class = "col-5" id = "div-produto">
                             <label for = "produto" class = "custom-label-form">Produto: *</label>
@@ -47,15 +47,15 @@
                         </div>
                         <div class = "col-2">
                             <label for = "quantidade" class = "custom-label-form">Quantidade: *</label>
-                            <input id = "quantidade" class = "form-control text-right" autocomplete = "off" type = "number" onkeyup = "$(this).trigger('change')" onchange = "idatbglobal=0;limitar(this)" />
+                            <input id = "quantidade" class = "form-control text-right" autocomplete = "off" type = "number" onkeyup = "$(this).trigger('change')" onchange = "/*idatbglobal=0;*/limitar(this)" />
                         </div>
                         <div class = "col-2">
                             <label for = "validade" class = "custom-label-form">Validade em dias: *</label>
-                            <input id = "validade" class = "form-control text-right" autocomplete = "off" type = "number" onkeyup = "$(this).trigger('change')" onchange = "idatbglobal=0;limitar(this)" />
+                            <input id = "validade" class = "form-control text-right" autocomplete = "off" type = "number" onkeyup = "$(this).trigger('change')" onchange = "/*idatbglobal=0;*/limitar(this)" />
                         </div>
                         <div class = "col-2">
                             <label for = "obrigatorio" class = "custom-label-form">Obrigatório: *</label>
-                            <select class = "form-control" id = "obrigatorio" onchange = "idatbglobal=0">
+                            <select class = "form-control" id = "obrigatorio" onchange = "/*idatbglobal=0*/">
                                 <option value = "opt-1">SIM</option>
                                 <option value = "opt-0">NÃO</option>
                             </select>

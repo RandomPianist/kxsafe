@@ -183,6 +183,10 @@ window.onload = function() {
         if (document.getElementById("rel-grupo1").value == "maquinas-por-empresa") relatorio.inverter();
     });
 
+    $("#atribuicoesModal").on("hide.bs.modal", function() {
+        idatbglobal = 0;
+    });
+
     $("#estoqueModal").on("hide.bs.modal", function() {
         Array.from(document.getElementsByClassName("remove-produto")).forEach((el) => {
             $(el).trigger("click");
@@ -724,18 +728,6 @@ function atribuicao(grade, id) {
             mostrar_atribuicoes();
         });
     });
-}
-
-function atualizaValidade() {
-    id_produto = document.getElementById("id_produto").value;
-    if (id_produto) {
-        $.get(URL + "/atribuicoes/validade", {
-            id : id_produto,
-            tipo : gradeGlobal ? "referencia" : "produto"
-        }, function(validade) {
-            document.getElementById("validade").value = validade;
-        });
-    }
 }
 
 function atribuir() {
