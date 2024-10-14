@@ -313,14 +313,14 @@ class RelatoriosController extends ControllerKX {
 
     public function extrato_consultar(Request $request) {
         if ($this->consultar_maquina($request)) return "maquina";
-        if (!$erro && ((trim($request->produto) && !sizeof(
+        if (((trim($request->produto) && !sizeof(
             DB::table("produtos")
                 ->where("id", $request->id_produto)
                 ->where("descr", $request->produto)
                 ->where("lixeira", 0)
                 ->get()
-        )) || (trim($request->id_produto) && !trim($request->produto)))) $erro = "produto";
-        return $erro;
+        )) || (trim($request->id_produto) && !trim($request->produto)))) return "produto";
+        return "";
     }
 
     public function controle(Request $request) {
