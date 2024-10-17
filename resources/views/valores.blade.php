@@ -52,9 +52,11 @@
             </div>
         </div>
     </div>
-    <button class = "btn btn-primary custom-fab" type = "button" onclick = "chamar_modal(0)">
-        <i class = "my-icon fas fa-plus"></i>
-    </button>
+    @if (!intval(App\Models\Pessoas::find(Auth::user()->id_pessoa)->id_empresa))
+        <button class = "btn btn-primary custom-fab" type = "button" onclick = "chamar_modal(0)">
+            <i class = "my-icon fas fa-plus"></i>
+        </button>
+    @endif
     <script type = "text/javascript" language = "JavaScript">
         function listar(coluna) {
             $.get(URL + "/valores/{{ $alias }}/listar", {

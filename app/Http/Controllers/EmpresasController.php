@@ -10,23 +10,32 @@ use App\Models\Pessoas;
 
 class EmpresasController extends ControllerKX {
     private function busca($param) {
-        $id_emp = Pessoas::find(Auth::user()->id_pessoa)->id_empresa;
         return DB::table("empresas")
-                ->select(
-                    "id",
-                    "nome_fantasia",
-                    "id_matriz"
-                )
-                ->where(function($query) use($id_emp, $param) {
-                    if (intval($id_emp) && $param == ">") {
-                        $query->where("id", $id_emp)
-                                ->orWhere("id_matriz", $id_emp);
-                    }
-                })
-                ->where("lixeira", 0)
-                ->where("id_matriz", $param, 0)
-                ->orderby("nome_fantasia")
-                ->get();
+                    ->select(
+                        "id",
+                        "nome_fantasia",
+                        "id_matriz"
+                    )
+                    ->where(function($sql) use($param) {
+                        $id_emp = Pessoas::find(Auth::user()->id_pessoa)->id_empresa;
+                        if (intval($id_emp)) {
+                            $empresa_usuario = Empresas::find($id_emp);
+                            if ($param == "matriz") {
+                                if (!intval($empresa_usuario->id_matriz)) 
+                                    $sql->where("id", $empresa_usuario->id);
+                                else 
+                                    $sql->where("id", $empresa_usuario->id_matriz);
+                            } else {
+                                if (!intval($empresa_usuario->id_matriz)) 
+                                    $sql->where("id_matriz", $empresa_usuario->id);
+                                else 
+                                    $sql->where("id", $empresa_usuario->id);
+                            }
+                        }
+                    })
+                    ->where("lixeira", 0)
+                    ->orderBy("nome_fantasia")
+                    ->get();
     }
 
     public function ver() {
@@ -38,8 +47,8 @@ class EmpresasController extends ControllerKX {
     public function listar() {
         $id_emp = intval(Pessoas::find(Auth::user()->id_pessoa)->id_empresa);
         $resultado = new \stdClass;
-        $resultado->inicial = $this->busca("=");
-        $resultado->final = $this->busca(">");
+        $resultado->inicial = $this->busca("matriz");
+        $resultado->final = $this->busca("filial");
         $resultado->matriz_editavel = $id_emp ? sizeof(DB::table("empresas")->where("id_matriz", $id_emp)->where("lixeira", 0)->get()) > 0 ? 1 : 0 : 1;
         return json_encode($resultado);
     }

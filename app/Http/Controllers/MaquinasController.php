@@ -122,7 +122,7 @@ class MaquinasController extends ControllerKX {
                                         ELSE 'N'
                                     END AS invalida_fim
                                 ")
-                            )->join("valores", "valores.id", "comodato.id_maquina")
+                            )->join("valores", "valores.id", "comodatos.id_maquina")
                             ->whereRaw("(('".$inicio."' BETWEEN comodatos.inicio AND comodatos.fim) OR ('".$fim."' BETWEEN comodatos.inicio AND comodatos.fim))")
                             ->where("comodatos.inicio", "<>", "comodatos.fim")
                             ->where("id_maquina", $request->id_maquina)

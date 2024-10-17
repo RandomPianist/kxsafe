@@ -46,19 +46,19 @@
                             <span>Corporativo</span>
                             <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
                             <ul class = "dropdown-toolbar">
-                                <li onclick = "redirect('/kxsafe-consulta/empresas')">
+                                <li onclick = "redirect('/incompany/empresas')">
                                     <span>Empresas</span>
                                 </li>
                                 <li>
                                     <!-- <span>Colaboradores</span> -->
-                                    <span>Colaboradores<img class = "dropdown-icon" src = "/kxsafe-consulta/img/sort-down.png"></span>
+                                    <span>Colaboradores<img class = "dropdown-icon" src = "/incompany/img/sort-down.png"></span>
                                     <ul class = "subdropdown-toolbar">
                                         @if (!intval(App\Models\Pessoas::find(Auth::user()->id_pessoa)->id_empresa))
-                                            <li onclick = "redirect('/kxsafe-consulta/colaboradores/pagina/A')">Administradores</li>
+                                            <li onclick = "redirect('/incompany/colaboradores/pagina/A')">Administradores</li>
                                         @endif
-                                        <li onclick = "redirect('/kxsafe-consulta/colaboradores/pagina/F')">Funcionários</li>
-                                        <li onclick = "redirect('/kxsafe-consulta/colaboradores/pagina/S')">Supervisores</li>
-                                        <li onclick = "redirect('/kxsafe-consulta/colaboradores/pagina/U')">Usuários</li>
+                                        <li onclick = "redirect('/incompany/colaboradores/pagina/F')">Funcionários</li>
+                                        <li onclick = "redirect('/incompany/colaboradores/pagina/S')">Supervisores</li>
+                                        <li onclick = "redirect('/incompany/colaboradores/pagina/U')">Usuários</li>
                                     </ul>
                                 </li>
                             </ul>
@@ -69,10 +69,10 @@
                                 <span>Itens</span>
                                 <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
                                 <ul class = "dropdown-toolbar">
-                                    <li onclick = "redirect('/kxsafe-consulta/valores/categorias')">
+                                    <li onclick = "redirect('/incompany/valores/categorias')">
                                         <span>Categorias</span>
                                     </li>
-                                    <li onclick = "redirect('/kxsafe-consulta/produtos')">
+                                    <li onclick = "redirect('/incompany/produtos')">
                                         <span>Produtos</span>
                                     </li>
                                 </ul>
@@ -92,7 +92,7 @@
                             <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
                             <ul class = "dropdown-toolbar">
                                 <li>
-                                    <span>Consumo<img class = "dropdown-icon" src = "/kxsafe-consulta/img/sort-down.png"></span>
+                                    <span>Consumo<img class = "dropdown-icon" src = "/incompany/img/sort-down.png"></span>
                                     <ul class = "subdropdown-toolbar">
                                         <li onclick = "relatorio = new RelatorioRetiradas('pessoa')">por colaborador</li>
                                         <li onclick = "relatorio = new RelatorioRetiradas('setor')">por setor</li>
@@ -108,7 +108,7 @@
                                     <li onclick = "relatorio = new RelatorioItens()">
                                         <span>Extrato de itens</span>
                                     </li>
-                                    <li onclick = "window.open('/kxsafe-consulta/relatorios/comodatos', '_blank')">
+                                    <li onclick = "window.open('/incompany/relatorios/comodatos', '_blank')">
                                         <span>Locação</span>
                                     </li>
                                     <li onclick = "relatorio = new RelatorioBilateral('maquinas-por-empresa')">

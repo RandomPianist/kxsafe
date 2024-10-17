@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ApiController;
 use App\Http\Controllers\ProdutosController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,4 +42,9 @@ Route::group(["prefix" => "app"], function() {
     Route::post("/retirar",                [ApiController::class, "retirar"]);
     Route::post("/retirar-com-supervisao", [ApiController::class, "retirarComSupervisao"]);
     Route::post("/validar-spv",            [ApiController::class, "validarSpv"]);
+});
+
+Route::group(["prefix" => "teste"], function() {
+    Route::get("/pessoas",              [DashboardController::class, "pessoas"]);
+    Route::get("/produtos/{id_pessoa}", [DashboardController::class, "produtos"]);
 });
