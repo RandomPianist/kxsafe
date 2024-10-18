@@ -673,3 +673,60 @@ span, label, table, h1, h2, h3, h4, h5, h6, .texto-tabela {
     animation: spin 2s linear infinite;
     margin: auto
 }
+
+.card-dashboard {
+    height: 50vh;
+    overflow-y: auto;
+}
+.header-card-dashboard {
+    height: 70px;
+}
+.titulo-card-dashboard {
+    font-size: 16pt;
+    color: #333;
+    font-weight: bold;
+}
+.subtitulo-card-dashboard {
+    font-size: 10pt;
+    color: #333;
+}
+.conteudo-card-dashboard {
+    margin:auto;
+}
+.tabela-funcionarios-dashboard {
+    width: 100%;
+    border: none;
+}
+.tabela-funcionarios-dashboard td {
+    font-weight: 400;
+    vertical-align: middle;
+    cursor: pointer
+}
+.tabela-funcionarios-dashboard tr:first-child td {
+    border: none;
+}
+.tabela-funcionarios-dashboard tbody {
+    font-size: 11pt;
+    border: none;
+    
+}
+.foto-funcionario-dashboard {
+    width: 40px;
+    height:40px;
+}
+.td-foto{
+    padding-right:0 !important;
+}
+.td-nome {
+    padding-left:.75rem !important;
+}
+.table-itens-em-atraso td {
+    font-weight: 400;
+    vertical-align: middle;
+    cursor: pointer;
+    padding:13px;
+    color:#333;
+}
+.table-itens-em-atraso thead  td {
+    font-weight: bold;
+}

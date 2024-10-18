@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ValoresController;
 use App\Http\Controllers\SetoresController;
 use App\Http\Controllers\EmpresasController;
@@ -24,8 +25,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware("auth")->group(function () {
-    Route::get("/",             [HomeController::class, "index"]);
-    Route::get("/autocomplete", [HomeController::class, "autocomplete"]);
+    Route::get("/",                               [DashboardController::class, "pagina"]);
+    Route::get("/produtos-em-atraso/{id_pessoa}", [DashboardController::class, "produtos"]);
+    Route::get("/autocomplete",                   [HomeController::class, "autocomplete"]);
 
     Route::group(["prefix" => "valores/{alias}"], function() {
         Route::get ("/",             [ValoresController::class, "ver"]);

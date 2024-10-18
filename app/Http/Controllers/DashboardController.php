@@ -110,7 +110,27 @@ class DashboardController extends Controller {
                     ->get();
     }
 
-    public function pessoas() {
+    public function produtos($id_pessoa) {
+        return json_encode($this->consulta("
+            produtos.id,
+            atribuicoes.validade,
+            atribuicoes.qtd,
+            CASE
+                WHEN atribuicoes.produto_ou_referencia_chave = 'P' THEN produtos.descr
+                ELSE produtos.referencia
+            END AS produto
+        ", "pessoas.id = ".$id_pessoa, "
+            produtos.id,
+            atribuicoes.validade,
+            atribuicoes.qtd,
+            CASE
+                WHEN atribuicoes.produto_ou_referencia_chave = 'P' THEN produtos.descr
+                ELSE produtos.referencia
+            END
+        "));
+    }
+
+    public function pagina() {
         $where = "pessoas.lixeira = 0";
         $id_emp = Pessoas::find(Auth::user()->id_pessoa)->id_empresa;
         if (intval($id_emp)) {
@@ -125,35 +145,17 @@ class DashboardController extends Controller {
                 )
             )";
         }
-        return $this->consulta("
+        $pessoas = $this->consulta("
             pessoas.id,
             pessoas.nome,
             pessoas.foto,
-            COUNT(DISTINCT produtos.id) AS cont
+            COUNT(DISTINCT produtos.id) AS total
         ", $where, "
             pessoas.id,
             pessoas.nome,
             pessoas.foto 
         ");
-    }
-
-    public function produtos($id_pessoa) {
-        return $this->consulta("
-            produtos.id,
-            atribuicoes.id AS id_atribuicao,
-            atribuicoes.produto_ou_referencia_chave,
-            CASE
-                WHEN atribuicoes.produto_ou_referencia_chave = 'P' THEN produtos.descr
-                ELSE produtos.referencia
-            END AS produto
-        ", "pessoas.id = ".$id_pessoa, "
-            produtos.id,
-            atribuicoes.id,
-            atribuicoes.produto_ou_referencia_chave,
-            CASE
-                WHEN atribuicoes.produto_ou_referencia_chave = 'P' THEN produtos.descr
-                ELSE produtos.referencia
-            END
-        ");
+        foreach ($pessoas as $pessoa) $pessoa->foto = asset("storage/".$pessoa->foto);
+        return view("dashboard", compact("pessoas"));
     }
 }
