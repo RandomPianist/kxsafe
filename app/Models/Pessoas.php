@@ -6,18 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int    $id
- * @property int    $created_at
- * @property int    $id_empresa
- * @property int    $id_setor
  * @property int    $lixeira
+ * @property int    $id_setor
+ * @property int    $id_empresa
+ * @property int    $created_at
+ * @property int    $updated_at
  * @property int    $senha
  * @property int    $supervisor
- * @property int    $updated_at
- * @property Date   $admissao
- * @property string $cpf
- * @property string $foto
- * @property string $funcao
  * @property string $nome
+ * @property string $cpf
+ * @property string $funcao
+ * @property string $foto
+ * @property string $foto64
+ * @property Date   $admissao
  */
 class Pessoas extends Model
 {
@@ -41,7 +42,7 @@ class Pessoas extends Model
      * @var array
      */
     protected $fillable = [
-        'admissao', 'cpf', 'created_at', 'foto', 'funcao', 'id_empresa', 'id_setor', 'lixeira', 'nome', 'senha', 'supervisor', 'updated_at'
+        'nome', 'cpf', 'lixeira', 'id_setor', 'id_empresa', 'created_at', 'updated_at', 'funcao', 'admissao', 'senha', 'foto', 'foto64', 'supervisor'
     ];
 
     /**
@@ -59,7 +60,7 @@ class Pessoas extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'int', 'admissao' => 'date', 'cpf' => 'string', 'created_at' => 'timestamp', 'foto' => 'string', 'funcao' => 'string', 'id_empresa' => 'int', 'id_setor' => 'int', 'lixeira' => 'int', 'nome' => 'string', 'senha' => 'int', 'supervisor' => 'int', 'updated_at' => 'timestamp'
+        'id' => 'int', 'nome' => 'string', 'cpf' => 'string', 'lixeira' => 'int', 'id_setor' => 'int', 'id_empresa' => 'int', 'created_at' => 'timestamp', 'updated_at' => 'timestamp', 'funcao' => 'string', 'admissao' => 'date', 'senha' => 'int', 'foto' => 'string', 'foto64' => 'string', 'supervisor' => 'int'
     ];
 
     /**
@@ -68,7 +69,7 @@ class Pessoas extends Model
      * @var array
      */
     protected $dates = [
-        'admissao', 'created_at', 'updated_at'
+        'created_at', 'updated_at', 'admissao'
     ];
 
     /**

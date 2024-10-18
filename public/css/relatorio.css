@@ -805,6 +805,10 @@ h5 {
 	margin: auto;
 }
 
+.manter-junto {
+	white-space: nowrap
+}
+
 @page {
 	size: A4;
 	margin: 0

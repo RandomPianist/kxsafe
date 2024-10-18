@@ -58,7 +58,8 @@ class ControllerKX extends Controller {
                     'API',
                     IFNULL(CONCAT(' - ', log.nome), '')
                 )) AS nome,
-                DATE_FORMAT(log.created_at, '%d/%m/%Y às %H:%i') AS data
+                DATE_FORMAT(log.created_at, '%d/%m/%Y') AS data
+                /*DATE_FORMAT(log.created_at, '%d/%m/%Y às %H:%i') AS data*/
 
             FROM log
 

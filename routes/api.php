@@ -36,6 +36,7 @@ Route::group(["prefix" => "erp"], function() {
 });
 
 Route::group(["prefix" => "app"], function() {
+    Route::get ("/pessoas-com-foto",       [ApiController::class, "pessoasComFoto"]);
     Route::post("/ver-pessoa",             [ApiController::class, "verPessoa"]);
     Route::post("/produtos-por-pessoa",    [ApiController::class, "produtosPorPessoa"]);
     Route::post("/validar",                [ApiController::class, "validarApp"]);

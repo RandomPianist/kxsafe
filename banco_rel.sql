@@ -51,6 +51,7 @@ CREATE TABLE pessoas (
 	admissao DATE,
 	senha INT,
 	foto VARCHAR(512),
+	foto64 TEXT,
 	supervisor TINYINT DEFAULT 0,
 	FOREIGN KEY (id_setor) REFERENCES setores(id),
 	FOREIGN KEY (id_empresa) REFERENCES empresas(id)

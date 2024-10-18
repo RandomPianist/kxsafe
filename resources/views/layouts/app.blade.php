@@ -36,36 +36,48 @@
     <body>
         <div id = "app">
             <main class = "py-4">
-                <div class = "main-toolbar">
+                <div class = "main-toolbar shadow-sm">
                     <a id = "link-home" href = "{{ config('app.root_url') }}">
                         <img src = "{{ asset('img/logo.png') }}" style = "height:100px">
                     </a>
                     <div class = "btn-toolbar px-3 mr-auto">
                         <a href = "#">
-                            <i class = "my-icon fa-light fa-city"></i>
+                            <img src = "{{ asset('img/corporativo.png') }}" class = "img-menu" />
                             <span>Corporativo</span>
                             <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
                             <ul class = "dropdown-toolbar">
                                 <li onclick = "redirect('/incompany/empresas')">
                                     <span>Empresas</span>
                                 </li>
-                                <li>
-                                    <!-- <span>Colaboradores</span> -->
-                                    <span>Colaboradores<img class = "dropdown-icon" src = "/incompany/img/sort-down.png"></span>
-                                    <ul class = "subdropdown-toolbar">
-                                        @if (!intval(App\Models\Pessoas::find(Auth::user()->id_pessoa)->id_empresa))
-                                            <li onclick = "redirect('/incompany/colaboradores/pagina/A')">Administradores</li>
-                                        @endif
-                                        <li onclick = "redirect('/incompany/colaboradores/pagina/F')">Funcionários</li>
-                                        <li onclick = "redirect('/incompany/colaboradores/pagina/S')">Supervisores</li>
-                                        <li onclick = "redirect('/incompany/colaboradores/pagina/U')">Usuários</li>
-                                    </ul>
+                                <li onclick = "redirect('/incompany/setores')">
+                                    <span>Setores</span>
+                                </li>
+                            </ul>
+                        </a>
+                        <a href = "#">
+                            <img src = "{{ asset('img/pessoas.png') }}" class = "img-menu" />
+                            <span>Pessoas</span>
+                            <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
+                            <ul class = "dropdown-toolbar">
+                                @if (!intval(App\Models\Pessoas::find(Auth::user()->id_pessoa)->id_empresa))
+                                    <li onclick = "redirect('/incompany/colaboradores/pagina/A')">
+                                        <span>Administradores</span>
+                                    </li>
+                                @endif
+                                <li onclick = "redirect('/incompany/colaboradores/pagina/F')">
+                                    <span>Funcionários</span>
+                                </li>
+                                <li onclick = "redirect('/incompany/colaboradores/pagina/S')">
+                                    <span>Supervisores</span>
+                                </li>
+                                <li onclick = "redirect('/incompany/colaboradores/pagina/U')">
+                                    <span>Usuários</span>
                                 </li>
                             </ul>
                         </a>
                         @if (!intval(App\Models\Pessoas::find(Auth::user()->id_pessoa)->id_empresa))
                             <a href = "#">
-                                <i class = "my-icon fa-light fa-box"></i>
+                                <img src = "{{ asset('img/itens.png') }}" class = "img-menu" />
                                 <span>Itens</span>
                                 <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
                                 <ul class = "dropdown-toolbar">
@@ -79,15 +91,11 @@
                             </a>
                         @endif
                         <a href = "{{ config('app.root_url') }}/valores/maquinas">
-                            <i class = "my-icon fa-light fa-shelves-empty"></i>
+                            <img src = "{{ asset('img/maquinas.png') }}"  class = "img-menu" />
                             <span>Máquinas</span>
                         </a>
-                        <a href = "{{ config('app.root_url') }}/setores">
-                            <i class = "my-icon fa-light fa-layer-group"></i>
-                            <span>Setores</span>
-                        </a>
                         <a href = "#">
-                            <i class = "my-icon fa-light fa-file-chart-line"></i>
+                            <img src = "{{ asset('img/relatorios.png') }}" class = "img-menu" />
                             <span>Relatórios</span>
                             <img class = "dropdown-icon" src = "{{ asset('img/sort-down.png') }}">
                             <ul class = "dropdown-toolbar">
@@ -176,6 +184,7 @@
         <script type = "text/javascript" language = "JavaScript" src = "{{ asset('js/jquery.min.js')    }}"></script>
         <script type = "text/javascript" language = "JavaScript" src = "{{ asset('js/jquery-ui.min.js') }}"></script>
         <script type = "text/javascript" language = "JavaScript" src = "{{ asset('js/bootstrap.min.js') }}"></script>
+        <script type = "text/javascript" language = "JavaScript" src = "{{ asset('js/highcharts.js')    }}"></script>
         @if (!intval(App\Models\Pessoas::find(Auth::user()->id_pessoa)->id_empresa) || ((isset($alias) ? $alias : "maquinas") == "maquinas"))
             <script type = "text/javascript" language = "JavaScript" src = "{{ asset('js/my-functions.js')  }}"></script>
         @else

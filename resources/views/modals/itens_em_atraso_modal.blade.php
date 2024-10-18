@@ -1,6 +1,5 @@
 
 <!-- Modal -->
-<style type = "text/css" id = "estiloAux"></style>
 <div class = "modal fade" id = "itensEmAtrasoModal" aria-labelledby = "itensEmAtrasoModalLabel" aria-hidden = "true">
     <div class = "modal-dialog modal-xl" role = "document">
         <div class = "modal-content">
@@ -18,10 +17,10 @@
                                 <tr>
                                     <td class = "pl-2">Nome</td>
                                     <td class = "text-right pr-2">Quantidade</td>
-                                    <td class = "text-right pr-">Validade</td>
+                                    <td class = "text-right">Validade em dias</td>
                                 </tr>
-                                <tbody id="table-itens-em-atraso-dados"></tbody>
                             </thead>
+                            <tbody id = "table-itens-em-atraso-dados"></tbody>
                         </table>
                     </div>
                 </div>

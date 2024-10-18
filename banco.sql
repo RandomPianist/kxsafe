@@ -45,6 +45,7 @@ CREATE TABLE pessoas (
 	admissao DATE,
 	senha INT,
 	foto VARCHAR(512),
+	foto64 TEXT,
 	supervisor TINYINT DEFAULT 0
 );
 

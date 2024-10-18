@@ -36,31 +36,6 @@ jQuery.fn.sortElements = (function() {
 })();
 
 window.onload = function() {
-    Array.from(document.querySelectorAll(".btn-toolbar a")).forEach((el) => {
-        el.addEventListener("mousemove", function() {
-            Array.from(el.children).forEach((elB) => {
-                if (elB.classList.value.indexOf("box") > -1) {
-                    elB.classList.remove("fa-box");
-                    elB.classList.add("fa-box-open");
-                } else if (elB.tagName == "I") {
-                    elB.classList.remove("fa-light");
-                    elB.classList.add("fad");    
-                }
-            });
-        });
-        el.addEventListener("mouseout", function() {
-            Array.from(el.children).forEach((elB) => {
-                if (elB.classList.value.indexOf("box") > -1) {
-                    elB.classList.remove("fa-box-open");
-                    elB.classList.add("fa-box");
-                } else if (elB.tagName == "I") {
-                    elB.classList.remove("fad");
-                    elB.classList.add("fa-light");
-                }
-            });
-        });
-    });
-
     Array.from(document.querySelectorAll(".modal-body .row")).forEach((el) => {
         if ($(el).prev().hasClass("row")) $(el).css("margin-top", $(el).prev().find(".tam-max").length ? "-14px" : "11px");
     });
@@ -876,4 +851,17 @@ async function controleTodos(ids) {
         elementos.pessoa.classList.add("invalido");
         s_alert("Colaborador não encontrado");
     }
+}
+
+function extrato_maquina(id_maquina) {
+    let req = {};
+    ["inicio", "fim", "id_produto"].forEach((chave) => {
+        req[chave] = "";
+    });
+    req.lm = "S";
+    req.id_maquina = id_maquina;
+    let link = document.createElement("a");
+    link.href = URL + "/relatorios/extrato?" + $.param(req);
+    link.target = "_blank";
+    link.click();
 }

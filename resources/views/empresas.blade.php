@@ -21,12 +21,12 @@
             margin-left:70rem
         }
 
-        .impar {
+        .par {
             background:#EEE !important
         }
 
         .texto-tabela {
-            color:#858796;
+            color:#333;
             text-decoration:none;
             background-color:transparent;
             padding-bottom:5px;
@@ -87,32 +87,44 @@
     @endif
     
     <script type = "text/javascript" language = "JavaScript">
-        let emp_atual;
+        function zebrar() {
+            setTimeout(function() {
+                let obterVisiveis = function(details, resultado) {
+                    let summary = details.querySelector("summary");
+                    if (summary) resultado.push(summary.id);
+                    Array.from(details.querySelectorAll(":scope > div, :scope > details > summary")).forEach((el) => {
+                        resultado.push(el.id);
+                    });
+                    Array.from(details.querySelectorAll(":scope > details")).forEach((el) => {
+                        if (el.open) obterVisiveis(el, resultado);
+                    });
+                    return resultado;
+                }
 
-        function zebrar(invertido) {
-            let inverter = function(param, executa) {
-                if (executa) param = !param;
-                return param;
-            }
-
-            let visiveis = new Array();
-            Array.from(document.getElementsByClassName("texto-tabela")).forEach((el) => {
-                el.classList.remove("impar");
-                el.classList.remove("par");
-            });
-            Array.from(document.getElementsByClassName("texto-tabela")).forEach((el) => {
-                if (
-                    (el.parentElement.tagName != "DETAILS") || (el.parentElement.tagName == "DETAILS" && (
-                        (el.tagName != "DIV") || (el.tagName == "DIV" && inverter(el.parentElement.open, invertido))
-                    ))
-                ) visiveis.push(el.id);
-            });
-            for (let i = 0; i < visiveis.length; i++) document.getElementById(visiveis[i]).classList.add(((i % 2 > 0) ? "im" : "") + "par");
+                let ativar = false;
+                let aux = new Array();
+                Array.from(document.querySelectorAll("#principal > div, #principal > details > summary")).forEach((el) => {
+                    aux.push(el.id);
+                });
+                Array.from(document.querySelectorAll("#principal > details")).forEach((el) => {
+                    if (el.open) {
+                        aux.concat(obterVisiveis(el, aux));
+                        ativar = true;
+                    }
+                });
+                let lista = new Array();
+                Array.from(document.querySelectorAll("#principal .texto-tabela")).forEach((el) => {
+                    el.classList.remove("impar");
+                    el.classList.remove("par");
+                    if (aux.indexOf(el.id) > -1) lista.push(el.id.replace("empresa-", ""));
+                });
+                for (let i = 0; i < lista.length; i++) document.querySelector("#principal #empresa-" + lista[i]).classList.add(((i % 2 > 0) ? "im" : "") + "par");
+            }, 0);
         }
 
         function listar() {
             let linha = function(id, nome) {
-                return "<summary class = 'texto-tabela' id = 'empresa-" + id + "' onclick = 'zebrar(true)'>" +
+                return "<summary class = 'texto-tabela' id = 'empresa-" + id + "' onclick = 'zebrar()'>" +
                     nome +
                     "<div class = 'btn-table-action'>" +
                         "<i title = 'Nova filial' class = 'espacamento my-icon far fa-plus' onclick = 'criar_filial(" + id + ", event)'></i>" +
@@ -140,7 +152,7 @@
                 Array.from(document.querySelectorAll("summary.texto-tabela")).forEach((el) => {
                     if (!$($(el).parent()).find("details").length) $($(el).parent()).replaceWith("<div class = 'sem-filhos texto-tabela' id = '" + el.id + "'>" + $(el).html() + "</div>");
                 });
-                zebrar(false);
+                zebrar();
             });
         }
 

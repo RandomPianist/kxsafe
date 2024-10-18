@@ -31,6 +31,10 @@ class EmpresasController extends ControllerKX {
                                 else 
                                     $sql->where("id", $empresa_usuario->id);
                             }
+                        } else if ($param == "matriz") {
+                            $sql->where("id_matriz", 0);
+                        } else {
+                            $sql->where("id_matriz", ">", 0);
                         }
                     })
                     ->where("lixeira", 0)

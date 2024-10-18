@@ -445,4 +445,17 @@ class ApiController extends ControllerKX {
         $empresa->save();
         return $empresa->id;
     }
+
+    public function pessoasComFoto() {
+        return json_encode(
+            DB::table("pessoas")
+                ->select(
+                    "id",
+                    "nome",
+                    "foto64"
+                )
+                ->whereNotNull("foto64")
+                ->get()
+        );
+    }
 }
