@@ -50,7 +50,7 @@
                                     <span>Empresas</span>
                                 </li>
                                 <li onclick = "redirect('/incompany/setores')">
-                                    <span>Setores</span>
+                                    <span>Centro de custos</span>
                                 </li>
                             </ul>
                         </a>
@@ -123,6 +123,9 @@
                                         <span>Máquinas por empresa</span>
                                     </li>
                                 @endif
+                                <li onclick = "relatorio = new RelatorioRanking()">
+                                    <span>Ranking de retiradas</span>
+                                </li>
                             </ul>
                         </a>
                     </div>
@@ -166,6 +169,7 @@
                 @include("modals.reports.itens_modal")
                 @include("modals.reports.retiradas_modal")
                 @include("modals.reports.controle_modal")
+                @include("modals.reports.ranking_modal")
             </main>
         </div>
         <div id = "loader">

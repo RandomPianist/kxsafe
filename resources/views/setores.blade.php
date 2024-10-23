@@ -6,7 +6,7 @@
             <table class = "w-100">
                 <tr>
                     <td class = "w-100">
-                        <h3 class = "col header-color mb-3">Setores</h3>
+                        <h3 class = "col header-color mb-3">Centro de custos</h3>
                     </td>
                     <td class = "ultima-atualizacao">
                         <span class = "custom-label-form">{{ $ultima_atualizacao }}</span>
@@ -120,7 +120,7 @@
 
         function chamar_modal(id) {
             let titulo = id ? "Editando" : "Cadastrando";
-            titulo += " setor";
+            titulo += " centro de custo";
             document.getElementById("setoresModalLabel").innerHTML = titulo;
             let el_cria_usuario = document.getElementById("cria_usuario");
             let el_cria_usuario_chk = document.getElementById("cria_usuario-chk");

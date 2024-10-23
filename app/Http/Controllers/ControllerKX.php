@@ -224,4 +224,22 @@ class ControllerKX extends Controller {
             $this->log_inserir2($novo ? "E" : "D", "atribuicoes", $where, $nome, $api);
         }
     }
+
+    protected function obter_where($id_pessoa) {
+        $id_emp = Pessoas::find($id_pessoa)->id_empresa;
+        $where = "pessoas.lixeira = 0";
+        if (intval($id_emp)) {
+            $where .= " AND pessoas.id_empresa IN (
+                SELECT id
+                FROM empresas
+                WHERE empresas.id = ".$id_emp."
+                UNION ALL (
+                    SELECT filiais.id
+                    FROM empresas AS filiais
+                    WHERE filiais.id_matriz = ".$id_emp."
+                )
+            )";
+        }
+        return $where;
+    }
 }

@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use DB;
 use Auth;
+use Illuminate\Http\Request;
 use App\Models\Pessoas;
 
-class DashboardController extends Controller {
+class DashboardController extends ControllerKX {
     private function minhas_maquinas() {
         return DB::table("comodatos")
                     ->select(
@@ -114,6 +115,49 @@ class DashboardController extends Controller {
                     ->get();
     }
 
+    private function ultimas_retiradas_main($where) {
+        $ultimas_retiradas = DB::table("pessoas")
+                                ->select(
+                                    "pessoas.id",
+                                    "pessoas.foto",
+                                    "pessoas.nome"
+                                )
+                                ->joinsub(
+                                    DB::table("retiradas")
+                                        ->select("id_pessoa")
+                                        ->whereRaw("MONTH(data) = MONTH(CURDATE())")
+                                        ->whereRaw("YEAR(data) = YEAR(CURDATE())")
+                                        ->groupby("id_pessoa"),
+                                    "ret",
+                                    "ret.id_pessoa",
+                                    "pessoas.id"
+                                )
+                                ->whereRaw($where)
+                                ->get();
+        foreach ($ultimas_retiradas as $retirada) $retirada->foto = asset("storage/".$retirada->foto);
+        return $ultimas_retiradas;
+    }
+
+    private function retiradas_por_setor_main($where) {
+        return DB::table("retiradas")
+                    ->select(
+                        "setores.id",
+                        "setores.descr",
+                        DB::raw("SUM(qtd) AS retirados")
+                    )
+                    ->join("pessoas", "pessoas.id", "retiradas.id_pessoa")
+                    ->join("setores", "setores.id", "pessoas.id_setor")
+                    ->whereRaw("MONTH(data) = MONTH(CURDATE())")
+                    ->whereRaw("YEAR(data) = YEAR(CURDATE())")
+                    ->where("setores.lixeira", 0)
+                    ->whereRaw($where)
+                    ->groupby(
+                        "setores.id",
+                        "setores.descr"
+                    )
+                    ->get();
+    }
+
     public function produtos($id_pessoa) {
         return json_encode($this->consulta("
             produtos.id,
@@ -138,66 +182,23 @@ class DashboardController extends Controller {
     }
 
     public function pagina() {
-        $where = "pessoas.lixeira = 0";
-        $id_emp = Pessoas::find(Auth::user()->id_pessoa)->id_empresa;
-        if (intval($id_emp)) {
-            $where .= " AND pessoas.id_empresa IN (
-                SELECT id
-                FROM empresas
-                WHERE empresas.id = ".$id_emp."
-                UNION ALL (
-                    SELECT filiais.id
-                    FROM empresas AS filiais
-                    WHERE filiais.id_matriz = ".$id_emp."
-                )
-            )";
-        }
+        $where = $this->obter_where(Auth::user()->id_pessoa);
         $pessoas = $this->consulta("
             pessoas.id,
             pessoas.nome,
             pessoas.foto,
-            COUNT(DISTINCT produtos.id) AS total
+            SUM(atribuicoes.qtd) AS total
         ", $where, "
             pessoas.id,
             pessoas.nome,
             pessoas.foto 
         ");
-        foreach ($pessoas as $pessoa) $pessoa->foto = asset("storage/".$pessoa->foto);
-        $ultimas_retiradas = DB::table("pessoas")
-                                ->select(
-                                    "pessoas.foto",
-                                    "pessoas.nome"
-                                )
-                                ->joinsub(
-                                    DB::table("retiradas")
-                                        ->select("id_pessoa")
-                                        ->whereRaw("MONTH(data) = MONTH(CURDATE())")
-                                        ->whereRaw("YEAR(data) = YEAR(CURDATE())")
-                                        ->groupby("id_pessoa"),
-                                    "ret",
-                                    "ret.id_pessoa",
-                                    "pessoas.id"
-                                )
-                                ->whereRaw($where)
-                                ->get();
-        foreach ($ultimas_retiradas as $retirada) $retirada->foto = asset("storage/".$retirada->foto);
-        $retiradas_por_setor = DB::table("retiradas")
-                                    ->select(
-                                        "setores.id",
-                                        "setores.descr",
-                                        DB::raw("SUM(qtd) AS retirados")
-                                    )
-                                    ->join("pessoas", "pessoas.id", "retiradas.id_pessoa")
-                                    ->join("setores", "setores.id", "pessoas.id_setor")
-                                    ->whereRaw("MONTH(data) = MONTH(CURDATE())")
-                                    ->whereRaw("YEAR(data) = YEAR(CURDATE())")
-                                    ->where("setores.lixeira", 0)
-                                    ->whereRaw($where)
-                                    ->groupby(
-                                        "setores.id",
-                                        "setores.descr"
-                                    )
-                                    ->get();
+        foreach ($pessoas as $pessoa) {
+            $pessoa->foto = asset("storage/".$pessoa->foto);
+            $pessoa->total = number_format($pessoa->total, 0);
+        }
+        $ultimas_retiradas = $this->ultimas_retiradas_main($where);
+        $retiradas_por_setor = $this->retiradas_por_setor_main($where);
         $total = 0;
         foreach ($retiradas_por_setor as $rps) $total += floatval($rps->retirados);
         $minhas_maquinas = DB::table("valores")
@@ -213,6 +214,73 @@ class DashboardController extends Controller {
                                          ->toArray()
                                 )
                                 ->get();
-        return view("dashboard", compact("pessoas", "ultimas_retiradas", "retiradas_por_setor", "total", "minhas_maquinas"));
+        $ranking = DB::table("retiradas")
+                        ->select(
+                            "pessoas.id",
+                            "pessoas.nome",
+                            "pessoas.foto",
+                            DB::raw("SUM(qtd) AS retirados")
+                        )
+                        ->join("pessoas", "pessoas.id", "retiradas.id_pessoa")
+                        ->whereRaw($this->obter_where(Auth::user()->id_pessoa))
+                        ->whereRaw("MONTH(data) = MONTH(CURDATE())")
+                        ->whereRaw("YEAR(data) = YEAR(CURDATE())")
+                        ->groupby(
+                            "pessoas.id",
+                            "pessoas.nome",
+                            "pessoas.foto"
+                        )
+                        ->orderby("retirados", "desc")
+                        ->orderby("pessoas.nome")
+                        ->get();
+        return view("dashboard", compact("pessoas", "ultimas_retiradas", "retiradas_por_setor", "total", "minhas_maquinas", "ranking"));
+    }
+
+    public function retiradas_por_setor($id_pessoa) {
+        return json_encode($this->retiradas_por_setor_main($this->obter_where($id_pessoa)));
+    }
+
+    public function retiradas_em_atraso($id_pessoa) {
+        $where = $this->obter_where($id_pessoa);
+        $pessoas = $this->consulta("
+            pessoas.id,
+            pessoas.nome,
+            pessoas.foto,
+            SUM(atribuicoes.qtd) AS total
+        ", $where, "
+            pessoas.id,
+            pessoas.nome,
+            pessoas.foto 
+        ");
+        foreach ($pessoas as $pessoa) {
+            $pessoa->foto = asset("storage/".$pessoa->foto);
+            $pessoa->total = number_format($pessoa->total, 0);
+        }
+        return json_encode($pessoas);
+    }
+
+    public function ultimas_retiradas($id_pessoa) {
+        return json_encode($this->ultimas_retiradas_main($this->obter_where($id_pessoa)));
+    }
+
+    public function ultimas_retiradas_prod($id_pessoa) {
+        return json_encode(
+            DB::table("retiradas")
+                ->select(
+                    DB::raw("
+                        CASE
+                            WHEN atribuicoes.produto_ou_referencia_chave = 'P' THEN produtos.descr
+                            ELSE produtos.referencia
+                        END AS produto
+                    "),
+                    "retiradas.qtd"
+                )
+                ->join("atribuicoes", "atribuicoes.id", "retiradas.id_atribuicao")
+                ->join("produtos", "produtos.id", "retiradas.id_produto")
+                ->where("retiradas.id_pessoa", $id_pessoa)
+                ->whereRaw("MONTH(retiradas.data) = MONTH(CURDATE())")
+                ->whereRaw("YEAR(retiradas.data) = YEAR(CURDATE())")
+                ->get()
+        );
     }
 }

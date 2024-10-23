@@ -408,11 +408,11 @@ class RelatoriosController extends ControllerKX {
                         array_push($criterios, $periodo);
                     }
                     if ($request->id_pessoa) {
-                        array_push($criterios, "Colaborador: ".$request->pessoa);
+                        array_push($criterios, "Colaborador: ".DB::table("pessoas")->where("id", $request->id_pessoa)->value("nome"));
                         $sql->where("pessoas.id", $request->id_pessoa);
                     }
                     if ($request->id_setor) {
-                        array_push($criterios, "Setor: ".$request->setor);
+                        array_push($criterios, "Centro de custo: ".$request->setor);
                         $sql->where("setores.id", $request->id_setor);
                     }
                     if ($request->id_empresa) {
@@ -470,5 +470,63 @@ class RelatoriosController extends ControllerKX {
                 ->get()
         ) && trim($request->setor)) || (!trim($request->setor) && trim($request->id_setor))) return "setor";
         return "";
+    }
+
+    public function ranking(Request $request) {
+        $qtd_total = 0;
+        $criterios = array();
+        $resultado = collect(
+            DB::table("retiradas")
+                    ->select(
+                        "pessoas.id_setor",
+                        "pessoas.id",
+                        "pessoas.nome",
+                        "setores.descr AS setor",
+                        DB::raw("SUM(qtd) AS retirados")
+                    )
+                    ->join("pessoas", "pessoas.id", "retiradas.id_pessoa")
+                    ->join("setores", "setores.id", "pessoas.id_setor")
+                    ->where(function($sql) use($request, &$criterios) {
+                        if ($request->inicio || $request->fim) {
+                            $periodo = "Período";
+                            if ($request->inicio) {
+                                $inicio = Carbon::createFromFormat('d/m/Y', $request->inicio)->format('Y-m-d');
+                                $sql->whereDate("retiradas.data", ">=", $inicio);
+                                $periodo .= " de ".$request->inicio;
+                            }
+                            if ($request->fim) {
+                                $fim = Carbon::createFromFormat('d/m/Y', $request->fim)->format('Y-m-d');
+                                $sql->whereDate("retiradas.data", "<=", $fim);
+                                $periodo .= " até ".$request->fim;
+                            }
+                            array_push($criterios, $periodo);
+                        }
+                    })
+                    ->where("setores.lixeira", 0)
+                    ->whereRaw($this->obter_where(Auth::user()->id_pessoa))
+                    ->groupby(
+                        "pessoas.id_setor",
+                        "pessoas.id",
+                        "pessoas.nome",
+                        "setores.descr",
+                    )
+                    ->orderby("retirados", "desc")
+                    ->orderby("pessoas.nome")
+                    ->get()
+        )->groupBy("id_setor")->map(function($itens) use($request, &$qtd_total) {
+            $qtd_total += $itens->sum("retirados");
+            return [
+                "setor" => $itens[0]->setor,
+                "total_qtd" => $itens->sum("retirados"),
+                "pessoas" => $itens->map(function($pessoa) {
+                    return [
+                        "nome" => $pessoa->nome,
+                        "retirados" => $pessoa->retirados
+                    ];
+                })->values()->all()
+            ];
+        })->values()->all();
+        $criterios = join(" | ", $criterios);
+        return sizeof($resultado) ? view("reports/ranking", compact("resultado", "criterios", "qtd_total")) : view("nada");
     }
 }

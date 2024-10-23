@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware("auth")->group(function () {
     Route::get("/",                               [DashboardController::class, "pagina"]);
     Route::get("/produtos-em-atraso/{id_pessoa}", [DashboardController::class, "produtos"]);
+    Route::get("/ultimas-retiradas/{id_pessoa}",  [DashboardController::class, "ultimas_retiradas_prod"]);
     Route::get("/autocomplete",                   [HomeController::class, "autocomplete"]);
 
     Route::group(["prefix" => "valores/{alias}"], function() {
@@ -95,6 +96,7 @@ Route::middleware("auth")->group(function () {
     Route::group(["prefix" => "retiradas"], function() {
         Route::get ("/consultar", [RetiradasController::class, "consultar"]);
         Route::post("/salvar",    [RetiradasController::class, "salvar"]);
+        Route::post("/desfazer",  [RetiradasController::class, "desfazer"]);
     });
 
     Route::group(["prefix" => "maquinas"], function() {
@@ -111,6 +113,7 @@ Route::middleware("auth")->group(function () {
 
     Route::group(["prefix" => "relatorios"], function() {
         Route::get("/comodatos", [RelatoriosController::class, "comodatos"]);
+        Route::get("/ranking",   [RelatoriosController::class, "ranking"]);
         Route::group(["prefix" => "bilateral"], function() {
             Route::get("/",          [RelatoriosController::class, "bilateral"]);
             Route::get("/consultar", [RelatoriosController::class, "bilateral_consultar"]);

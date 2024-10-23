@@ -452,7 +452,8 @@ class ApiController extends ControllerKX {
                 ->select(
                     "id",
                     "nome",
-                    "foto64"
+                    "foto64",
+                    "cpf"
                 )
                 ->whereNotNull("foto64")
                 ->get()

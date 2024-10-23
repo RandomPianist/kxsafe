@@ -73,7 +73,7 @@
                                 <input id = "cpf" name = "cpf" class = "form-control" autocomplete = "off" type = "text" onkeyup = "formatar_cpf(this)" />
                             </div>
                             <div class = "col-5 pr-0 form-search-2">
-                                <label for = "pessoa-setor" class = "custom-label-form">Setor: *</label>
+                                <label for = "pessoa-setor" class = "custom-label-form">Centro de custo: *</label>
                                 <input id = "pessoa-setor"
                                     class = "form-control autocomplete"
                                     data-input = "#pessoa-id_setor"
@@ -87,7 +87,7 @@
                                 <input id = "pessoa-id_setor" name = "id_setor" type = "hidden" onchange = "pessoa.toggle_user(parseInt(this.value))"/>
                             </div>
                             <div class = "col-1 pt-4 d-flex align-items-center">
-                                <a href = "{{ config('app.root_url') }}/setores" title = "Cadastro de setores" target = "_blank">
+                                <a href = "{{ config('app.root_url') }}/setores" title = "Cadastro de centro de custos" target = "_blank">
                                     <i class="fa-sharp fa-regular fa-arrow-up-right-from-square"></i>
                                 </a>
                             </div>

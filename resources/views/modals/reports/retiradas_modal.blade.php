@@ -45,7 +45,7 @@
                                 <input id = "rel-id_pessoa2" name = "id_pessoa" type = "hidden" />
                             </div>
                             <div class = "col-6 form-search">
-                                <label for = "rel-setor" class = "custom-label-form">Setor:</label>
+                                <label for = "rel-setor" class = "custom-label-form">Centro de custo:</label>
                                 <input id = "rel-setor"
                                     name = "setor"
                                     class = "form-control autocomplete"

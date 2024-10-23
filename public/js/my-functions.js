@@ -865,3 +865,23 @@ function extrato_maquina(id_maquina) {
     link.target = "_blank";
     link.click();
 }
+
+function RelatorioRanking() {
+    let elementos = relObterElementos(["inicio4", "fim4"]);
+
+    this.validar = function() {
+        limpar_invalido();
+        let erro = "";
+        if (elementos.inicio.value && elementos.fim.value) erro = validar_datas(elementos.inicio, elementos.fim, false);
+        if (!erro) document.querySelector("#relatorioRankingModal form").submit();
+        else s_alert(erro);
+    }
+    
+    limpar_invalido();
+    setTimeout(function() {
+        modal("relatorioRankingModal", 0, function() {
+            elementos.inicio.value = hoje();
+            elementos.fim.value = hoje();
+        });
+    }, 0);
+}

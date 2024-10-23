@@ -37,7 +37,7 @@
                                 <span>Empresa</span>
                             </th>
                             <th width = "20%">
-                                <span>Setor</span>
+                                <span>Centro de custo</span>
                             </th>
                             <th width = "15%" class = "text-center nao-ordena">
                                 <span>Ações</span>
@@ -71,7 +71,10 @@
                         "<td width = '25%'>" + linha.empresa + "</td>" +
                         "<td width = '20%'>" + linha.setor + "</td>" +
                         "<td class = 'text-center btn-table-action' width = '15%'>";
-                    if (parseInt(linha.possui_retiradas)) resultado += "<i class = 'my-icon fa-light fa-file' title = 'Retiradas' onclick = 'retirada_pessoa(" + linha.id + ")'></i>";
+                    if (parseInt(linha.possui_retiradas)) {
+                        resultado += "<i class = 'my-icon fa-light fa-file' title = 'Retiradas' onclick = 'retirada_pessoa(" + linha.id + ")'></i>" +
+                            "<i class = 'my-icon fa-regular fa-clock-rotate-left' title = 'Desfazer retiradas' onclick = 'desfazer_retiradas(" + linha.id + ")'></i>";
+                    }
                     resultado += "" +
                             "<i class = 'my-icon far fa-box'       title = 'Atribuir produto' onclick = 'atribuicao(false, " + linha.id + ")'></i>" +
                             "<i class = 'my-icon far fa-tshirt'    title = 'Atribuir grade'   onclick = 'atribuicao(true, " + linha.id + ")'></i>" +
@@ -91,11 +94,24 @@
                 req[chave] = "";
             });
             req.id_pessoa = id_pessoa;
-            req.tipo = 'A';
+            req.tipo = "A";
+            req.rel_grupo = "pessoa";
+            req.consumo = "todos";
             let link = document.createElement("a");
             link.href = URL + "/relatorios/retiradas?" + $.param(req);
             link.target = "_blank";
             link.click();
+        }
+
+        function desfazer_retiradas(_id_pessoa) {
+            s_confirm("Tem certeza que deseja desfazer as retiradas?<br>Essa alteração é irreversível.", function() {
+                $.post(URL + "/retiradas/desfazer", {
+                    _token : $("meta[name='csrf-token']").attr("content"),
+                    id_pessoa : _id_pessoa
+                }, function() {
+                    location.reload();
+                });
+            });
         }
     </script>
 

@@ -3,7 +3,7 @@
 @section("content")
     <div class = "container-fluid h-100 px-3">
     <div class = "d-flex justify-content-around">
-        <div class = "card-dashboard mx-3 w-100 bg-white rounded-lg shadow-sm custom-scrollbar">
+        <div class = "card-dashboard mx-1 w-100 bg-white rounded-lg shadow-sm custom-scrollbar">
             <div class = "header-card-dashboard d-flex justify-content-between border-bottom">
                 <div class = "d-flex flex-column justify-content-center align-items-start ml-3">
                     <span class = "titulo-card-dashboard">Últimas retiradas</span>
@@ -14,9 +14,9 @@
             </div>
             @if (sizeof($ultimas_retiradas))
                 <div class = "d-flex justify-content-center">
-                    <table class = "table tabela-funcionarios-dashboard">
+                    <table class = "table tabela-funcionarios-dashboard cProd">
                         @foreach ($ultimas_retiradas as $retirada)
-                            <tr>
+                            <tr onclick = "retiradas({{ $retirada->id }})">
                                 <td width = "20%" class = "td-foto text-center">
                                     <img class = 'foto-funcionario-dashboard' src = '{{ $retirada->foto }}' onerror = "this.classList.add('d-none');this.nextElementSibling.classList.remove('d-none')" />
                                     <i class = 'fas fa-user d-none'></i>
@@ -32,7 +32,7 @@
                 </div>
             @endif
         </div>
-        <div class = "card-dashboard mx-3 w-100 bg-white rounded-lg shadow-sm custom-scrollbar">
+        <div class = "card-dashboard mx-1 w-100 bg-white rounded-lg shadow-sm custom-scrollbar">
             <div class = "header-card-dashboard d-flex justify-content-between border-bottom">
                 <div class = "d-flex flex-column justify-content-center align-items-start ml-3">
                     <span class = "titulo-card-dashboard">Retiradas em atraso</span>
@@ -51,7 +51,11 @@
                                     <i class = 'fas fa-user d-none'></i>
                                 </td>
                                 <td width="85%" class = "td-nome">{{ $pessoa->nome }}</td>
-                                <td class="text-right" width = "5%">{{ $pessoa->total }}</td>
+                                <td class="text-right" width = "5%">
+                                    <div class = "numerico">
+                                        {{ $pessoa->total }}
+                                    </div>
+                                </td>
                             </tr>
                         @endforeach
                     </table>
@@ -62,10 +66,10 @@
                 </div>
             @endif
         </div>
-        <div class = "card-dashboard mx-3 w-100 bg-white rounded-lg shadow-sm custom-scrollbar">
+        <div class = "card-dashboard mx-1 w-100 bg-white rounded-lg shadow-sm custom-scrollbar">
             <div class = "header-card-dashboard d-flex justify-content-between border-bottom">
                 <div class = "d-flex flex-column justify-content-center align-items-start ml-3">
-                    <span class = "titulo-card-dashboard">Retiradas por setor</span>
+                    <span class = "titulo-card-dashboard">Retiradas por centro de custo</span>
                 </div>    
                 <div class = "align-self-start m-3">
                     <i class = "fa-solid fa-ellipsis-vertical"></i>
@@ -83,7 +87,7 @@
                 @endif
             </div>
         </div>
-        <div class = "card-dashboard mx-3 w-100 bg-white rounded-lg shadow-sm custom-scrollbar">
+        <div class = "card-dashboard mx-1 w-100 bg-white rounded-lg shadow-sm custom-scrollbar">
             <div class = "header-card-dashboard d-flex justify-content-between border-bottom">
                 <div class = "d-flex flex-column justify-content-center align-items-start ml-3">
                     <span class = "titulo-card-dashboard">Minhas máquinas</span>
@@ -113,7 +117,40 @@
                 @endif
             </div>
         </div>
-        
+        <div class = "card-dashboard mx-1 w-100 bg-white rounded-lg shadow-sm custom-scrollbar">
+            <div class = "header-card-dashboard d-flex justify-content-between border-bottom">
+                <div class = "d-flex flex-column justify-content-center align-items-start ml-3">
+                    <span class = "titulo-card-dashboard">Ranking de retiradas</span>
+                </div>    
+                <div class = "align-self-start m-3">
+                    <i class = "fa-solid fa-ellipsis-vertical"></i>
+                </div>
+            </div>
+            @if (sizeof($ranking))
+                <div class = "d-flex justify-content-center">
+                    <table class = "table tabela-funcionarios-dashboard cProd">
+                        @foreach ($ranking as $item)
+                            <tr onclick = "retiradas({{ $item->id }})">
+                                <td width = "20%" class = "td-foto text-center">
+                                    <img class = 'foto-funcionario-dashboard' src = '{{ $item->foto }}' onerror = "this.classList.add('d-none');this.nextElementSibling.classList.remove('d-none')" />
+                                    <i class = 'fas fa-user d-none'></i>
+                                </td>
+                                <td width="85%" class = "td-nome">{{ $item->nome }}</td>
+                                <td class="text-right" width = "5%">
+                                    <div class = "numerico">
+                                        {{ number_format($item->retirados, 0) }}
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </table>
+                </div>
+            @else
+                <div class = "d-flex flex-column align-items-center m-5">
+                    <span>Não há nada a mostrar</span>
+                </div>
+            @endif
+        </div>
     </div>
 
     <script type = "text/javascript" language = "JavaScript">
@@ -226,6 +263,23 @@
                 modal("itensEmAtrasoModal", 0);
             });
         }
+
+        function retiradas(idFuncionario) {
+            $.get(URL + "/ultimas-retiradas/" + idFuncionario, function(data) {
+                let resultado = "";
+                if (typeof data == "string") data = $.parseJSON(data);
+                data.forEach((linha) => {
+                    resultado += 
+                    "<tr>" +
+                        "<td width = '75%' class = 'text-left px-2'>" + linha.produto + "</td>" +
+                        "<td width = '25%' class = 'text-right pr-2'>" + linha.qtd + "</td>" +
+                    "</tr>";
+                });
+                document.getElementById("table-retirados-dados").innerHTML = resultado;
+                modal("retiradasListaModal", 0);
+            });
+        }
     </script>
     @include("modals.itens_em_atraso_modal")
+    @include("modals.retiradas_lista_modal")
 @endsection

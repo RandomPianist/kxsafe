@@ -43,9 +43,11 @@ Route::group(["prefix" => "app"], function() {
     Route::post("/retirar",                [ApiController::class, "retirar"]);
     Route::post("/retirar-com-supervisao", [ApiController::class, "retirarComSupervisao"]);
     Route::post("/validar-spv",            [ApiController::class, "validarSpv"]);
-});
 
-Route::group(["prefix" => "teste"], function() {
-    Route::get("/pessoas",              [DashboardController::class, "pessoas"]);
-    Route::get("/produtos/{id_pessoa}", [DashboardController::class, "produtos"]);
+    Route::group(["prefix" => "dashboard"], function() {
+        Route::get("/retiradas-por-setor/{id_pessoa}",  [DashboardController::class, "retiradas_por_setor"]);
+        Route::get("/retiradas-em-atraso/{id_pessoa}",  [DashboardController::class, "retiradas_em_atraso"]);
+        Route::get("/ultimas-retiradas/{id_pessoa}",    [DashboardController::class, "ultimas_retiradas"]);
+        Route::get("/produtos-em-atraso/{id_pessoa}",   [DashboardController::class, "produtos"]);
+    });
 });

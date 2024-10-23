@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Atribuicoes;
@@ -22,5 +23,10 @@ class RetiradasController extends ControllerKX {
         );
         if (intval($request->supervisor)) $json["id_supervisor"] = $request->supervisor;
         $this->retirada_salvar($json);
+    }
+
+    public function desfazer(Request $request) {
+        $this->log_inserir2("D", "retiradas", "id_pessoa = ".$request->id_pessoa, "NULL");
+        DB::statement("DELETE FROM retiradas WHERE id_pessoa = ".$request->id_pessoa);
     }
 }

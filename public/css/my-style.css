@@ -756,3 +756,13 @@ span, label, table, h1, h2, h3, h4, h5, h6, .texto-tabela {
 .fa-ellipsis-vertical {
     display: none !important
 }
+
+.numerico {
+    height: 20px;
+    width: 20px;
+    background: red;
+    border-radius: 50%;
+    text-align: center;
+    padding-bottom: 23px;
+    padding-left: 1px
+}
